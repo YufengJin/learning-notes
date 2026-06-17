@@ -20,6 +20,14 @@ hide:
 
     [:octicons-arrow-right-24: 进入](ml/index.md)
 
+-   :material-robot-industrial: __机器人__
+
+    ---
+
+    机器人学习 / 控制 / 感知 / 仿真。
+
+    [:octicons-arrow-right-24: 进入](robotics/index.md)
+
 -   :material-function-variant: __数学__
 
     ---
@@ -27,14 +35,6 @@ hide:
     线性代数 / 概率 / 优化等基础笔记。
 
     [:octicons-arrow-right-24: 进入](math/index.md)
-
--   :material-code-tags: __编程__
-
-    ---
-
-    语言、工具、工程实践速查。
-
-    [:octicons-arrow-right-24: 进入](programming/index.md)
 
 -   :material-book-open-variant: __阅读__
 
@@ -46,6 +46,6 @@ hide:
 
 </div>
 
-!!! tip "如何添加笔记"
-    在 `docs/<分区>/` 下新建 `.md` 文件，并在 `mkdocs.yml` 的 `nav` 里登记；
-    `git push` 后 GitHub Actions 会自动构建部署。
+---
+
+<small>:material-palette-outline: [样式模板 / Style Guide](style/index.md) —— 统一风格的元素参照。</small>

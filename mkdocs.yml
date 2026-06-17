@@ -79,14 +79,17 @@ plugins:
 
 nav:
   - 首页: index.md
-  - 样式:
-      - style/index.md
   - 机器学习:
       - ml/index.md
       - 线性回归: ml/linear-regression.md
+  - 机器人:
+      - robotics/index.md
   - 数学:
       - math/index.md
-  - 编程:
-      - programming/index.md
   - 阅读:
       - reading/index.md
+  # 样式模板页(style/index.md)不进顶部 tab，仅从首页底部链接
+
+validation:
+  nav:
+    omitted_files: ignore   # 允许 style/ 不在 nav 中而不报警
