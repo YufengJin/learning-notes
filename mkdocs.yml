@@ -1,0 +1,84 @@
+site_name: Yufeng's Learning Notes
+site_url: https://yufengjin.github.io/learning-notes/
+site_author: Yufeng Jin
+site_description: 个人学习笔记知识库 — 数学 / 机器学习 / 编程 / 阅读
+repo_url: https://github.com/YufengJin/learning-notes
+repo_name: YufengJin/learning-notes
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: zh
+  palette:
+    scheme: default          # 单一浅色主题（暖灰 + 橙，见 docs/stylesheets/extra.css）
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs        # 顶部大分类 tab
+    - navigation.sections    # 左侧栏分组展开
+    - navigation.indexes     # 分区可有 index 落地页
+    - navigation.top         # 回到顶部
+    - navigation.tracking    # URL 跟随锚点
+    - navigation.instant     # 即时加载（SPA 式）
+    - navigation.instant.progress
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tooltips
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search:
+      # CJK 友好的分词分隔符（Material 官方推荐，让中文搜索可用）
+      separator: '[\s​\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+nav:
+  - 首页: index.md
+  - 机器学习:
+      - ml/index.md
+      - 线性回归: ml/linear-regression.md
+  - 数学:
+      - math/index.md
+  - 编程:
+      - programming/index.md
+  - 阅读:
+      - reading/index.md
