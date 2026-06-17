@@ -60,6 +60,12 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.caret       # 上标 ^^ins^^
+  - pymdownx.tilde       # 删除线 ~~del~~ / 下标
+  - pymdownx.mark        # 高亮 ==mark==
+  - pymdownx.keys        # 键盘键 ++ctrl+c++
+  - pymdownx.smartsymbols
+  - pymdownx.betterem
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -73,6 +79,8 @@ plugins:
 
 nav:
   - 首页: index.md
+  - 样式:
+      - style/index.md
   - 机器学习:
       - ml/index.md
       - 线性回归: ml/linear-regression.md
