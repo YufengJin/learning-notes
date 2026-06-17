@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{#
+  自定义左栏：
+  - 文章页（有 H2 目录）：左栏只显示「返回上级」箭头 + 「目录」(本页 TOC)，不显示大类/文章导航树。
+  - 非文章页（分区落地页等）：显示正常导航树。
+  - 右栏（secondary）一律不渲染。
+#}
+{% block site_nav %}
+  {% if nav %}
+    {% set hidden = "" %}
+    {% if page.meta and page.meta.hide and "navigation" in page.meta.hide %}
+      {% set hidden = "hidden" %}
+    {% endif %}
+    {% set _h1 = page.toc | first %}
+    {% set is_article = _h1 and _h1.children %}
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" {{ hidden }}>
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          {% if is_article %}
+            {% set segs = page.url.strip('/').split('/') %}
+            {% if segs | length > 1 %}
+              {% set parent_url = (segs[:-1] | join('/')) ~ '/' %}
+              <a class="ln-back" href="{{ parent_url | url }}">
+                <span class="ln-back__arrow">←</span>
+                <span>返回{{ page.parent.title if page.parent else "上级" }}</span>
+              </a>
+            {% endif %}
+            {% include "partials/toc.html" %}
+          {% else %}
+            {% include "partials/nav.html" %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

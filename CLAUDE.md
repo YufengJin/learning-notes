@@ -41,6 +41,12 @@ git add . && git commit -m "notes: add my-note" && git push   # 3) Action 自动
 - **不提交原始大图 / PDF / 大视频**；大媒体走外部托管或图床，不进 git 历史。
 - 单文件远低于 ~9MB；上限是 GitHub Pages **1GB 构建站点**。
 
+## 写作规范
+- **解释、叙述用中文**；但**学术 / 技术术语保留英文原文**，不要硬翻译。
+  - 例：`tokenization`、`mode averaging`、`DCT`、`energy compaction`、`Prefix-LM`、`straight-through estimator`、`cross-entropy`、`flow matching` 等保持英文；周围的说明文字用中文。
+  - 首次出现可中英并列（如「能量压缩（energy compaction）」），其后用英文原词即可。
+  - 公式、变量、代码、库名/类名一律英文原文。
+
 ## 命名规范
 - 目录 / 文件名一律 **小写 kebab-case**（`a-z 0-9 -`）：不用空格、大写、下划线或中文（URL 友好）。
 - 笔记 md 如 `linear-regression.md`；分区目录 ascii 小写（`ml/ robotics/ math/ reading/`）。

@@ -9,6 +9,7 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   language: zh
+  custom_dir: overrides       # 覆盖 site_nav：文章页左栏只显示「目录」+ 返回箭头
   palette:
     scheme: default          # 单一浅色主题（暖灰 + 石墨灰，见 docs/stylesheets/extra.css）
   font:
@@ -20,10 +21,12 @@ theme:
     - navigation.tabs        # 顶部大分类 tab
     - navigation.sections    # 左侧栏分组展开
     - navigation.indexes     # 分区可有 index 落地页
+    - navigation.path        # 顶部面包屑（文件夹结构，可点击任意跳转 / 返回上级）
     - navigation.top         # 回到顶部
     - navigation.tracking    # URL 跟随锚点
     - navigation.instant     # 即时加载（SPA 式）
     - navigation.instant.progress
+    - navigation.footer      # 文末上一页/下一页
     - toc.follow
     - search.suggest
     - search.highlight
@@ -37,6 +40,9 @@ extra_css:
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/action-tokenization.js   # robotics 笔记的交互 demo（document$.subscribe 兼容 instant 加载）
+  - javascripts/autoregressive-models.js # ml 笔记的交互 demo
+  - javascripts/fourier-dct.js           # math 笔记的交互 demo
 
 markdown_extensions:
   - abbr
@@ -48,6 +54,7 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      title: 目录
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -81,11 +88,13 @@ nav:
   - 首页: index.md
   - 机器学习:
       - ml/index.md
-      - 线性回归: ml/linear-regression.md
+      - "自回归模型：BERT / GPT 与 Prefix-LM 架构详解": ml/autoregressive-models.md
   - 机器人:
       - robotics/index.md
+      - "Action Tokenization：把连续动作离散成 token": robotics/action-tokenization.md
   - 数学:
       - math/index.md
+      - "Fourier 变换与 DCT：从频域到能量压缩": math/fourier-dct.md
   - 阅读:
       - reading/index.md
   # 样式模板页(style/index.md)不进顶部 tab，仅从首页底部链接

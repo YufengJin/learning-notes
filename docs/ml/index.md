@@ -2,6 +2,12 @@
 
 模型、训练、调参与踩坑记录。
 
-- [线性回归](linear-regression.md) —— 从最小二乘到正则化的笔记示例。
+<div class="grid cards" markdown>
 
-> 这是分区落地页，可在此写该分区的总览 / 索引。新增笔记请在 `docs/ml/` 下建文件并在 `mkdocs.yml` 登记。
+-   :material-text-box-multiple-outline: __[自回归模型：BERT / GPT 与 Prefix-LM 架构详解](autoregressive-models.md)__
+
+    ---
+
+    序列建模三大范式、双向 vs 因果注意力、Prefix-LM 为何是 VLA 的选择；含可交互注意力掩码 / 自回归生成 demo。
+
+</div>
