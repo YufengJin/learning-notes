@@ -1,0 +1,1627 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="个人学习笔记知识库 — 数学 / 机器学习 / 编程 / 阅读">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/robotics/action-tokenization/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../../math/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Action Tokenization：把连续动作离散成 token - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#action-tokenization" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Action Tokenization：把连续动作离散成 token
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ml/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  机器学习
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  机器人
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  数学
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reading/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  阅读
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                <span>返回机器人</span>
+              </a>
+            
+            
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 大局观：到底在解决什么问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-robot-action-tokenize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 什么是 robot action（被 tokenize 的对象）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 什么是 robot action（被 tokenize 的对象）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        归一化：第一步预处理 LEARNED（统计分位数，近似无损）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 为什么要把连续动作离散化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 为什么要把连续动作离散化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-mode-averaging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 核心动机：mode averaging（模式平均）灾难
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-tokenization-nlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. tokenization 概念（从 NLP 借来的）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dct-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DCT 离散余弦变换 DIRECT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. DCT 离散余弦变换 DIRECT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        直觉：把一条曲线拆成"不同频率的余弦波之和"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dct-ii" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        公式（DCT-II，知道长这样即可）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-direct-lossy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 量化 / 取整 DIRECT LOSSY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-bpe-learned-fit-nn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. BPE 字节对编码 LEARNED（统计 fit，非 NN，无损）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-fast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 把 FAST 拼起来（全景）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 把 FAST 拼起来（全景）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 一个完整的数值示例：看清每一步的 shape 与数据
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-vq-vae-fsq-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. VQ-VAE 与码本（理解 FSQ 的前置）LEARNED（真神经网络）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. VQ-VAE 与码本（理解 FSQ 的前置）LEARNED（真神经网络）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#straight-through-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        straight-through estimator（直通梯度）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-fsq-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. FSQ 有限标量量化 LEARNED
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-binning-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Binning 均匀分桶（最朴素基线）DIRECT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 自回归建模 + 交叉熵
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 多模态是怎么"免费"得到的
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. 多模态是怎么&#34;免费&#34;得到的">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 采样与 temperature
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-prefix-vs-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. 注意力掩码：prefix 双向 vs action 因果
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-flow-matching0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. 对比：另一条路线 flow matching（π₀）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-tokenizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. 三种 tokenizer 重建效果对比
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-0-fast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. π₀-FAST 模型全貌：基础模型 / 输入 / 输出
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="16. π₀-FAST 模型全貌：基础模型 / 输入 / 输出">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#161-paligemmagemma-2b-siglip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.1 基础模型：PaliGemma（Gemma-2B 解码器 + SigLIP 视觉）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#162-embed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.2 输入与多模态 embed 顺序
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#163-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.3 输出：每步预测一个 token，自回归直到结束
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#164-t-d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.4 解码完是不是 (T, D)？——是
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        术语表（速查）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        延伸阅读
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    机器人
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="action-tokenization">机器人 Action Tokenization<a class="headerlink" href="#action-tokenization" title="Permanent link">&para;</a></h1>
+<p>把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 <strong>π₀-FAST 风格的离散自回归路线</strong>，并对照 FSQ、Binning 以及连续生成的 flow matching。</p>
+<p>全程出现三种标签：</p>
+<ul>
+<li><span class="ln-tag ln-direct">DIRECT</span> — 纯数学变换（确定性、无需训练）</li>
+<li><span class="ln-tag ln-learned">LEARNED</span> — 从数据拟合（统计 fit 或神经网络）</li>
+<li><span class="ln-tag ln-lossy">LOSSY</span> — 有信息损失</li>
+</ul>
+<hr />
+<h2 id="0">0. 大局观：到底在解决什么问题<a class="headerlink" href="#0" title="Permanent link">&para;</a></h2>
+<p>一个机器人策略（policy）要做的事：<strong>看到观测 <span class="arithmatex">\(o\)</span>（图像 + 本体状态），输出一段未来动作 <span class="arithmatex">\(a_{1:T}\)</span></strong>。动作是<strong>连续</strong>的实数向量（关节角度、末端位姿、夹爪开合）。</p>
+<p>建模 <span class="arithmatex">\(p(a_{1:T}\mid o)\)</span> 有两条完全不同的路线：</p>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>动作表示</th>
+<th>代表</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>连续生成</strong></td>
+<td>直接吐实数向量</td>
+<td>π₀（flow matching / 扩散）</td>
+<td>像图像扩散模型</td>
+</tr>
+<tr>
+<td><strong>离散自回归</strong></td>
+<td>先把动作变成 token，像 LLM 逐个预测</td>
+<td>π₀-FAST</td>
+<td>像 GPT 写句子</td>
+</tr>
+</tbody>
+</table>
+<p>本笔记聚焦<strong>第二条路线</strong>。核心魔法：把连续动作"翻译"成一串整数 token，于是机器人控制问题就<strong>变成了语言建模问题</strong>——可以直接复用 LLM 的全套机器（Transformer、交叉熵、采样）。</p>
+<div class="admonition note">
+<p class="admonition-title">一句话直觉</p>
+<p>Tokenization = 给连续动作发一本"字典"，把光滑曲线翻译成有限个"单词"。难点全在于：字典怎么建（learned 还是 direct？）、翻译会丢多少信息（lossy 在哪一步？）、翻译回去准不准（可逆性）。</p>
+</div>
+<p><strong>概念依赖图：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>robot action（连续向量序列）
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   │  为什么不直接回归？ → mode averaging 问题（§2.1）
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   ▼
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>离散化的动机 ───────────────┐
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   │                        │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ├─ FAST 路线：           ├─ 信号处理：DCT（§4）压缩能量
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>   │   DCT→量化→BPE          ├─ 量化/取整（§5）唯一的有损步
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   │                        └─ BPE（§6）无损压缩字典
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ├─ FSQ 路线：神经自编码器 + VQ/FSQ 码本（§8、§9）
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>   │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   └─ Binning 路线：均匀分桶（§10，最朴素基线）
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                ▼
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        都接到 自回归 Transformer（§11）
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        用 交叉熵 训练 → 天然 多模态（§12）
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        靠 采样 + temperature（§12.1）取出不同解
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        靠 注意力掩码（§13）区分 prompt / action
+</span></code></pre></div>
+<hr />
+<h2 id="1-robot-action-tokenize">1. 什么是 robot action（被 tokenize 的对象）<a class="headerlink" href="#1-robot-action-tokenize" title="Permanent link">&para;</a></h2>
+<p>一个动作样本是一个二维矩阵：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>actions.shape == (T, D)
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>            ┌─ T = action_horizon：一次预测未来多少步（如 50 步 ≈ 1 秒@50Hz）
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>            └─ D = action_dim：每步的自由度数（如 7 = 6 关节 + 1 夹爪，或 14 = 双臂）
+</span></code></pre></div>
+<p>两个关键性质：</p>
+<ul>
+<li><strong>① 时间上平滑</strong>：相邻时刻动作变化不大（机器人不会瞬移）→ 这是 DCT 能压缩的前提。</li>
+<li><strong>② 各维量纲不同</strong>：关节角范围可能 ±3 rad，夹爪 0~1 → 必须先<strong>归一化</strong>到统一范围。</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">为什么是'一段'而不是'一步'</p>
+<p>预测一整段 <strong>action chunk</strong>（而非单步）能减少累积误差、让动作更连贯，也给 DCT 提供了"时间轴"去做频域变换。单步动作没有频域可言。</p>
+</div>
+<h3 id="learned">归一化：第一步预处理 <span class="ln-tag ln-learned">LEARNED</span>（统计分位数，近似无损）<a class="headerlink" href="#learned" title="Permanent link">&para;</a></h3>
+<p>把每一维动作缩放到约 <span class="arithmatex">\([-1,1]\)</span>。常用<strong>分位数（quantile）归一化</strong>而不是简单的 min-max：取第 1% 和 99% 分位作为边界，对离群值更鲁棒。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 概念：用训练集统计出的分位数把 action 压到 [-1,1]</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">a_norm</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">q01</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">q99</span> <span class="o">-</span> <span class="n">q01</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>   <span class="c1"># 超出的 clip 掉</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">为什么算 LEARNED 但不是神经网络</p>
+<p>"learned" 在这里 = <strong>从数据统计拟合出来的参数</strong>（分位数），而不是梯度下降训练的权重。这个区分会贯穿全文：FAST 的 BPE 词表、归一化分位数都是这种"统计 fit"，<strong>不是 neural network</strong>。</p>
+</div>
+<hr />
+<h2 id="2">2. 为什么要把连续动作离散化<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>最自然的想法是让网络直接输出实数动作，用 L2/MSE 回归监督。那为什么要费劲离散化成 token？三个理由：</p>
+<ol>
+<li><strong>复用 LLM 的整套基础设施</strong>：一旦动作是 token，就能直接用预训练 VLM（如 PaliGemma）的 Transformer、词表、交叉熵，省掉重新设计输出头。</li>
+<li><strong>天然支持多模态</strong>（§12 详讲）：离散分布能同时给"向左"和"向右"高概率，回归不行。</li>
+<li><strong>压缩 + 高效自回归</strong>：FAST 用 DCT+BPE 把一段动作压成很短的 token 序列，自回归推理更快。</li>
+</ol>
+<h3 id="21-mode-averaging">2.1 核心动机：mode averaging（模式平均）灾难<a class="headerlink" href="#21-mode-averaging" title="Permanent link">&para;</a></h3>
+<p>这是<strong>理解整条离散化路线最重要的一个直觉</strong>。设想机器人面前有个障碍物，绕过去有两种同样正确的方式：<strong>向左绕</strong> 或 <strong>向右绕</strong>。训练数据里两种都有。</p>
+<div class="admonition danger">
+<p class="admonition-title">L2 回归的致命伤</p>
+<p>MSE 回归本质上是在拟合一个<strong>单峰高斯</strong>，它的最优解是所有正确答案的<strong>平均值</strong>。"向左"和"向右"的平均 = <strong>直直撞上障碍物</strong>。这就是 mode averaging。</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · mode averaging vs 多峰分布</div>
+<div class="ln-demo-hint">数据里有两个正确动作（蓝点簇=向左，绿点簇=向右）。拖动滑块改变两簇距离，看 L2 回归的"最优预测"（红线）落在哪里。</div>
+<canvas id="cvMode" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>两个模式的间距 <input type="range" id="modeGap" min="0" max="100" value="70"></label>
+<label><input type="checkbox" id="showCat" checked> 显示离散分布（多峰）</label>
+</div>
+<div class="ln-readout" id="modeOut"></div>
+</div>
+
+<p>间距越大，L2 的"最优预测"（两簇均值）越落在<strong>无人区</strong>——一个谁都没演示过、可能直接撞墙的动作。而离散分布能<strong>同时</strong>在左右两个 bin 上点亮高概率，完美保留两个模式。这就是为什么要把连续动作切成离散 token + 用分类交叉熵。</p>
+<hr />
+<h2 id="3-tokenization-nlp">3. tokenization 概念（从 NLP 借来的）<a class="headerlink" href="#3-tokenization-nlp" title="Permanent link">&para;</a></h2>
+<p>在 NLP 里，tokenization = 把一段连续的文字符流切成有限词表里的整数 ID：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&quot;机器人很可爱&quot;  →  [&quot;机器&quot;,&quot;人&quot;,&quot;很&quot;,&quot;可爱&quot;]  →  [8123, 442, 19, 5601]
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>   文本                 子词（subword）            整数 token id
+</span></code></pre></div>
+<p>这些整数随后被查 <strong>embedding 表</strong>变成向量喂进 Transformer。关键点：</p>
+<ul>
+<li><strong>词表（vocabulary）</strong>是有限的（如 PaliGemma 有 257,152 个 token）。</li>
+<li>每个 token id 对应词表里一行 embedding 向量。</li>
+<li>模型输出是<strong>词表上的概率分布</strong>（softmax over 257,152 类）。</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">迁移到机器人的核心 trick</p>
+<p>PaliGemma 词表最后 <strong>128 个</strong> id 平时几乎用不到。可以<strong>征用这 128 个槽位</strong>当 action token——于是动作 token 和文字 token <strong>共享同一张 embedding 表、同一个 softmax 输出头</strong>。机器人动作真的被当成"一门新语言的单词"塞进了语言模型。</p>
+</div>
+<hr />
+<h2 id="4-dct-direct">4. DCT 离散余弦变换 <span class="ln-tag ln-direct">DIRECT</span><a class="headerlink" href="#4-dct-direct" title="Permanent link">&para;</a></h2>
+<p>这是 FAST 的第一步，也是很多人最陌生的一块。</p>
+<h3 id="_1">直觉：把一条曲线拆成"不同频率的余弦波之和"<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>任何一段离散信号（比如某个关节角度随时间的 50 个采样点），都可以<strong>精确地</strong>表示成一堆不同频率余弦波的加权和。DCT 就是算出"每个频率占多少权重"的那组系数。</p>
+<div class="admonition tip">
+<p class="admonition-title">类比：调音台</p>
+<p>想象一个音频均衡器：低频（重低音）、中频、高频各有一个推子。DCT 就是把信号分解到这些"频率推子"上。机器人动作<strong>平滑</strong> → 几乎全是低频 → 只有最左边几个推子有值，右边一大片≈0。这就是"能量集中在低频"。</p>
+</div>
+<h3 id="dct-ii">公式（DCT-II，知道长这样即可）<a class="headerlink" href="#dct-ii" title="Permanent link">&para;</a></h3>
+<p>把长度 <span class="arithmatex">\(N\)</span> 的信号 <span class="arithmatex">\(x_0,\dots,x_{N-1}\)</span> 变成系数 <span class="arithmatex">\(X_0,\dots,X_{N-1}\)</span>：</p>
+<div class="arithmatex">\[
+X_k = \sum_{n=0}^{N-1} x_n \cos\!\left[\frac{\pi}{N}\left(n+\tfrac12\right)k\right]
+\]</div>
+<p><span class="arithmatex">\(k=0\)</span> 是直流分量（整体平均），<span class="arithmatex">\(k\)</span> 越大频率越高。逆变换 IDCT 用同样的余弦基把系数加回去，<strong>完全可逆</strong>（除浮点误差）。沿<strong>时间轴 T</strong> 对每个动作维度 D 独立做 DCT。</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · DCT 能量集中</div>
+<div class="ln-demo-hint">上图是一段"动作信号"（可调平滑度），下图是它的 DCT 系数。看平滑信号如何把能量挤到最左边几个低频系数上。</div>
+<canvas id="cvDct" width="900" height="360"></canvas>
+<div class="ln-controls">
+<label>信号平滑度 <input type="range" id="dctSmooth" min="1" max="20" value="3"></label>
+<button id="dctReroll">🎲 换一条信号</button>
+</div>
+<div class="ln-readout" id="dctOut"></div>
+</div>
+
+<div class="admonition note">
+<p class="admonition-title">为什么 DCT 是离散化的'神助攻'</p>
+<p>DCT 本身<strong>不离散化、不丢信息</strong>（纯可逆数学）。但它把信号能量<strong>重新分布</strong>：平滑动作 → 大部分系数≈0。下一步取整时，这些接近 0 的小系数会被压成<strong>恰好 0</strong>，产生大量重复的 0 → 给 BPE 提供了绝佳的压缩素材。<strong>DCT 不压缩，但它让后面的压缩变得高效。</strong></p>
+</div>
+<hr />
+<h2 id="5-direct-lossy">5. 量化 / 取整 <span class="ln-tag ln-direct">DIRECT</span> <span class="ln-tag ln-lossy">LOSSY</span><a class="headerlink" href="#5-direct-lossy" title="Permanent link">&para;</a></h2>
+<p>这是整条 FAST 链路里<strong>唯一真正丢信息的一步</strong>，也是"连续 → 离散"真正发生的地方。</p>
+<p>连续值有无穷多种取值，token 词表只能表示有限个。量化 = <strong>把连续值映射到最近的"格点"上</strong>。最简单的形式：先乘一个缩放系数，再四舍五入取整。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">q</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>        <span class="c1"># 连续 x → 整数 q   （编码，有损）</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">x_hat</span> <span class="o">=</span> <span class="n">q</span> <span class="o">/</span> <span class="n">scale</span>           <span class="c1"># 整数 q → 近似连续 x̂（解码，回不到原值）</span>
+</span></code></pre></div>
+<p>误差 <span class="arithmatex">\(|x-\hat x|\)</span> 最大约 <span class="arithmatex">\(\frac{1}{2\,\text{scale}}\)</span>。scale 越大 → 格点越密 → 越精确，但整数范围越大、token 越多。这是<strong>精度 vs 压缩率</strong>的权衡。</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · 量化的精度 / 压缩权衡</div>
+<div class="ln-demo-hint">蓝线是原始连续信号，红色阶梯是量化后重建的信号。拖动"量化级数"看：级数越少越省（token 少）但越失真。</div>
+<canvas id="cvQuant" width="900" height="300"></canvas>
+<div class="ln-controls">
+<label>量化级数（bins） <input type="range" id="qBins" min="2" max="64" value="8"> <span class="ln-val" id="qBinsV">8</span></label>
+</div>
+<div class="ln-readout" id="quantOut"></div>
+</div>
+
+<div class="admonition warning">
+<p class="admonition-title">FAST 的精妙之处</p>
+<p>FAST 不是直接量化原始动作，而是量化 <strong>DCT 系数</strong>。因为高频系数≈0，取整后变成一大片 0——既丢得起（高频对平滑动作几乎没贡献），又制造了可压缩的重复模式。"在频域取整"比"在时域取整"聪明得多。</p>
+</div>
+<hr />
+<h2 id="6-bpe-learned-fit-nn">6. BPE 字节对编码 <span class="ln-tag ln-learned">LEARNED</span>（统计 fit，非 NN，无损）<a class="headerlink" href="#6-bpe-learned-fit-nn" title="Permanent link">&para;</a></h2>
+<p>取整后得到一长串整数（含大量重复，尤其是 0）。BPE 是一种<strong>无损压缩</strong>算法，把"高频重复的模式"合并成单个新 token，让序列变短。</p>
+<p>反复执行："找出当前序列里<strong>出现最频繁的相邻 pair</strong>，把它合并成一个新符号"，直到达到目标词表大小。</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>初始: a a b a a b a a b          （a a 这对出现很多）
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>合并 (a,a)→Z:  Z b Z b Z b        （现在 Z b 这对出现很多）
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>合并 (Z,b)→Y:  Y Y Y               ← 9 个符号压成 3 个，完全可还原
+</span></code></pre></div>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · BPE 合并压缩</div>
+<div class="ln-demo-hint">下面是一段量化后的整数序列（很多重复）。点"合并一次"执行一步 BPE，看序列如何变短、字典如何增长。</div>
+<canvas id="cvBpe" width="900" height="170"></canvas>
+<div class="ln-controls">
+<button id="bpeStep">▶ 合并最频繁的 pair</button>
+<button id="bpeReset">↺ 重置</button>
+</div>
+<div class="ln-readout" id="bpeOut"></div>
+</div>
+
+<p>"哪些 pair 该合并、合并顺序如何" = <strong>BPE 词表/合并规则</strong>，它是<strong>从训练数据统计出来的</strong>（所以是 learned），但<strong>只是查表式的统计规则，不含任何神经网络/梯度</strong>。给定词表，编码和解码都<strong>完全无损</strong>。</p>
+<div class="admonition note">
+<p class="admonition-title">FAST 名字的由来</p>
+<p>FAST = <strong>F</strong>requency-space <strong>A</strong>ction <strong>S</strong>equence <strong>T</strong>okenization。DCT+BPE 是它的算法本体——纯信号处理 + 统计压缩，没有神经网络。</p>
+</div>
+<hr />
+<h2 id="7-fast">7. 把 FAST 拼起来（全景）<a class="headerlink" href="#7-fast" title="Permanent link">&para;</a></h2>
+<p>编码方向（连续 → token）：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>归一化的 action 矩阵 A (T, D)，约 [-1,1]
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>   │
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>   ① DCT（沿时间轴）          DIRECT 无损，能量挤向低频
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>   ▼
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>频域系数矩阵 C (T, D)，高频≈0
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>   │
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>   ② Scale + Round            DIRECT · LOSSY ← 离散化在此发生
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>   ▼
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>稀疏整数矩阵（大量 0）
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>   │
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>   ③ Flatten 拍平成 1D        DIRECT
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>   │
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>   ④ BPE 合并重复模式         LEARNED 词表 · 无损
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>   ▼
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>最终离散 token 序列（长度可变，通常远短于 T×D）
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>   │
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>   ⑤ 映射到 PaliGemma 词表尾部 128 槽   DIRECT 纯算术
+</span></code></pre></div>
+<p>解码方向就是<strong>完全反过来</strong>：BPE 解码 → reshape → 除以 scale → IDCT → 反归一化。</p>
+<div class="admonition danger">
+<p class="admonition-title">最容易记混的结论</p>
+<p><strong>FAST 不是神经网络！</strong> 它是"确定性可逆压缩（DCT+取整+Flatten）+ 一个统计拟合的 BPE 词表"。唯一的信息损失来自步骤②的取整。这正是它相对 VQ/FSQ 的卖点——<strong>不用训练神经自编码器</strong>，开箱即用。</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · FAST 完整往返流水线（连续 ↔ 离散，可调 scale）</div>
+<div class="ln-demo-hint">一段平滑的多维动作轨迹，沿时间轴做 DCT → 量化取整 → IDCT 还原。拖动量化 scale 看四个面板同时变化——这是"连续怎么变离散、损失从哪来、token 多少"的最直观演示。</div>
+<canvas id="cvRT" width="900" height="250"></canvas>
+<canvas id="cvTrade" width="900" height="200" style="margin-top:14px"></canvas>
+<div class="ln-controls">
+<label>量化 scale（越大越精细） <input type="range" id="rtScale" min="1" max="64" value="10" step="0.5"> <span class="ln-val" id="rtScaleV">10</span></label>
+<button id="rtReroll">🎲 换一条轨迹</button>
+</div>
+<div class="ln-readout" id="rtOut"></div>
+</div>
+
+<h3 id="71-shape">7.1 一个完整的数值示例：看清每一步的 shape 与数据<a class="headerlink" href="#71-shape" title="Permanent link">&para;</a></h3>
+<p>很多人对"DCT 输入输出到底是什么 shape、scale+round 怎么落地"没有具象感。下面用<strong>真实计算的数字</strong>走一遍（为看清楚取 <code>D=1</code> 单维、<code>T=8</code> 个时间步；多维时每一列独立重复同样的过程）。</p>
+<p><strong>输入：归一化后的动作矩阵 A</strong>，形状 <code>(T, D) = (8, 1)</code>，值已归一化到 <span class="arithmatex">\([-1,1]\)</span>：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>A = [ 1.000, 0.816, 0.494, 0.111, -0.258, -0.555, -0.755, -0.853 ]   # shape (8,1)
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>     t=0    t=1    t=2    t=3    t=4     t=5     t=6     t=7         ← 时间轴
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>这是一条平滑下降的曲线（机器人动作的典型样子）。
+</span></code></pre></div>
+<p><strong>① DCT —— 沿时间轴变换，输入输出 shape 不变</strong>（<code>(T,)→(T,)</code>，对 <code>(T,D)</code> 就是每列各做一次）：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>C = DCT(A) = [ 0.00, 1.889, 0.159, -0.00, -0.00, 0.00, 0.00, -0.00 ]   # 仍是 (8,1)
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>              k=0   k=1    k=2    k=3    k=4   k=5   k=6   k=7         ← 频率轴
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>              直流  低频────────→                       高频
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>能量几乎全集中在 k=1（=1.889）！k≥3 的高频系数已经≈0。
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">关键认知</p>
+<p>DCT <strong>不改变元素个数</strong>：进去 8 个数，出来 8 个数。它只是<strong>换了一组坐标</strong>——从"时刻"换到"频率"。信息一个没丢（可逆），但被<strong>重新分布</strong>到少数几个低频系数上。</p>
+</div>
+<p><strong>② Scale + Round —— 离散化在这里发生</strong>（取 <code>scale = 8</code>）：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>C × scale = [ 0.00, 15.115, 1.273, -0.00, -0.00, 0.00, 0.00, -0.00 ]
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>round(·)  = [   0,    15,     1,     0,     0,    0,    0,    0    ]   = Cq（整数！）
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>                                                                       8 个里只有 2 个非零
+</span></code></pre></div>
+<p>这一步：① 把连续小数变成<strong>整数</strong>（真正的"离散化"）；② 那些 ≈0 的高频系数被<strong>压成恰好 0</strong>。损失就来自这里（<code>15.115→15</code>、<code>1.273→1</code> 的舍入）。</p>
+<p><strong>③ Flatten</strong> 把 <code>(T,D)</code> 拍平成 1D 整数序列 <code>[0, 15, 1, 0, 0, 0, 0, 0]</code>（<code>D&gt;1</code> 时按 <code>T×D</code> 拉直）。</p>
+<p><strong>④ BPE</strong> 把高频重复模式（如"连续 5 个 0"）合并成单个 token，序列更短，最后 <strong>⑤</strong> 映射到词表最高 128 个槽位的 id。</p>
+<p><strong>解码：原路返回，看损失有多小</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>token → BPE解码 → [0,15,1,0,0,0,0,0] → reshape(8,1) → ÷scale → IDCT → 反归一化
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>重建 A_rec = [0.977, 0.803, 0.497, 0.125, -0.241, -0.545, -0.756, -0.862]
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>原始 A     = [1.000, 0.816, 0.494, 0.111, -0.258, -0.555, -0.755, -0.853]
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>重建 MSE ≈ 1.7e-4   ← 仅用 2 个非零系数就几乎完美还原 8 个值！
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">这个例子说明了一切</p>
+<p>8 个连续值 → DCT → 只有 <strong>2 个</strong>有效（非零）整数系数 → 重建误差仅 1.7e-4。<strong>这就是 FAST 高效压缩的全部秘密</strong>：平滑动作经 DCT 后能量极度集中，取整制造大量 0，BPE 再把 0 的游程压掉。想深入 DCT 的能量压缩数学，见 <a href="../../math/fourier-dct/#7-dct">Fourier 与 DCT · 能量压缩</a>。</p>
+</div>
+<hr />
+<h2 id="8-vq-vae-fsq-learned">8. VQ-VAE 与码本（理解 FSQ 的前置）<span class="ln-tag ln-learned">LEARNED</span>（真神经网络）<a class="headerlink" href="#8-vq-vae-fsq-learned" title="Permanent link">&para;</a></h2>
+<p>FSQ 路线是<strong>真正的神经网络方案</strong>。要懂 FSQ，先懂它的前身 VQ-VAE 的"码本"思想。</p>
+<p>VQ-VAE（Vector Quantized VAE）的想法：维护一本<strong>可学习的"码本"</strong>——比如 256 个向量，每个叫一个 codeword（码字），编号 0~255。</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>编码器(NN) → 连续向量 z
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>         ↓ 在码本里找最近的码字
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>最近码字的编号 = token（如 #42）          ← 离散化
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>         ↓
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>解码器(NN) 用 #42 对应的码字向量重建动作
+</span></code></pre></div>
+<p>整个编码器、解码器、<strong>码本里的 256 个向量本身</strong>都是<strong>梯度训练</strong>出来的（用重建 MSE 损失）。这就是真正的"端到端学习的离散表示"。</p>
+<div class="admonition warning">
+<p class="admonition-title">VQ-VAE 的痛点</p>
+<p>① <strong>码本坍缩</strong>：训练中很多码字从没被用到，浪费容量、难训练。</p>
+<p>② 取最近邻不可导 → 需要 <strong>straight-through estimator</strong>（直通梯度）的 trick 才能反向传播。</p>
+<p>这些痛点正是 <strong>FSQ</strong> 要解决的。</p>
+</div>
+<h3 id="straight-through-estimator">straight-through estimator（直通梯度）<a class="headerlink" href="#straight-through-estimator" title="Permanent link">&para;</a></h3>
+<p>"取最近邻 / 四舍五入"是阶梯函数，导数处处为 0，梯度传不回编码器。技巧：<strong>前向用离散值，反向假装它是恒等函数</strong>（梯度直接穿过去）。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">z_q</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">stop_gradient</span><span class="p">(</span><span class="n">quantize</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1">#   前向：z_q == quantize(z)（离散）</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">#   反向：d z_q / d z == 1   （梯度像没量化一样直通回去）</span>
+</span></code></pre></div>
+<hr />
+<h2 id="9-fsq-learned">9. FSQ 有限标量量化 <span class="ln-tag ln-learned">LEARNED</span><a class="headerlink" href="#9-fsq-learned" title="Permanent link">&para;</a></h2>
+<p>FSQ（Finite Scalar Quantization）是 VQ-VAE 的优雅替代：<strong>砍掉可学习码本，改成"在极少数几维上各自做固定网格的四舍五入"</strong>。它无需学习码本，却天然不会坍缩。</p>
+<p>核心 trick：</p>
+<ol>
+<li>编码器把动作投影到<strong>极低维</strong>（比如只有 3 维）。</li>
+<li>每一维用 <span class="arithmatex">\(\tanh\)</span> 压到 <span class="arithmatex">\([-1,1]\)</span>，然后<strong>四舍五入到该维固定的几个格点</strong>（如第 1 维 8 个格点、第 2 维 6 个、第 3 维 5 个）。</li>
+<li>多维格点的组合用<strong>混合进制</strong>编码成<strong>单个整数</strong> token（<span class="arithmatex">\(8\times6\times5=240\approx256\)</span> 个码字）。</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># FSQ encode（概念）</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">x</span> <span class="o">=</span> <span class="n">proj_down</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>                      <span class="c1"># 投影到 ~3 维      [LEARNED]</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">zc</span> <span class="o">=</span> <span class="n">tanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                          <span class="c1"># 压到 [-1,1]</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">digits</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">zc</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">bases</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>    <span class="c1"># 每维四舍五入到格点 [DIRECT, LOSSY]</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">token</span> <span class="o">=</span> <span class="n">undigitize</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>            <span class="c1"># 多维 digit → 单整数（混合进制）[DIRECT]</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">FSQ vs VQ 一句话</p>
+<p>VQ：码本是<strong>学出来的一堆任意向量</strong>，要小心坍缩。</p>
+<p>FSQ：码本是<strong>固定的规则网格</strong>（每维等距格点的笛卡尔积），不用学、不会坍缩。只有投影编码器/解码器是神经网络。</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · FSQ 的 2D 固定网格码本</div>
+<div class="ln-demo-hint">把动作压到 2 维后，FSQ 的"码字"就是这些规则网格点。移动鼠标（或拖动），看连续点被吸附到最近的网格码字（=一个整数 token）。调每维格点数看码本大小变化。</div>
+<canvas id="cvFsq" width="420" height="420" style="margin:auto"></canvas>
+<div class="ln-controls">
+<label>第1维格点数 <input type="range" id="fsqB1" min="2" max="9" value="6"> <span class="ln-val" id="fsqB1V">6</span></label>
+<label>第2维格点数 <input type="range" id="fsqB2" min="2" max="9" value="5"> <span class="ln-val" id="fsqB2V">5</span></label>
+</div>
+<div class="ln-readout" id="fsqOut"></div>
+</div>
+
+<hr />
+<h2 id="10-binning-direct">10. Binning 均匀分桶（最朴素基线）<span class="ln-tag ln-direct">DIRECT</span><a class="headerlink" href="#10-binning-direct" title="Permanent link">&para;</a></h2>
+<p>RT-2 / OpenVLA 风格，<strong>零学习</strong>：每个维度、每个时间步<strong>独立</strong>地把 <span class="arithmatex">\([-1,1]\)</span> 均匀切成 256 个桶，取整成桶编号。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">token</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n_bins</span><span class="p">)</span>     <span class="c1"># 编码</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">a_hat</span> <span class="o">=</span> <span class="n">token</span> <span class="o">/</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>      <span class="c1"># 解码</span>
+</span></code></pre></div>
+<ul>
+<li><strong>优点</strong>：简单、无需任何训练、完全可逆（除取整）。</li>
+<li><strong>缺点</strong>：token 数 = T×D（不压缩，序列很长）；精度只有 256 级且<strong>不利用时间相关性</strong>。是论文里的对照基线。</li>
+</ul>
+<p>三者放一起看：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Binning</th>
+<th>FAST</th>
+<th>FSQ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>连续→离散</td>
+<td>均匀分桶取整</td>
+<td>DCT→取整→BPE</td>
+<td>Transformer→FSQ 量化</td>
+</tr>
+<tr>
+<td>是否 NN</td>
+<td>❌</td>
+<td>❌（统计 fit）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>需预训练</td>
+<td>❌</td>
+<td>仅 BPE 词表/分位数</td>
+<td>✅ 需 checkpoint</td>
+</tr>
+<tr>
+<td>token 数</td>
+<td>多（T×D）</td>
+<td>少（压缩）</td>
+<td>中（固定）</td>
+</tr>
+<tr>
+<td>利用时间相关性</td>
+<td>❌</td>
+<td>✅（DCT）</td>
+<td>✅（注意力）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11">11. 自回归建模 + 交叉熵<a class="headerlink" href="#11" title="Permanent link">&para;</a></h2>
+<p>无论用哪个 tokenizer，动作变成 token 后，<strong>训练目标和 GPT 一模一样</strong>：预测下一个 token。</p>
+<p>序列长什么样：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Task: pick up the cup, State: &lt;离散化的本体状态&gt;;
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Action: &lt;a₁&gt;&lt;a₂&gt;...&lt;aₙ&gt;|
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>└──────── 前缀 prefix（条件，不算损失）───────┘└─ 后缀 postfix（算损失）─┘
+</span></code></pre></div>
+<p>注意：连本体 <strong>state 也被离散化</strong>（切 256 桶）一起塞进 prompt。</p>
+<p>训练目标 = next-token 交叉熵（负对数似然）：</p>
+<div class="arithmatex">\[
+\mathcal{L} = -\frac{1}{|\text{mask}|}\sum_{t}\; \text{mask}_t \cdot \log p_\theta(a_t \mid a_{&lt;t}, o)
+\]</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">targets</span> <span class="o">=</span> <span class="n">one_hot</span><span class="p">(</span><span class="n">tokens</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">vocab</span><span class="o">=</span><span class="mi">257152</span><span class="p">)</span>   <span class="c1"># 右移一位当 target</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">logp</span>    <span class="o">=</span> <span class="n">log_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">token_logp</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">targets</span> <span class="o">*</span> <span class="n">logp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>        <span class="c1"># 正确 token 的 log 概率</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">token_logp</span> <span class="o">*</span> <span class="n">loss_mask</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">loss_mask</span><span class="p">)</span>  <span class="c1"># 只在 action 段算损失</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">三个要点</p>
+<p>① <strong>没有任何 MSE/回归项</strong>——纯交叉熵。</p>
+<p>② <code>loss_mask</code> 只在后缀 <code>Action:...|</code> 为 True → 只对 action token 计损失，prompt/state 只当条件。</p>
+<p>③ 推理时自回归逐 token 采样，遇到 <code>|</code> 或 EOS 停止，再用 tokenizer 反变换回连续动作。</p>
+</div>
+<hr />
+<h2 id="12">12. 多模态是怎么"免费"得到的<a class="headerlink" href="#12" title="Permanent link">&para;</a></h2>
+<p>回到 §2.1 的 mode averaging 问题。离散 token + 交叉熵<strong>从三个层面</strong>解决它：</p>
+<ol>
+<li><strong>离散 categorical 天然多峰</strong>：每个 token 位置输出整个词表的 softmax，可以同时给"向左对应的 token"和"向右对应的 token"高概率。不再被迫平均。</li>
+<li><strong>自回归分解表达联合多模态</strong>：<span class="arithmatex">\(p(a_{1:n}\mid o)=\prod_t p(a_t\mid a_{&lt;t},o)\)</span>。一串 categorical 的连乘能表示复杂的多峰联合分布——"向左"是一条连贯 token 序列，"向右"是另一条。</li>
+<li><strong>推理时靠采样取出不同的解</strong>（下一节）。</li>
+</ol>
+<h3 id="121-temperature">12.1 采样与 temperature<a class="headerlink" href="#121-temperature" title="Permanent link">&para;</a></h3>
+<p>有了多峰分布，怎么取出动作？对每个 token 的 logits 做带温度的采样：</p>
+<div class="arithmatex">\[
+p_i = \frac{\exp(z_i/\tau)}{\sum_j \exp(z_j/\tau)}
+\]</div>
+<ul>
+<li><span class="arithmatex">\(\tau=0\)</span>：取 argmax → 确定性、单一最可能解。</li>
+<li><span class="arithmatex">\(\tau&gt;0\)</span>：从分布随机采样 → 不同 RNG 得到不同可行解；<span class="arithmatex">\(\tau\)</span> 越大越多样。</li>
+</ul>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · temperature 如何调节多模态采样</div>
+<div class="ln-demo-hint">某个 token 位置的双峰 logits（"向左"和"向右"两个高概率区）。拖动 temperature 看 softmax 分布怎么变；点"采样 20 次"看实际抽到的 token 分布。</div>
+<canvas id="cvTemp" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>temperature τ <input type="range" id="tempT" min="0" max="200" value="100"> <span class="ln-val" id="tempTV">1.00</span></label>
+<button id="tempSample">🎲 采样 20 次</button>
+</div>
+<div class="ln-readout" id="tempOut"></div>
+</div>
+
+<div class="admonition tip">
+<p class="admonition-title">直觉</p>
+<p>τ→0：分布变成一根尖针（只取最高峰，丢掉另一个解）。τ 大：分布变平，两个峰都有机会被抽到 → 这次绕左、下次绕右。<strong>多模态的"解"是靠随机采样从保留下来的多峰分布里取出来的。</strong></p>
+</div>
+<hr />
+<h2 id="13-prefix-vs-action">13. 注意力掩码：prefix 双向 vs action 因果<a class="headerlink" href="#13-prefix-vs-action" title="Permanent link">&para;</a></h2>
+<p>序列里 prompt/state（前缀）和 action（后缀）扮演不同角色，用不同的注意力掩码（<code>ar_mask</code>）：</p>
+<ul>
+<li><strong>前缀 = 双向注意力（像 encoder）</strong>：prompt + state 是已知条件，互相都能看到（BERT 式），让模型充分理解任务上下文。</li>
+<li><strong>后缀 = 因果注意力（像 decoder）</strong>：action token 只能看到自己<strong>左边</strong>的（GPT 式），保证自回归生成时"不偷看未来"。</li>
+</ul>
+<p>这种"前缀双向 + 后缀因果"的混合掩码是 <strong>prefix-LM</strong> 结构，PaliGemma / π₀-FAST 都用它。</p>
+<hr />
+<h2 id="14-flow-matching0">14. 对比：另一条路线 flow matching（π₀）<a class="headerlink" href="#14-flow-matching0" title="Permanent link">&para;</a></h2>
+<p>为了把离散路线放进坐标系，简单看看连续路线。π₀ <strong>不 tokenize</strong>，用 <strong>flow matching</strong>（扩散家族）直接生成连续动作：从高斯噪声出发，沿学到的"速度场"积分，逐步把噪声"流"成动作。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>π₀-FAST（本笔记主线）</th>
+<th>π₀（flow matching）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动作表示</td>
+<td>离散 token</td>
+<td>连续向量</td>
+</tr>
+<tr>
+<td>建模</td>
+<td>自回归 + 交叉熵</td>
+<td>速度场 + 积分</td>
+</tr>
+<tr>
+<td>多模态来源</td>
+<td>多峰 categorical + 采样</td>
+<td>从噪声出发的随机积分路径</td>
+</tr>
+<tr>
+<td>复用 LLM</td>
+<td>✅ 直接复用词表/Transformer</td>
+<td>需专门的 flow 头</td>
+</tr>
+<tr>
+<td>推理</td>
+<td>逐 token（快慢取决于 token 数）</td>
+<td>少步积分</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">同一个问题，两种答案</p>
+<p>两条路线都在解"一个观测对应多个合理动作"的多模态难题。FAST 用"离散化 + 分类"，π₀ 用"连续随机生成"。理解了离散路线为什么需要 tokenization（mode averaging + 复用 LLM），就理解了这个领域的核心张力。</p>
+</div>
+<hr />
+<h2 id="15-tokenizer">15. 三种 tokenizer 重建效果对比<a class="headerlink" href="#15-tokenizer" title="Permanent link">&para;</a></h2>
+<p>"连续 → token → 连续"必然有损（来自量化取整）。三种 tokenizer 的<strong>重建误差</strong>和<strong>token 数</strong>各有取舍。先看一张实测对比，再亲手调参验证。</p>
+<div class="admonition warning">
+<p class="admonition-title">一个事实澄清</p>
+<p>实践中通常<strong>只有 FAST 真正把 action 编码成 token</strong>；Binning / FSQ 更多作为<strong>推理基线</strong>（只负责把已有 token 解码回动作）。下面的"编码-解码往返对比"是<strong>按各自算法的数学定义</strong>做的概念实测，用来理解三者的精度/压缩取舍。</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · FAST vs Binning vs FSQ 重建往返对比</div>
+<div class="ln-demo-hint">同一段动作（可调平滑度/噪声），三种方法各自编码再解码。上图叠加三条重建曲线，下图用柱状对比「重建 MSE」和「token 数」。FSQ 为<b>示意</b>（无训练 checkpoint，用「固定 token 数 + 网格量化」近似其行为）。</div>
+<canvas id="cvCmp" width="900" height="250"></canvas>
+<canvas id="cvCmpBar" width="900" height="190" style="margin-top:14px"></canvas>
+<div class="ln-controls">
+<label>信号平滑度 <input type="range" id="cmpSmooth" min="1" max="12" value="2"> <span class="ln-val" id="cmpSmoothV">2</span></label>
+<label><input type="checkbox" id="cmpNoise"> 加噪声</label>
+<label>FAST scale <input type="range" id="cmpScale" min="2" max="40" value="12"> <span class="ln-val" id="cmpScaleV">12</span></label>
+<label>FSQ token 数 <input type="range" id="cmpFsqN" min="4" max="24" value="12"> <span class="ln-val" id="cmpFsqNV">12</span></label>
+</div>
+<div class="ln-readout" id="cmpOut"></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>FAST</th>
+<th>FSQ</th>
+<th>Binning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>重建误差来源</td>
+<td>DCT 系数取整</td>
+<td>FSQ 网格量化 + 神经重建误差</td>
+<td>每个标量独立 256 桶取整</td>
+</tr>
+<tr>
+<td>误差随平滑度改善</td>
+<td>✅ 越平滑越准（DCT 利用时间相关性）</td>
+<td>✅ 编码器能学到时间结构</td>
+<td>❌ 与平滑度无关，固定量化地板</td>
+</tr>
+<tr>
+<td>token 数</td>
+<td>少且<strong>可变</strong>（压缩，≪ T×D）</td>
+<td>中且<strong>固定</strong>（=num_tokens）</td>
+<td>多且固定（=T×D，每标量一个）</td>
+</tr>
+<tr>
+<td>同等 token 预算下精度</td>
+<td>高（平滑信号）</td>
+<td>高（需训练好）</td>
+<td>低（浪费在高频）</td>
+</tr>
+<tr>
+<td>是否需训练</td>
+<td>仅 BPE 词表/分位数（统计 fit）</td>
+<td>✅ 需训练神经 checkpoint</td>
+<td>❌ 零训练</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">怎么读这张表</p>
+<p>核心权衡是<strong>「token 数 ↔ 精度 ↔ 是否利用时间结构」</strong>。Binning 最朴素：每标量一个 token、误差恒定但 token 最多、不懂时间相关性。FAST 用 DCT 把时间相关性变成低频稀疏，<strong>用更少 token 拿到更高精度</strong>（前提：动作平滑）。FSQ 用神经网络学一个紧凑潜空间，token 数固定可控，但要先训练。</p>
+</div>
+<hr />
+<h2 id="16-0-fast">16. π₀-FAST 模型全貌：基础模型 / 输入 / 输出<a class="headerlink" href="#16-0-fast" title="Permanent link">&para;</a></h2>
+<p>tokenizer 把动作变成 token 之后，是谁在消费这些 token？这一节把 π₀-FAST 的模型骨架讲清楚。</p>
+<h3 id="161-paligemmagemma-2b-siglip">16.1 基础模型：PaliGemma（Gemma-2B 解码器 + SigLIP 视觉）<a class="headerlink" href="#161-paligemmagemma-2b-siglip" title="Permanent link">&para;</a></h3>
+<p>π₀-FAST 的骨干是 <strong>PaliGemma</strong>——一个视觉语言模型（VLM），由两部分组成：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>是什么</th>
+<th>规格</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>视觉编码器</td>
+<td><strong>SigLIP So400m/14</strong>（ViT）</td>
+<td>patch=14，224×224 → 16×16 = <strong>256 个图像 token / 张</strong></td>
+</tr>
+<tr>
+<td>语言模型 (LLM)</td>
+<td><strong>Gemma-2B，decoder-only</strong></td>
+<td>width=2048, depth=18, heads=8, vocab=<strong>257,152</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">是 Decoder-only 吗？——是，但用 prefix-LM 掩码</p>
+<p>Gemma 本身是 <strong>decoder-only</strong> 的语言模型。但 π₀-FAST 通过<strong>注意力掩码</strong>把它用成 <strong>prefix-LM</strong>：图像 + prompt + state 这段前缀用<strong>双向</strong>注意，action 这段后缀用<strong>因果</strong>注意。所以"decoder-only 架构 + prefix-LM 掩码"两句话都对。掩码细节与可交互对比见 <a href="../../ml/autoregressive-models/#2">自回归模型 · 注意力掩码</a>。</p>
+</div>
+<h3 id="162-embed">16.2 输入与多模态 embed 顺序<a class="headerlink" href="#162-embed" title="Permanent link">&para;</a></h3>
+<p>模型输入含：多路相机图像、各自的 mask、本体 state、以及已 tokenize 的文本 prompt。它们被拼成<strong>一条 token 序列</strong>，顺序是：</p>
+<div class="ln-fig">
+<svg viewBox="0 0 860 230" role="img" aria-label="π0-FAST 输入序列结构">
+  <text x="10" y="20" fill="#6B675F" font-size="13">输入 token 序列（沿序列轴 concat）：左→右</text>
+  <rect x="10" y="36" width="150" height="56" rx="8" fill="rgba(63,185,80,.13)" stroke="#3fb950"/>
+  <text x="85" y="60" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="700">① 图像 token</text>
+  <text x="85" y="78" text-anchor="middle" fill="#6B675F" font-size="10">base_0 / base_1 / wrist_0</text>
+  <rect x="166" y="36" width="330" height="56" rx="8" fill="rgba(63,185,80,.13)" stroke="#3fb950"/>
+  <text x="331" y="58" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="700">② 文本前缀</text>
+  <text x="331" y="76" text-anchor="middle" fill="#6B675F" font-size="10">"Task: …, State: ⟨离散化state⟩;\nAction: "</text>
+  <rect x="502" y="36" width="250" height="56" rx="8" fill="rgba(88,166,255,.13)" stroke="#58a6ff"/>
+  <text x="627" y="58" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="700">③ action token + "|"</text>
+  <text x="627" y="76" text-anchor="middle" fill="#6B675F" font-size="10">FAST 离散 token（要预测的）</text>
+  <line x1="10" y1="104" x2="496" y2="104" stroke="#3fb950" stroke-width="2"/>
+  <text x="253" y="122" text-anchor="middle" fill="#3fb950" font-size="12">前缀 prefix · 双向注意 · 不计损失</text>
+  <line x1="502" y1="104" x2="752" y2="104" stroke="#58a6ff" stroke-width="2"/>
+  <text x="627" y="122" text-anchor="middle" fill="#58a6ff" font-size="12">后缀 suffix · 因果 · 计损失</text>
+  <text x="10" y="158" fill="#6B675F" font-size="12">embed 来源：</text>
+  <text x="85" y="178" text-anchor="middle" fill="#bc8cff" font-size="11">SigLIP 视觉编码器</text>
+  <text x="430" y="178" text-anchor="middle" fill="#bc8cff" font-size="11">Gemma 词表 embedding（文本 + action 共享同一张表）</text>
+  <text x="10" y="208" fill="#6B675F" font-size="11">注：state 不是单独向量，而是被离散成 256 桶后写进文本 prompt 里（字符串）。</text>
+</svg>
+<div class="ln-fig-cap">先图像、后文本前缀，再 action；前缀双向、后缀因果。</div>
+</div>
+
+<ul>
+<li><strong>先图像、后文本</strong>：先把每张图过 SigLIP 得到一串图像 token，<strong>再</strong>把 tokenized 文本 prompt 的 embedding 接在后面。</li>
+<li><strong>state 在文本里</strong>：本体 state 被离散成 256 桶、转成字符串拼进 <code>"State: …;"</code>，所以它走的是<strong>文本 embedding</strong>，不是单独通道。</li>
+<li><strong>图像与文本/action 共享同一个 Transformer</strong>，但图像 token 之间是双向注意。</li>
+</ul>
+<h3 id="163-token">16.3 输出：每步预测一个 token，自回归直到结束<a class="headerlink" href="#163-token" title="Permanent link">&para;</a></h3>
+<p>模型输出是<strong>词表（257,152 类）上的概率分布</strong>，即"下一个 token 是谁"。生成是<strong>逐 token 自回归</strong>的：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>while 未遇到 EOS 且 步数 &lt; 上限(256):
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    token = 从 last_logit 采样          # 每步只产出【1 个】token（argmax 或带温度采样）
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    把 token embed 回去，预测下一个     # 接回输入，继续
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>遇到 EOS 或到达上限则停止
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">每次预测一个还是多个？</p>
+<p><strong>每次预测一个 action token</strong>（每步取一个）。action token 的<strong>总数是可变的</strong>（FAST 压缩后通常远少于 T×D），靠遇到 <code>"|"</code> / EOS 终止。训练时则不同：是<strong>一次前向 teacher forcing</strong>——整条序列并行预测每个位置的下一个 token，只在 action 段算交叉熵。</p>
+</div>
+<h3 id="164-t-d">16.4 解码完是不是 (T, D)？——是<a class="headerlink" href="#164-t-d" title="Permanent link">&para;</a></h3>
+<p>生成的一串变长 action token 被还原：取 <code>"Action: "</code> 与 <code>"|"</code> 之间的 token → 映射回 FAST token 空间 → 用 <code>time_horizon=T, action_dim=D</code> 解码，reshape 成 <strong><code>(T, D)</code></strong>。</p>
+<div class="admonition tip">
+<p class="admonition-title">闭环</p>
+<p>无论中间 token 数是多少，解码端都用 <code>time_horizon</code> / <code>action_dim</code> 强制 reshape 回 <code>(T, D)</code>，正好对上 §1 里 tokenizer 的<strong>输入</strong>形状——整条"连续 (T,D) → token → 连续 (T,D)"的环就闭合了。</p>
+</div>
+<hr />
+<h2 id="_2">术语表（速查）<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action chunk / horizon (T)</td>
+<td>一次预测的未来动作步数</td>
+</tr>
+<tr>
+<td>action_dim (D)</td>
+<td>每步动作的自由度数</td>
+</tr>
+<tr>
+<td>tokenization</td>
+<td>连续/文本 → 有限词表的整数 ID</td>
+</tr>
+<tr>
+<td>DCT / IDCT</td>
+<td>离散余弦（逆）变换，时域↔频域，可逆 direct</td>
+</tr>
+<tr>
+<td>quantization</td>
+<td>连续值映射到有限格点（取整），唯一有损步</td>
+</tr>
+<tr>
+<td>BPE</td>
+<td>字节对编码，合并高频 pair 的无损压缩</td>
+</tr>
+<tr>
+<td>codebook / codeword</td>
+<td>码本 / 码字，离散表示的"字典"及其条目</td>
+</tr>
+<tr>
+<td>VQ-VAE</td>
+<td>带可学习码本的离散自编码器</td>
+</tr>
+<tr>
+<td>FSQ</td>
+<td>有限标量量化，用固定网格代替可学习码本</td>
+</tr>
+<tr>
+<td>straight-through estimator</td>
+<td>前向离散、反向恒等的梯度直通技巧</td>
+</tr>
+<tr>
+<td>mode averaging</td>
+<td>回归把多个正确解平均成错误解的现象</td>
+</tr>
+<tr>
+<td>categorical 分布</td>
+<td>离散类别上的概率分布，可多峰</td>
+</tr>
+<tr>
+<td>cross-entropy</td>
+<td>分类任务的负对数似然损失</td>
+</tr>
+<tr>
+<td>temperature τ</td>
+<td>采样温度，调节分布尖锐度/多样性</td>
+</tr>
+<tr>
+<td>ar_mask</td>
+<td>区分双向(prefix)/因果(action)注意力的掩码</td>
+</tr>
+<tr>
+<td>prefix-LM</td>
+<td>前缀双向+后缀因果的混合 Transformer</td>
+</tr>
+<tr>
+<td>flow matching</td>
+<td>连续动作生成路线（π₀），扩散家族</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_3">延伸阅读<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="/paper-snapshots/fast-tokenization/">FAST Tokenization 论文快照</a> — paper-snapshots 上对 FAST 原论文的精读</li>
+<li><a href="../../math/fourier-dct/">Fourier 变换与 DCT</a> — 把 §4 的 DCT 讲透：能量压缩、为何接近最优(KLT)、JPEG 到 FAST 的同源套路</li>
+<li><a href="../../ml/autoregressive-models/">自回归模型 · BERT / GPT</a> — §11/§13 的展开：三大范式、BERT 双向 vs GPT 因果、为何 VLA 选 Prefix-LM</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="上一页: 机器人">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              <div class="md-ellipsis">
+                机器人
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../math/" class="md-footer__link md-footer__link--next" aria-label="下一页: 数学">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              <div class="md-ellipsis">
+                数学
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../javascripts/fourier-dct.js"></script>
+      
+    
+  </body>
+</html>

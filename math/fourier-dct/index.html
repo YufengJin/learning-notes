@@ -1,0 +1,876 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="个人学习笔记知识库 — 数学 / 机器学习 / 编程 / 阅读">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/math/fourier-dct/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../../reading/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Fourier 变换与 DCT：从频域到能量压缩 - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fourier-dct" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Fourier 变换与 DCT：从频域到能量压缩
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ml/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  机器学习
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../robotics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  机器人
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  数学
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reading/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  阅读
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                <span>返回数学</span>
+              </a>
+            
+            
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 为什么要把信号变到"频率域"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-fourier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fourier 级数：周期信号 = 正弦/余弦之和
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fourier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 连续 Fourier 变换：从周期到任意信号
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-dft-fft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. DFT 与 FFT：离散世界的傅里叶
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dft-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 从 DFT 到 DCT：去掉复数与边界跳变
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. DCT 的四种变体（知道有别即可）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. DCT 基函数画廊
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 能量压缩：DCT 的杀手锏（亲手验证）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 为什么偏偏是 DCT（它接近"最优"变换）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-jpeg-fast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 应用：从 JPEG 到 FAST
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        延伸阅读
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    数学
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="fourier-dct">Fourier 变换与 DCT 深入<a class="headerlink" href="#fourier-dct" title="Permanent link">&para;</a></h1>
+<p>从傅里叶级数讲起，一路到 DCT 的能量压缩性质，真正理解：为什么对平滑信号（如机器人动作）做 DCT，能量会奇迹般集中到几个低频系数上。是 <a href="../../robotics/action-tokenization/">Action Tokenization</a> 里把 DCT 当黑盒用的那一步的展开。</p>
+<div class="admonition note">
+<p class="admonition-title">一条主线</p>
+<p><strong>任何信号都能写成一堆"波"的叠加。</strong> 傅里叶家族研究的就是"用哪些波、各占多少"。DCT 是其中专为<strong>实数、平滑信号</strong>优化的一员，它的杀手锏是<strong>能量压缩</strong>——把信息挤进极少数低频系数，这正是 FAST / JPEG 压缩的根基。</p>
+</div>
+<hr />
+<h2 id="0">0. 为什么要把信号变到"频率域"<a class="headerlink" href="#0" title="Permanent link">&para;</a></h2>
+<p>同一段信号有两种看法：</p>
+<ul>
+<li><strong>时域（time domain）</strong>："每个时刻的值是多少"。机器人动作原始就是这种：第 0 步、第 1 步……的关节角度。</li>
+<li><strong>频域（frequency domain）</strong>："信号由哪些快慢不同的波组成、各占多少"。同一信息的另一种坐标系。</li>
+</ul>
+<p>换到频域的好处：很多在时域看起来"密密麻麻"的信号，在频域<strong>极其稀疏</strong>（只有几个频率有值）。平滑 = 变化慢 = 只有低频 = 频域稀疏 → <strong>可压缩</strong>。</p>
+<hr />
+<h2 id="1-fourier">1. Fourier 级数：周期信号 = 正弦/余弦之和<a class="headerlink" href="#1-fourier" title="Permanent link">&para;</a></h2>
+<p>傅里叶的洞见（1807）：任何<strong>周期</strong>函数都能写成不同频率正弦/余弦的加权和：</p>
+<div class="arithmatex">\[
+f(t)=\frac{a_0}{2}+\sum_{n=1}^{\infty}\Big(a_n\cos(n\omega t)+b_n\sin(n\omega t)\Big)
+\]</div>
+<p>频率 <span class="arithmatex">\(n\omega\)</span> 越高的项变化越快。下面用<strong>奇次谐波的正弦叠加逼近方波</strong>——经典例子，也能看到"加越多越像、但边角永远过冲"的<strong>吉布斯现象</strong>。</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · 傅里叶级数逼近方波</div>
+<div class="ln-demo-hint">方波 = 无穷个奇次正弦谐波之和。拖滑块增加谐波个数，看叠加结果（红）如何逼近方波（灰）。</div>
+<canvas id="cvSquare" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>谐波个数 <input type="range" id="sqN" min="1" max="40" value="3"> <span class="ln-val" id="sqNV">3</span></label>
+</div>
+<div class="ln-readout" id="sqOut"></div>
+</div>
+
+<div class="admonition warning">
+<p class="admonition-title">吉布斯现象</p>
+<p>不连续点（方波的跳变）附近永远有约 9% 的过冲，无论加多少项。启示：<strong>越不连续/越多高频的信号，越难用少数低频项表示</strong>——反过来，<strong>越平滑越好压</strong>。机器人动作恰恰平滑。</p>
+</div>
+<hr />
+<h2 id="2-fourier">2. 连续 Fourier 变换：从周期到任意信号<a class="headerlink" href="#2-fourier" title="Permanent link">&para;</a></h2>
+<p>把周期推向无穷，级数的"离散频率求和"变成"连续频率积分"，就得到 Fourier 变换：</p>
+<div class="arithmatex">\[
+F(\omega)=\int_{-\infty}^{\infty} f(t)\,e^{-i\omega t}\,dt
+\]</div>
+<p>这里 <span class="arithmatex">\(e^{-i\omega t}=\cos\omega t - i\sin\omega t\)</span>（欧拉公式）把正弦余弦打包成<strong>复指数</strong>。<span class="arithmatex">\(F(\omega)\)</span> 是复数，其<strong>模</strong>表示该频率的强度、<strong>幅角</strong>表示相位。</p>
+<div class="admonition tip">
+<p class="admonition-title">复指数 = 旋转的相量</p>
+<p><span class="arithmatex">\(e^{-i\omega t}\)</span> 在复平面上是一个以角频率 <span class="arithmatex">\(\omega\)</span> 旋转的单位向量。傅里叶变换在问："信号里有多少成分，和这个以 <span class="arithmatex">\(\omega\)</span> 旋转的相量同步？" 同步的频率分量就大。</p>
+</div>
+<hr />
+<h2 id="3-dft-fft">3. DFT 与 FFT：离散世界的傅里叶<a class="headerlink" href="#3-dft-fft" title="Permanent link">&para;</a></h2>
+<p>计算机里信号是<strong>有限个采样点</strong> <span class="arithmatex">\(x_0,\dots,x_{N-1}\)</span>，对应<strong>离散傅里叶变换 DFT</strong>：</p>
+<div class="arithmatex">\[
+X_k=\sum_{n=0}^{N-1}x_n\,e^{-i2\pi kn/N},\quad k=0,\dots,N-1
+\]</div>
+<p>直接算是 <span class="arithmatex">\(O(N^2)\)</span>。<strong>FFT（快速傅里叶变换）</strong>利用对称性把它降到 <span class="arithmatex">\(O(N\log N)\)</span>——这是 20 世纪最重要的算法之一，让实时音视频处理成为可能。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>输入</th>
+<th>输出</th>
+<th>复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fourier 级数</td>
+<td>连续周期函数</td>
+<td>离散系数 <span class="arithmatex">\(a_n,b_n\)</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Fourier 变换 (FT)</td>
+<td>连续非周期</td>
+<td>连续谱 <span class="arithmatex">\(F(\omega)\)</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td>DFT</td>
+<td><span class="arithmatex">\(N\)</span> 个离散采样</td>
+<td><span class="arithmatex">\(N\)</span> 个复系数</td>
+<td><span class="arithmatex">\(O(N^2)\)</span></td>
+</tr>
+<tr>
+<td>FFT</td>
+<td>同 DFT（算法优化）</td>
+<td>同 DFT</td>
+<td><span class="arithmatex">\(O(N\log N)\)</span></td>
+</tr>
+<tr>
+<td><strong>DCT</strong></td>
+<td><span class="arithmatex">\(N\)</span> 个实数采样</td>
+<td><span class="arithmatex">\(N\)</span> 个<strong>实</strong>系数</td>
+<td><span class="arithmatex">\(O(N\log N)\)</span></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-dft-dct">4. 从 DFT 到 DCT：去掉复数与边界跳变<a class="headerlink" href="#4-dft-dct" title="Permanent link">&para;</a></h2>
+<p>DFT 有两个对压缩不友好的地方，DCT 正是为修正它们而生：</p>
+<ol>
+<li><strong>DFT 系数是复数</strong>（有实部虚部），对实数信号有冗余。</li>
+<li><strong>DFT 默认信号周期延拓</strong>，首尾若值不同会在边界产生<strong>人为跳变</strong> → 制造大量高频 → 不利压缩。</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">DCT 的两个 trick</p>
+<p>① <strong>偶对称延拓</strong>：DCT 先把信号"镜像"成偶函数再做变换。偶函数的傅里叶展开<strong>只含余弦项</strong> → 系数全是<strong>实数</strong>，没有虚部冗余。</p>
+<p>② <strong>镜像消跳变</strong>：镜像延拓让边界<strong>平滑续接</strong>（不再有 DFT 那种首尾跳变）→ 高频被压低 → 能量更集中在低频。</p>
+<p>这两点合起来，使 DCT 对实数平滑信号的<strong>能量压缩</strong>显著优于 DFT。</p>
+</div>
+<p>最常用的是 <strong>DCT-II</strong>（就是 JPEG 和 FAST 用的那个）：</p>
+<div class="arithmatex">\[
+X_k=\sum_{n=0}^{N-1}x_n\cos\!\Big[\frac{\pi}{N}\big(n+\tfrac12\big)k\Big]
+\]</div>
+<p>注意基底是纯余弦、系数 <span class="arithmatex">\(X_k\)</span> 是实数。<span class="arithmatex">\(k=0\)</span> 是直流（均值），<span class="arithmatex">\(k\)</span> 越大频率越高。逆变换 IDCT（即 DCT-III）用同样的余弦基重建，<strong>完全可逆</strong>。</p>
+<hr />
+<h2 id="5-dct">5. DCT 的四种变体（知道有别即可）<a class="headerlink" href="#5-dct" title="Permanent link">&para;</a></h2>
+<p>按"在两端怎么做对称延拓"不同，DCT 有 I~IV 四型。实践中：</p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DCT-II</strong></td>
+<td>最常用。JPEG、MPEG、<strong>FAST action tokenization</strong> 都用它</td>
+</tr>
+<tr>
+<td><strong>DCT-III</strong></td>
+<td>DCT-II 的逆变换（即 IDCT）</td>
+</tr>
+<tr>
+<td>DCT-I</td>
+<td>端点处理不同，较少用</td>
+</tr>
+<tr>
+<td>DCT-IV</td>
+<td>用于 MDCT（音频，如 MP3/AAC 的重叠变换）</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">norm=\"ortho\" 是什么</p>
+<p>scipy 里常加 <code>norm="ortho"</code>：给系数乘上归一化因子（<span class="arithmatex">\(k{=}0\)</span> 乘 <span class="arithmatex">\(\sqrt{1/N}\)</span>，其余乘 <span class="arithmatex">\(\sqrt{2/N}\)</span>），使变换<strong>正交且能量守恒</strong>（Parseval：时域能量 = 频域能量）。这样 IDCT 就是 DCT 的转置，数值更干净。</p>
+</div>
+<hr />
+<h2 id="6-dct">6. DCT 基函数画廊<a class="headerlink" href="#6-dct" title="Permanent link">&para;</a></h2>
+<p>DCT 把信号分解到这一组<strong>固定的余弦基向量</strong>上。第 <span class="arithmatex">\(k\)</span> 个基 = 频率为 <span class="arithmatex">\(k\)</span> 的余弦采样。任何信号都是这些基的加权和，权重就是 DCT 系数。下面是前 8 个基（<span class="arithmatex">\(N=32\)</span>）：</p>
+<div class="ln-demo">
+<div class="ln-demo-title">DCT-II 基函数（k = 0…7）</div>
+<div class="ln-demo-hint">k=0 是常数（直流/均值），k 越大振荡越快（频率越高）。鼠标移到任意一个高亮查看。</div>
+<canvas id="cvBasis" width="900" height="320"></canvas>
+<div class="ln-readout">每个小图是一个余弦基向量 $\cos[\pi/N\,(n+0.5)\,k]$。DCT 系数 $X_k$ = 信号在第 k 个基上的投影。</div>
+</div>
+
+<hr />
+<h2 id="7-dct">7. 能量压缩：DCT 的杀手锏（亲手验证）<a class="headerlink" href="#7-dct" title="Permanent link">&para;</a></h2>
+<p>这是整页最重要的概念，也是 FAST 能工作的根本原因。<strong>能量压缩（energy compaction）</strong>：对平滑信号，DCT 把绝大部分能量集中到<strong>极少数低频系数</strong>，其余系数接近 0。</p>
+<p>于是我们只需<strong>保留前几个大系数、丢弃一大堆接近 0 的</strong>，就能用很少的数据近乎完美地重建信号。下面亲手验证：</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Demo · 只保留前 k 个 DCT 系数的重建质量</div>
+<div class="ln-demo-hint">上图：原始信号（蓝）vs 只用前 k 个 DCT 系数的重建（红）。下图：DCT 系数能量（保留的高亮）。拖 k，看平滑信号只需极少系数就几乎重合；再切换成"含高频/噪声"的信号对比。</div>
+<canvas id="cvCompact" width="900" height="360"></canvas>
+<div class="ln-controls">
+<label>保留前 k 个系数 <input type="range" id="ckK" min="1" max="32" value="4"> <span class="ln-val" id="ckKV">4</span> / 32</label>
+<button id="ckSmooth" class="on">平滑信号</button>
+<button id="ckRough">含高频/噪声</button>
+</div>
+<div class="ln-readout" id="ckOut"></div>
+</div>
+
+<div class="admonition note">
+<p class="admonition-title">连接到 FAST</p>
+<p>FAST 不显式"丢弃"系数，而是<strong>对系数取整（量化）</strong>：那些接近 0 的高频系数取整后<strong>变成恰好 0</strong>，效果等同于丢弃，还顺便产生大量重复的 0 供 BPE 压缩。能量压缩越强（信号越平滑），取整后 0 越多 → token 越少。</p>
+</div>
+<hr />
+<h2 id="8-dct">8. 为什么偏偏是 DCT（它接近"最优"变换）<a class="headerlink" href="#8-dct" title="Permanent link">&para;</a></h2>
+<p>理论上，对给定信号统计，<strong>能量压缩最优</strong>的变换是 <strong>KLT（Karhunen–Loève 变换，即 PCA）</strong>——它把信号投影到协方差矩阵的特征向量上。但 KLT 依赖数据统计、要现算特征向量，昂贵且不通用。</p>
+<div class="admonition tip">
+<p class="admonition-title">DCT ≈ 免费的 KLT</p>
+<p>对于<strong>一阶马尔可夫信号</strong>（相邻采样高度相关——平滑信号正是如此），可以证明 <strong>DCT 的基函数无限接近 KLT 的最优基</strong>。也就是说：DCT 用一组<strong>固定、无需训练</strong>的余弦基，几乎达到了"为这类信号量身定制的最优变换"的压缩效果。这就是为什么 JPEG、MPEG、FAST 都选 DCT 而不是真的去算 KLT。</p>
+</div>
+<p>呼应 learned vs direct：DCT 是 <strong>direct</strong>（固定基、零训练），却逼近了需要数据统计的最优 learned 变换——<strong>用确定性数学拿到了接近学习的收益</strong>。</p>
+<hr />
+<h2 id="9-jpeg-fast">9. 应用：从 JPEG 到 FAST<a class="headerlink" href="#9-jpeg-fast" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>怎么用 DCT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JPEG</strong></td>
+<td>图像切 8×8 块 → 2D DCT → 量化（丢高频）→ 熵编码。你看到的几乎所有照片都被 DCT 压过</td>
+</tr>
+<tr>
+<td><strong>MPEG / H.26x</strong></td>
+<td>视频帧（残差）做 DCT + 量化</td>
+</tr>
+<tr>
+<td><strong>MP3 / AAC</strong></td>
+<td>用 MDCT（DCT-IV 的重叠版）压音频</td>
+</tr>
+<tr>
+<td><strong>FAST（机器人）</strong></td>
+<td>动作 (T,D) 沿<strong>时间轴</strong>做 DCT → 量化取整 → BPE。平滑动作 → 能量集中 → 取整后大量 0 → 短 token 序列</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">同一个套路</p>
+<p>JPEG 压图片、FAST 压动作，<strong>骨架完全一样</strong>：变到频域(DCT) → 量化丢弃不重要的高频 → 无损熵编码(BPE/Huffman)。理解了 JPEG，你就理解了 FAST 的一半。</p>
+</div>
+<hr />
+<h2 id="_1">延伸阅读<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../robotics/action-tokenization/">Action Tokenization</a> — 机器人动作离散化主线；FAST 用 DCT 把动作压成 token</li>
+<li><a href="../../ml/autoregressive-models/">自回归模型 · BERT / GPT</a> — 序列建模范式与 Prefix-LM，token 之后由谁消费</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="上一页: 数学">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              <div class="md-ellipsis">
+                数学
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../reading/" class="md-footer__link md-footer__link--next" aria-label="下一页: 阅读">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              <div class="md-ellipsis">
+                阅读
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../javascripts/fourier-dct.js"></script>
+      
+    
+  </body>
+</html>
