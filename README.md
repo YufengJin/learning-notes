@@ -3,7 +3,7 @@
 个人学习笔记知识库，**MkDocs + Material** 构建，发布在
 **<https://yufengjin.github.io/learning-notes/>**。主题与
 [paper-snapshots](https://github.com/YufengJin/paper-snapshots) 统一：Claude 暖灰底
-(`#F8F8F6`) 配橙色 (`#FB5D00`)，极简浅色风格（见 `docs/stylesheets/extra.css`）。
+(`#F8F8F6`) 配石墨灰 (`#5A5953`)，极简浅色风格（见 `docs/stylesheets/extra.css`）。
 
 ## 添加笔记
 
@@ -29,7 +29,7 @@ mkdocs.yml                 # 配置（主题 / 导航 / 扩展 / 插件）
 docs/
   index.md                 # 首页
   ml/ math/ programming/ reading/   # 分区（每区一个 index.md 落地页）
-  stylesheets/extra.css    # 统一主题：暖灰 + 橙
+  stylesheets/extra.css    # 统一主题：暖灰 + 石墨灰
   javascripts/mathjax.js   # 公式渲染
 .github/workflows/deploy.yml   # push 到 main 即自动部署
 ```

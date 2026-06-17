@@ -8,7 +8,7 @@ hide:
 
 我的个人学习笔记知识库 —— 把读过、学过、调试过的东西沉淀成可检索的笔记。
 
-主题与 [Paper Snapshots](https://yufengjin.github.io/paper-snapshots/) 统一：Claude 暖灰底配橙色，极简风格。
+主题与 [Paper Snapshots](https://yufengjin.github.io/paper-snapshots/) 统一：Claude 暖灰底配石墨灰，极简风格。
 
 <div class="grid cards" markdown>
 

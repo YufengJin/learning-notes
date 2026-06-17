@@ -10,7 +10,7 @@ theme:
   name: material
   language: zh
   palette:
-    scheme: default          # 单一浅色主题（暖灰 + 橙，见 docs/stylesheets/extra.css）
+    scheme: default          # 单一浅色主题（暖灰 + 石墨灰，见 docs/stylesheets/extra.css）
   font:
     text: Inter
     code: JetBrains Mono

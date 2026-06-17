@@ -1,7 +1,7 @@
 /* ============================================================
-   Learning Notes — 统一主题：Claude 暖灰底 (#F8F8F6) + 橙 (#FB5D00)
-   与 paper-snapshots 共用同一套设计 token。极简：浅色头部、1px 细线、
-   小圆角、几乎无阴影；橙色只点缀链接 / 激活态 / 重点。
+   Learning Notes — 统一主题：Claude 暖灰底 (#F8F8F6) + 石墨灰 (#5A5953)
+   与 paper-snapshots 共用同一套设计 token。极简近单色：浅色头部、1px 细线、
+   小圆角、几乎无阴影；石墨灰点缀链接 / 激活态 / 重点。
    ============================================================ */
 
 :root {
@@ -13,8 +13,8 @@
   --ln-ink-2:     #3A3833;   /* 次级标题 */
   --ln-muted:     #6B675F;   /* 次要文字 */
   --ln-line:      #E8E4DC;   /* 1px 细边框 */
-  --ln-acc:       #FB5D00;   /* 强调 / 链接 / 激活 */
-  --ln-acc-weak:  #FFF0E6;   /* 橙色淡底 */
+  --ln-acc:       #5A5953;   /* 强调 / 链接 / 激活（石墨灰）*/
+  --ln-acc-weak:  #ECEAE3;   /* 石墨灰淡底 */
 
   /* —— 映射到 Material 变量 —— */
   --md-default-bg-color:          var(--ln-bg);
@@ -23,16 +23,16 @@
   --md-default-fg-color--lighter: var(--ln-muted);
   --md-default-fg-color--lightest:var(--ln-line);
 
-  /* 头部用浅色（不要整条橙色横幅），文字用暖近黑 */
+  /* 头部用浅色（不要整条石墨灰横幅），文字用暖近黑 */
   --md-primary-fg-color:        var(--ln-surface);
   --md-primary-fg-color--light: var(--ln-surface);
   --md-primary-fg-color--dark:  var(--ln-surface-2);
   --md-primary-bg-color:        var(--ln-ink);
   --md-primary-bg-color--light: var(--ln-muted);
 
-  /* 橙色作为强调 / hover */
+  /* 石墨灰作为强调 / hover */
   --md-accent-fg-color:             var(--ln-acc);
-  --md-accent-fg-color--transparent:rgba(251, 93, 0, .1);
+  --md-accent-fg-color--transparent:rgba(90, 89, 83, .1);
 
   /* 链接与代码 */
   --md-typeset-a-color: var(--ln-acc);
@@ -58,7 +58,7 @@
 .md-header--shadow { box-shadow: none; }
 .md-header__title { font-weight: 600; }
 
-/* 顶部 tab：选中态橙色下划线 */
+/* 顶部 tab：选中态石墨灰下划线 */
 .md-tabs {
   background-color: var(--ln-surface);
   color: var(--ln-ink);
@@ -80,7 +80,7 @@
   background-color: var(--ln-surface);
 }
 
-/* —— 左侧导航：激活项橙色 —— */
+/* —— 左侧导航：激活项石墨灰 —— */
 .md-nav__link--active,
 .md-nav__link:focus,
 .md-nav__link:hover { color: var(--ln-acc); }
@@ -119,7 +119,7 @@
   box-shadow: none;
 }
 
-/* 表格：扁平细线，橙色表头底线 */
+/* 表格：扁平细线，石墨灰表头底线 */
 .md-typeset table:not([class]) {
   border: 1px solid var(--ln-line);
   border-radius: 10px;
@@ -132,7 +132,7 @@
   font-weight: 600;
 }
 
-/* 引用块：橙色左边线 */
+/* 引用块：石墨灰左边线 */
 .md-typeset blockquote {
   border-left: 3px solid var(--ln-acc);
   color: var(--ln-muted);
@@ -147,7 +147,7 @@
   font-size: .76rem;
 }
 
-/* 链接 / 按钮 hover 用橙色 */
+/* 链接 / 按钮 hover 用石墨灰 */
 .md-typeset .md-button {
   border-radius: 10px;
   border-color: var(--ln-line);
@@ -162,5 +162,5 @@
 .md-footer { background-color: var(--ln-ink); }
 .md-footer-meta { background-color: var(--ln-ink-2); }
 
-/* 选区高亮用橙色淡底 */
+/* 选区高亮用石墨灰淡底 */
 ::selection { background: var(--ln-acc-weak); }
