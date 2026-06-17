@@ -41,6 +41,12 @@ git add . && git commit -m "notes: add my-note" && git push   # 3) Action 自动
 - **不提交原始大图 / PDF / 大视频**；大媒体走外部托管或图床，不进 git 历史。
 - 单文件远低于 ~9MB；上限是 GitHub Pages **1GB 构建站点**。
 
+## 命名规范
+- 目录 / 文件名一律 **小写 kebab-case**（`a-z 0-9 -`）：不用空格、大写、下划线或中文（URL 友好）。
+- 笔记 md 如 `linear-regression.md`；分区目录 ascii 小写（`ml/ robotics/ math/ reading/`）。
+- 图片描述性 kebab-case，放 `docs/<分区>/img/`，扩展名小写 `.webp`。
+- 中文只用于 `nav` 标题与页面正文，**不进路径/文件名**。
+
 ## 其它约定
 - **不要手改 `gh-pages` 分支**（它是 Action 的构建产物）。
 - 不提交构建产物 `site/`、`.venv/`、`.cache/`、`.DS_Store`（已在 `.gitignore`）。
