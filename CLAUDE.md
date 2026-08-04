@@ -41,6 +41,14 @@ Claude 暖灰底 + 石墨灰强调，极简近单色，**单一浅色主题**（
 - `theme.features` 不能有 `navigation.instant`：它与 Material 的语言选择器（contextual
   link）不兼容，`mkdocs-static-i18n` 会在构建时报 WARNING，`--strict` 下直接中断构建。
 
+## 写作规范（learning-note skill）
+教学笔记的写作与移植规则固化在 **`.claude/skills/learning-note/SKILL.md`**（已入库）：
+材料忠实渲染（数字逐字回查、三级论断标签、范围词对齐证据面）、结构契约
+（导语/引言/动机/预备知识三元组/正文四拍/图注/References）、分类判据
+（**以读者会去哪里找它为准**）、交互 demo 规则（浅色、命名空间前缀、
+document$.subscribe + 存在性守卫）、注册三件套（nav + nav_translations +
+extra_javascript）。把材料/草稿/现成 blog 变成笔记时触发该 skill。
+
 ## 添加笔记
 ```bash
 $EDITOR docs/<分区>/my-note.md     # 1) 新建 markdown

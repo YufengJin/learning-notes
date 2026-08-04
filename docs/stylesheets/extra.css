@@ -220,3 +220,70 @@
 .md-sidebar--primary .md-nav--secondary .md-nav__title{
   font-weight:700; color:var(--ln-ink); padding-top:0;
 }
+
+/* ============================================================
+   fm-solvers 笔记（ml/fm-solvers.md）的交互 demo 样式。
+   全部走 fms- 前缀 + --fms-* 变量，不触碰站点全局样式；
+   求解器五色是数据语义色（仅用于 demo 图内），非站点强调色。
+   来源：fm_solver_exp/solver_blog_offline.html 的浅色主题。
+   ============================================================ */
+:root{
+  --fms-bg:#F8F8F6; --fms-panel:#FFFFFF; --fms-ink:#201F1C; --fms-muted:#6B675F;
+  --fms-line:#E8E4DC; --fms-grid:#ECEAE3;
+  --fms-euler:#C33C54; --fms-midpoint:#2E6FDF; --fms-heun:#1F8A5D;
+  --fms-rk4:#7B3FBF; --fms-dopri5:#D97706;
+  --fms-good:#1F8A5D; --fms-bad:#C33C54;
+  --fms-serif:"Georgia","Songti SC","STSong","Noto Serif CJK SC",serif;
+  --fms-sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --fms-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+figure.fms-panel{background:var(--fms-panel);border:1px solid var(--fms-line);
+  border-radius:8px;padding:18px 18px 14px;margin:1.4rem 0 2rem}
+figure.fms-panel canvas{display:block;width:100%}
+figure.fms-panel figcaption{font-size:.84rem;color:var(--fms-muted);line-height:1.7;
+  padding:.65rem 2px 0;border-top:1px solid var(--fms-grid);margin-top:.7rem;text-align:left}
+figure.fms-panel figcaption b{color:var(--fms-ink);font-weight:650}
+.fms-controls{display:flex;flex-wrap:wrap;gap:.7rem 1.4rem;align-items:center;
+  padding:.35rem 0 .8rem}
+.fms-controls label{font-size:.82rem;color:var(--fms-muted);display:flex;
+  align-items:center;gap:.5rem}
+.fms-controls input[type=range]{accent-color:var(--fms-ink);width:150px}
+.fms-seg{display:inline-flex;border:1px solid var(--fms-line);border-radius:6px;overflow:hidden}
+.fms-seg button{border:0;background:transparent;color:var(--fms-muted);
+  font-family:var(--fms-mono);font-size:.78rem;padding:.34rem .7rem;cursor:pointer;
+  border-right:1px solid var(--fms-line)}
+.fms-seg button:last-child{border-right:0}
+.fms-seg button[aria-pressed="true"]{background:var(--fms-ink);color:var(--fms-panel)}
+.fms-readout{font-family:var(--fms-mono);font-size:.8rem;color:var(--fms-ink);
+  font-variant-numeric:tabular-nums}
+.fms-stats{display:flex;flex-wrap:wrap;gap:.5rem 2rem;padding:.5rem 0 .2rem;
+  font-family:var(--fms-mono);font-size:.8rem;font-variant-numeric:tabular-nums}
+.fms-stats .k{color:var(--fms-muted)}
+.fms-legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.8rem;
+  font-family:var(--fms-mono);padding:.3rem 0 .5rem;color:var(--fms-muted)}
+.fms-legend span{display:flex;align-items:center}
+.fms-chip{display:inline-block;width:.68em;height:.68em;border-radius:2px;
+  margin-right:.35em;vertical-align:baseline;transform:translateY(.04em)}
+.fms-c-euler{background:var(--fms-euler)} .fms-c-midpoint{background:var(--fms-midpoint)}
+.fms-c-heun{background:var(--fms-heun)} .fms-c-rk4{background:var(--fms-rk4)}
+.fms-c-dopri5{background:var(--fms-dopri5)}
+.fms-t-euler{color:var(--fms-euler)} .fms-t-midpoint{color:var(--fms-midpoint)}
+.fms-t-heun{color:var(--fms-heun)} .fms-t-rk4{color:var(--fms-rk4)}
+.fms-t-dopri5{color:var(--fms-dopri5)}
+table.fms-butcher{width:auto;margin:0 auto}
+table.fms-butcher td{border:0;padding:.15rem .55rem;font-family:var(--fms-mono);
+  font-size:.78rem;text-align:center;font-variant-numeric:tabular-nums}
+table.fms-butcher td.cl{border-right:1.5px solid var(--fms-ink)}
+table.fms-butcher td.tp{border-top:1px solid var(--fms-line)}
+.fms-takeaways{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:12px;margin:1.4rem 0}
+.fms-tk{border:1px solid var(--fms-line);border-radius:8px;padding:14px 16px;
+  background:var(--fms-panel)}
+.fms-tk .n{font-family:var(--fms-serif);font-size:1.5rem;line-height:1;margin-bottom:.4rem}
+.fms-tk p{margin:.3rem 0;font-size:.86rem;line-height:1.65}
+.fms-tk .hd{font-weight:650;font-size:.92rem}
+#fmsTip{position:fixed;pointer-events:none;background:var(--fms-panel);
+  border:1px solid var(--fms-line);border-radius:6px;padding:.4rem .6rem;
+  font-family:var(--fms-mono);font-size:.74rem;line-height:1.5;
+  box-shadow:0 4px 14px rgba(0,0,0,.13);opacity:0;z-index:50;
+  font-variant-numeric:tabular-nums;max-width:260px}

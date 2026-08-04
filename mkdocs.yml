@@ -54,6 +54,7 @@ extra_javascript:
   - javascripts/action-tokenization.js   # robotics 笔记的交互 demo（document$.subscribe 兼容 instant 加载）
   - javascripts/autoregressive-models.js # ml 笔记的交互 demo
   - javascripts/fourier-dct.js           # math 笔记的交互 demo
+  - javascripts/fm-solvers.js            # ml/fm-solvers 笔记的交互 demo（流匹配 ODE 求解器）
 
 markdown_extensions:
   - abbr
@@ -117,12 +118,14 @@ plugins:
             阅读: Reading
             线性回归: Linear Regression
             "Fourier 变换与 DCT：从频域到能量压缩": "Fourier Transform & DCT: From Frequency to Energy Compaction"
+            "流匹配 ODE 求解器 · 图解": "Flow Matching ODE Solvers, Illustrated"
 
 nav:
   - 首页: index.md
   - 机器学习:
       - ml/index.md
       - "自回归模型：BERT / GPT 与 Prefix-LM 架构详解": ml/autoregressive-models.md
+      - "流匹配 ODE 求解器 · 图解": ml/fm-solvers.md
   - 机器人:
       - robotics/index.md
       - "Action Tokenization：把连续动作离散成 token": robotics/action-tokenization.md
