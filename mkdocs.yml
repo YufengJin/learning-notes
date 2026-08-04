@@ -86,6 +86,7 @@ nav:
       - robotics/index.md
   - 数学:
       - math/index.md
+      - Lie Theory: math/lie-theory.md
   - 阅读:
       - reading/index.md
   # 样式模板页(style/index.md)不进顶部 tab，仅从首页底部链接
