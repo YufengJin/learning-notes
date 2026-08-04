@@ -164,3 +164,59 @@
 
 /* 选区高亮用石墨灰淡底 */
 ::selection { background: var(--ln-acc-weak); }
+
+/* ===== 交互 demo（action-tokenization / autoregressive / fourier-dct）=====
+   浅色主题：画布白底，画布内绘图用深色文字/线条（见各 .js 的配色）。 */
+.ln-demo{
+  background:var(--ln-surface-2); border:1px solid var(--ln-line);
+  border-radius:12px; padding:18px; margin:22px 0;
+}
+.ln-demo .ln-demo-title{font-weight:700; color:var(--ln-ink); margin-bottom:4px}
+.ln-demo .ln-demo-hint{font-size:13px; color:var(--ln-muted); line-height:1.6; margin-bottom:12px}
+.ln-demo canvas{background:#FFFFFF; border:1px solid var(--ln-line); border-radius:8px; display:block; max-width:100%; width:100%; height:auto}
+.ln-demo .ln-controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:12px 0; font-size:14px}
+.ln-demo .ln-controls label{display:flex; align-items:center; gap:8px; color:var(--ln-muted)}
+.ln-demo input[type=range]{accent-color:var(--ln-acc)}
+.ln-demo button{
+  background:var(--ln-surface); color:var(--ln-ink); border:1px solid var(--ln-line);
+  border-radius:8px; padding:7px 14px; cursor:pointer; font-size:14px;
+}
+.ln-demo button:hover{border-color:var(--ln-acc); color:var(--ln-acc)}
+.ln-demo .ln-val{color:var(--ln-acc); font-variant-numeric:tabular-nums; font-weight:600}
+.ln-demo .ln-readout{font-size:13px; color:var(--ln-muted); line-height:1.6; margin-top:8px; font-variant-numeric:tabular-nums}
+/* 切换型按钮的激活态（注意力掩码 / 平滑·粗糙 等 demo）*/
+.ln-demo button.on{border-color:var(--ln-acc); color:var(--ln-acc); background:var(--ln-acc-weak)}
+/* 图框：承载 SVG 示意图（如 BERT/GPT 架构图、输入序列结构图），浅色 */
+.ln-fig{background:#FFFFFF; border:1px solid var(--ln-line); border-radius:10px; padding:14px; margin:22px 0}
+.ln-fig svg{max-width:100%; height:auto; display:block; margin:0 auto}
+.ln-fig .ln-fig-cap{text-align:center; color:var(--ln-muted); font-size:13px; margin-top:8px}
+
+/* ===== 语义 tag 芯片（DIRECT / LEARNED / LOSSY）=====
+   沿用 demo 同款语义色：DIRECT 绿、LEARNED 紫、LOSSY 红；浅底高对比。 */
+.md-typeset .ln-tag{
+  display:inline-block; padding:.04em .55em; margin:0 .12em;
+  border-radius:999px; font-size:.7em; font-weight:700;
+  letter-spacing:.4px; vertical-align:middle; line-height:1.7;
+  border:1px solid transparent; white-space:nowrap;
+}
+.md-typeset .ln-direct { color:#2f7d3a; background:rgba(63,185,80,.13);  border-color:rgba(63,185,80,.38); }
+.md-typeset .ln-learned{ color:#6f49bf; background:rgba(188,140,255,.16); border-color:rgba(188,140,255,.45); }
+.md-typeset .ln-lossy  { color:#c0392f; background:rgba(248,81,73,.12);  border-color:rgba(248,81,73,.38); }
+
+/* ===== 文章左栏：返回箭头 + 目录（自定义 overrides/main.html）===== */
+/* 返回上级链接（在「目录」上方）*/
+.md-sidebar--primary .ln-back{
+  display:inline-flex; align-items:center; gap:.4em;
+  margin:.2rem .6rem .6rem; padding:.3em .7em;
+  font-size:.7rem; font-weight:600; color:var(--ln-muted);
+  border:1px solid var(--ln-line); border-radius:999px;
+  background:var(--ln-surface); text-decoration:none;
+}
+.md-sidebar--primary .ln-back:hover{ color:var(--ln-acc); border-color:var(--ln-acc); }
+.ln-back__arrow{ font-size:.95em; line-height:1; }
+/* 把本页 TOC（md-nav--secondary）在左栏里正常显示为块 */
+.md-sidebar--primary .md-nav--secondary{ display:block; }
+.md-sidebar--primary .md-nav--secondary > .md-nav__list{ display:block; }
+.md-sidebar--primary .md-nav--secondary .md-nav__title{
+  font-weight:700; color:var(--ln-ink); padding-top:0;
+}
