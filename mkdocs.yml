@@ -22,14 +22,25 @@ theme:
     - navigation.indexes     # 分区可有 index 落地页
     - navigation.top         # 回到顶部
     - navigation.tracking    # URL 跟随锚点
-    - navigation.instant     # 即时加载（SPA 式）
-    - navigation.instant.progress
+    # navigation.instant 与 mkdocs-static-i18n 的语言选择器（Material 原生，右上角
+    # header）不兼容 —— 插件自身会在 build 时报 WARNING 并在 --strict 下中断构建，
+    # 见 mkdocs_static_i18n/reconfigure.py 的 reconfigure_material_theme()。
+    # 已移除以保证双语切换正常工作；其余即时体验保留 navigation.tracking/top。
     - toc.follow
     - search.suggest
     - search.highlight
     - content.code.copy
     - content.code.annotate
     - content.tooltips
+
+extra:
+  social:
+    - icon: fontawesome/solid/note-sticky
+      link: /paper-snapshots/
+      name: Paper Notes — 论文海报合集
+    - icon: fontawesome/brands/github
+      link: https://github.com/YufengJin
+      name: GitHub
 
 extra_css:
   - stylesheets/extra.css
@@ -76,6 +87,28 @@ plugins:
   - search:
       # CJK 友好的分词分隔符（Material 官方推荐，让中文搜索可用）
       separator: '[\s​\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  # i18n 声明在 search 之后：插件会接管并按语言重配 search。
+  # 语言选择器由插件自动注入 extra.alternate，Material 渲染在右上角 header。
+  - i18n:
+      docs_structure: suffix        # docs/ml/index.md + docs/ml/index.en.md
+      fallback_to_default: true     # 未翻译的页面在 /en/ 下显示中文原文
+      languages:
+        - locale: zh
+          default: true
+          name: 中文
+          build: true
+        - locale: en
+          name: English
+          build: true
+          site_name: "Yufeng's Learning Notes"
+          site_description: "Personal knowledge base — math / machine learning / programming / reading"
+          nav_translations:
+            首页: Home
+            机器学习: Machine Learning
+            机器人: Robotics
+            数学: Mathematics
+            阅读: Reading
+            线性回归: Linear Regression
 
 nav:
   - 首页: index.md

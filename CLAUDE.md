@@ -10,7 +10,7 @@
 - `docs/style/index.md` — **样式模板页**，枚举所有常用格式；**不进顶部 tab**，仅从首页底部链接（`mkdocs.yml` 里 `validation.nav.omitted_files: ignore` 已放行）。
 - `docs/stylesheets/extra.css` — 统一主题（见下）。`docs/javascripts/mathjax.js` — 公式渲染。
 - `.github/workflows/deploy.yml` — push 到 `main` 即 `mkdocs gh-deploy` 自动构建并部署到 `gh-pages` 分支。
-- `requirements.txt` — `mkdocs-material`。
+- `requirements.txt` — `mkdocs-material` + `mkdocs-static-i18n`（双语，见下）。
 
 ## 统一风格（与 paper-snapshots 一致，务必保持）
 Claude 暖灰底 + 石墨灰强调，极简近单色，**单一浅色主题**（不加深色切换、不引入橙色或其它强调色）。
@@ -27,6 +27,20 @@ Claude 暖灰底 + 石墨灰强调，极简近单色，**单一浅色主题**（
 - 字体：正文 Inter + 中文系统字体回退；代码 JetBrains Mono。
 - 调样式只改 `extra.css`，并同步参照 `docs/style/` 页确认观感。
 
+## 双语
+`mkdocs-static-i18n` 提供中英双语，**语言选择器是 Material 原生的，在右上角 header**
+（插件自动注入 `extra.alternate`，不要手写切换器）。
+
+- 中文在根路径 `/learning-notes/`，英文在 `/learning-notes/en/`。
+- `docs_structure: suffix` —— 英文版是同名 `.en.md`（如 `docs/ml/index.en.md`）。
+- `fallback_to_default: true` —— **没写 `.en.md` 的页面在 `/en/` 下自动显示中文原文**。
+  所以新笔记只写中文完全不会坏站，想翻哪篇再加 `.en.md` 即可。
+- nav 标题的英文在 `mkdocs.yml` 的 `nav_translations` 里；新增分区记得同步加一条。
+- 插件声明在 `search` 之后（它会接管并按语言重配 search）。改动 plugins 顺序后
+  务必验证中文搜索仍可用——CJK separator 容易被插件覆盖掉。
+- `theme.features` 不能有 `navigation.instant`：它与 Material 的语言选择器（contextual
+  link）不兼容，`mkdocs-static-i18n` 会在构建时报 WARNING，`--strict` 下直接中断构建。
+
 ## 添加笔记
 ```bash
 $EDITOR docs/<分区>/my-note.md     # 1) 新建 markdown
@@ -35,6 +49,7 @@ git add . && git commit -m "notes: add my-note" && git push   # 3) Action 自动
 ```
 - 本地预览：`pip install -r requirements.txt && mkdocs serve`（带子路径 `http://127.0.0.1:8000/learning-notes/`）。
 - 写作直接用样式页里的格式：admonition 记录框 / 代码高亮 / 标签页 / 表格 / `$...$` 数学。
+- 只写中文即可；`/en/` 会回退显示中文。要出英文版就加同名 `.en.md`。
 
 ## 资产规则（保持仓库精简）
 - **图片一律先压缩再入库**：转 WebP `cwebp -q 80-85 -resize 1280-1600 0`，放在 `docs/<分区>/img/` 下相对引用。
