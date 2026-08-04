@@ -15,7 +15,20 @@
 
     把元素 **log** 到平直的 tangent space，在同构的 $\mathbb{R}^n$ 里像往常一样做优化，再 **exp** 回到 manifold。全篇都在讲这一张图。
 
-> 学习笔记，源自 Aalok Patwardhan 的 [*A Visual Introduction to Lie Theory*](https://aalok.uk/projects/lietheory/)，并补上了具体推导与代码。
+> 学习笔记，源自 Aalok Patwardhan 的 [*A Visual Introduction to Lie Theory*](https://aalok.uk/projects/lietheory/)<sup>[[1]](#refs)</sup>，并补上了具体推导与代码。
+
+---
+
+## 预备知识
+
+正文将反复用到下面几个概念，每个写成「中文名 = 英文名 = 最小定义」三元组：
+
+- **流形 = manifold** = 一个光滑弯曲的空间，局部看起来像平直的 $\mathbb{R}^n$、整体是弯的。<sup>[[2]](#refs)</sup>
+- **李群 = Lie group** = 既是 manifold、群运算（矩阵乘法与求逆）又光滑的对象。<sup>[[4]](#refs)</sup>
+- **切空间 = tangent space** = 贴在 manifold 某一点处的平直切平面。<sup>[[2]](#refs)</sup>
+- **李代数 = Lie algebra** = Lie group 在单位元处的那张特殊 tangent space（旋转群的记作 $\mathfrak{so}(n)$）。<sup>[[2]](#refs)</sup>
+- **反对称矩阵 = skew-symmetric matrix** = 满足 $A^\top=-A$ 的矩阵；旋转群的 Lie algebra 元素恰好取这种形式。<sup>[[2]](#refs)</sup>
+- **指数映射 / 对数映射 = exponential map / logarithm map** = 在 tangent space 与 manifold 之间往返的一对互逆映射；对旋转就是矩阵指数 / 矩阵对数。<sup>[[4]](#refs)</sup>
 
 ---
 
@@ -74,7 +87,7 @@ $$
 SO(n)=\{\,R\in\mathbb{R}^{n\times n}\ \mid\ R^\top R=I,\ \det R = 1\,\}
 $$
 
-它们是 **manifold**：一个光滑弯曲的空间，**局部**看起来像平直的 $\mathbb{R}^n$（就像地球表面局部近似一张平地图），但**整体**是弯的。既是 manifold、群运算（矩阵乘法与求逆）又光滑，这样的对象就是 **Lie group**。
+它们是 **manifold**：一个光滑弯曲的空间，**局部**看起来像平直的 $\mathbb{R}^n$（就像地球表面局部近似一张平地图），但**整体**是弯的。既是 manifold、群运算（矩阵乘法与求逆）又光滑，这样的对象就是 **Lie group**<sup>[[4]](#refs)</sup>。
 
 !!! info "维数 vs 自由度：为什么 $3\times3$ 旋转只有 3 个自由度"
     $SO(3)$ 的矩阵有 9 个元素，但 $R^\top R=I$ 是一个对称矩阵方程，给出 $\tfrac{3\cdot 4}{2}=6$ 个独立约束。
@@ -90,7 +103,7 @@ $$
 
 ## 4. Lie algebra 与 tangent space
 
-在 manifold 上某一点 $X$ 处，可以贴一张平直的切平面，叫 **tangent space**。在**单位元** $I$ 处的那张特殊的 tangent space，就是这个 Lie group 的 **Lie algebra**，记作 $\mathfrak{so}(n)$。
+在 manifold 上某一点 $X$ 处，可以贴一张平直的切平面，叫 **tangent space**。在**单位元** $I$ 处的那张特殊的 tangent space，就是这个 Lie group 的 **Lie algebra**，记作 $\mathfrak{so}(n)$<sup>[[2]](#refs)</sup>。
 
 对旋转来说，Lie algebra 的元素恰好是 **skew-symmetric matrix**（反对称矩阵，$A^\top=-A$）：
 
@@ -163,7 +176,7 @@ $$
 
 ### 6.2 $SO(3)$：Rodrigues 公式
 
-设 $\boldsymbol{\omega}=\theta\,\hat{\mathbf{u}}$，其中 $\theta=\|\boldsymbol{\omega}\|$ 是转角、$\hat{\mathbf{u}}$ 是单位转轴。利用 $\mathfrak{so}(3)$ 的恒等式 $(\boldsymbol{\omega}^\wedge)^3=-\theta^2\,\boldsymbol{\omega}^\wedge$ 把级数收拢，得到 **Rodrigues' rotation formula**：
+设 $\boldsymbol{\omega}=\theta\,\hat{\mathbf{u}}$，其中 $\theta=\|\boldsymbol{\omega}\|$ 是转角、$\hat{\mathbf{u}}$ 是单位转轴。利用 $\mathfrak{so}(3)$ 的恒等式 $(\boldsymbol{\omega}^\wedge)^3=-\theta^2\,\boldsymbol{\omega}^\wedge$ 把级数收拢，得到 **Rodrigues' rotation formula**<sup>[[2]](#refs)</sup><sup>[[3]](#refs)</sup>：
 
 $$
 R=\exp(\boldsymbol{\omega}^\wedge)=I+\frac{\sin\theta}{\theta}\,\boldsymbol{\omega}^\wedge+\frac{1-\cos\theta}{\theta^2}\,(\boldsymbol{\omega}^\wedge)^2
@@ -190,6 +203,8 @@ $$
 $$
 X(\boldsymbol{\tau}) = X\,\exp(\boldsymbol{\tau}^\wedge)\;\equiv\;X\boxplus\boldsymbol{\tau}
 $$
+
+（$\boxplus$ 记号沿用 micro Lie theory 的约定<sup>[[2]](#refs)</sup>。）
 
 在 $\boldsymbol{\tau}=\mathbf{0}$ 处对 $f$ 关于 $\boldsymbol{\tau}$ 求梯度（这一步完全发生在平坦的 $\mathbb{R}^3$ 里，普通链式法则），拿到 gradient $\mathbf{g}\in\mathbb{R}^3$，然后：
 
@@ -251,14 +266,14 @@ $$
     真实项目里别自己造轮子，直接用成熟实现：
 
     - **[Sophus](https://github.com/strasdat/Sophus)**（C++，`SO3`/`SE3`，含 Jacobian）
-    - **[manif](https://github.com/artivis/manif)**（C++/Python，micro Lie theory 的参考实现）
+    - **[manif](https://github.com/artivis/manif)**（C++/Python，micro Lie theory<sup>[[2]](#refs)</sup> 的参考实现）
     - **[GTSAM](https://gtsam.org/)** / **[Ceres](http://ceres-solver.org/)**（把 manifold 优化封装成 factor graph / `Manifold` 类型）
 
 ---
 
 ## 9. 为什么这套东西重要
 
-Lie theory 是现代机器人**状态估计**的通用语言。凡是要对旋转、位姿做优化或积分的地方，几乎都在用它：
+Lie theory 是现代机器人**状态估计**的通用语言<sup>[[2]](#refs)</sup><sup>[[3]](#refs)</sup>。凡是要对旋转、位姿做优化或积分的地方，几乎都在用它：
 
 | 场景 | 用到 Lie theory 的地方 |
 |---|---|
@@ -273,8 +288,9 @@ Lie theory 是现代机器人**状态估计**的通用语言。凡是要对旋�
 
 ---
 
-## 参考
+## References { #refs }
 
-- Aalok Patwardhan, [*A Visual Introduction to Lie Theory*](https://aalok.uk/projects/lietheory/) — 本笔记的原文。
-- J. Solà, J. Deray, D. Atchuthan, [*A micro Lie theory for state estimation in robotics*](https://arxiv.org/abs/1812.01537)（2018）— 工程视角的权威小册子，配套库为 **manif**。
-- T. Barfoot, *State Estimation for Robotics*（2017）— 系统教材，第 7 章讲 $SO(3)/SE(3)$。
+1. Aalok Patwardhan, [*A Visual Introduction to Lie Theory*](https://aalok.uk/projects/lietheory/), aalok.uk 交互式教程 — 本笔记的原文。
+2. J. Solà, J. Deray, D. Atchuthan, [*A micro Lie theory for state estimation in robotics*](https://arxiv.org/abs/1812.01537), arXiv:1812.01537（2018）— 工程视角的权威小册子，配套库为 **manif**。
+3. T. D. Barfoot, *State Estimation for Robotics*, Cambridge University Press（2017）— 系统教材，第 7 章讲 $SO(3)/SE(3)$。
+4. B. C. Hall, *Lie Groups, Lie Algebras, and Representations: An Elementary Introduction*, 2nd ed., Springer, Graduate Texts in Mathematics 222（2015）。

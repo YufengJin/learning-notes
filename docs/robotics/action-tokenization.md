@@ -1,6 +1,6 @@
 # 机器人 Action Tokenization
 
-把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 **π₀-FAST 风格的离散自回归路线**，并对照 FSQ、Binning 以及连续生成的 flow matching。
+把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 **π₀-FAST 风格的离散自回归路线**<sup>[[1]](#refs)</sup>，并对照 FSQ、Binning 以及连续生成的 flow matching<sup>[[2]](#refs)</sup>。
 
 全程出现三种标签：
 
@@ -47,6 +47,19 @@ robot action（连续向量序列）
         靠 采样 + temperature（§12.1）取出不同解
         靠 注意力掩码（§13）区分 prompt / action
 ```
+
+---
+
+## 预备知识：核心概念三元组
+
+正文反复用到的几个概念，先在这里给出**中文名 = 英文名 = 最小定义**；正文用词与此处一致。
+
+- **词元化 = tokenization** = 把文本或连续信号映射成有限词表（vocabulary）里的整数 ID 序列，供 Transformer 按类别处理<sup>[[3]](#refs)</sup>。
+- **模式平均 = mode averaging** = L2/MSE 回归把多个互斥的正确解平均成一个错误解的现象；它是本文整条离散化路线的核心动机（§2.1）。
+- **离散余弦变换 = DCT (discrete cosine transform)** = 把一段离散信号可逆地分解为一组不同频率余弦基之权重（系数）的正交变换；平滑信号的能量集中在低频系数上<sup>[[4]](#refs)</sup>。
+- **量化 = quantization** = 把连续值映射到有限个格点上（如乘 scale 后四舍五入取整）的操作<sup>[[5]](#refs)</sup>；是"连续 → 离散"链路里唯一有损的一步（§5）。
+- **字节对编码 = BPE (byte pair encoding)** = 反复合并序列中最频繁相邻 pair、把序列变短的无损压缩算法；合并规则从数据统计得到，不含神经网络<sup>[[3]](#refs)</sup>。
+- **前缀语言模型 = prefix-LM** = 前缀（prompt/条件）用双向注意力、后缀（生成目标）用因果注意力的混合掩码 Transformer 结构<sup>[[6]](#refs)</sup>。
 
 ---
 
@@ -98,8 +111,8 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
     MSE 回归本质上是在拟合一个**单峰高斯**，它的最优解是所有正确答案的**平均值**。"向左"和"向右"的平均 = **直直撞上障碍物**。这就是 mode averaging。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · mode averaging vs 多峰分布</div>
-<div class="ln-demo-hint">数据里有两个正确动作（蓝点簇=向左，绿点簇=向右）。拖动滑块改变两簇距离，看 L2 回归的"最优预测"（红线）落在哪里。</div>
+<div class="ln-demo-title">图 1 · mode averaging vs 多峰分布（交互 demo）</div>
+<div class="ln-demo-hint">数据里有两个正确动作（蓝点簇=向左，绿点簇=向右）。拖动滑块改变两簇距离，看 L2 回归的"最优预测"（红线）落在哪里。结论：红线始终落在两簇之间的无人区——回归把两个正确解平均成一个错误解，这就是 mode averaging；勾选"显示离散分布"可见多峰分布同时保留两个解。</div>
 <canvas id="cvMode" width="900" height="280"></canvas>
 <div class="ln-controls">
 <label>两个模式的间距 <input type="range" id="modeGap" min="0" max="100" value="70"></label>
@@ -123,7 +136,7 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
 
 这些整数随后被查 **embedding 表**变成向量喂进 Transformer。关键点：
 
-- **词表（vocabulary）**是有限的（如 PaliGemma 有 257,152 个 token）。
+- **词表（vocabulary）**是有限的（如 PaliGemma 有 257,152 个 token<sup>[[6]](#refs)</sup>）。
 - 每个 token id 对应词表里一行 embedding 向量。
 - 模型输出是**词表上的概率分布**（softmax over 257,152 类）。
 
@@ -138,7 +151,7 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
 
 ### 直觉：把一条曲线拆成"不同频率的余弦波之和"
 
-任何一段离散信号（比如某个关节角度随时间的 50 个采样点），都可以**精确地**表示成一堆不同频率余弦波的加权和。DCT 就是算出"每个频率占多少权重"的那组系数。
+任何一段离散信号（比如某个关节角度随时间的 50 个采样点），都可以**精确地**表示成一堆不同频率余弦波的加权和。DCT 就是算出"每个频率占多少权重"的那组系数<sup>[[4]](#refs)</sup>。
 
 !!! tip "类比：调音台"
     想象一个音频均衡器：低频（重低音）、中频、高频各有一个推子。DCT 就是把信号分解到这些"频率推子"上。机器人动作**平滑** → 几乎全是低频 → 只有最左边几个推子有值，右边一大片≈0。这就是"能量集中在低频"。
@@ -154,8 +167,8 @@ $$
 $k=0$ 是直流分量（整体平均），$k$ 越大频率越高。逆变换 IDCT 用同样的余弦基把系数加回去，**完全可逆**（除浮点误差）。沿**时间轴 T** 对每个动作维度 D 独立做 DCT。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · DCT 能量集中</div>
-<div class="ln-demo-hint">上图是一段"动作信号"（可调平滑度），下图是它的 DCT 系数。看平滑信号如何把能量挤到最左边几个低频系数上。</div>
+<div class="ln-demo-title">图 2 · DCT 能量集中（交互 demo）</div>
+<div class="ln-demo-hint">上图是一段"动作信号"（可调平滑度），下图是它的 DCT 系数；横轴左端为低频、右端为高频。看平滑信号如何把能量挤到最左边几个低频系数上。结论：信号越平滑，非零系数越集中在低频端——这就是能量压缩（energy compaction），是后面取整与 BPE 压缩高效的前提。</div>
 <canvas id="cvDct" width="900" height="360"></canvas>
 <div class="ln-controls">
 <label>信号平滑度 <input type="range" id="dctSmooth" min="1" max="20" value="3"></label>
@@ -173,7 +186,7 @@ $k=0$ 是直流分量（整体平均），$k$ 越大频率越高。逆变换 IDC
 
 这是整条 FAST 链路里**唯一真正丢信息的一步**，也是"连续 → 离散"真正发生的地方。
 
-连续值有无穷多种取值，token 词表只能表示有限个。量化 = **把连续值映射到最近的"格点"上**。最简单的形式：先乘一个缩放系数，再四舍五入取整。
+连续值有无穷多种取值，token 词表只能表示有限个。量化 = **把连续值映射到最近的"格点"上**<sup>[[5]](#refs)</sup>。最简单的形式：先乘一个缩放系数，再四舍五入取整。
 
 ```python
 q = round(x * scale)        # 连续 x → 整数 q   （编码，有损）
@@ -183,8 +196,8 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
 误差 $|x-\hat x|$ 最大约 $\frac{1}{2\,\text{scale}}$。scale 越大 → 格点越密 → 越精确，但整数范围越大、token 越多。这是**精度 vs 压缩率**的权衡。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · 量化的精度 / 压缩权衡</div>
-<div class="ln-demo-hint">蓝线是原始连续信号，红色阶梯是量化后重建的信号。拖动"量化级数"看：级数越少越省（token 少）但越失真。</div>
+<div class="ln-demo-title">图 3 · 量化的精度 / 压缩权衡（交互 demo）</div>
+<div class="ln-demo-hint">蓝线是原始连续信号，红色阶梯是量化后重建的信号。拖动"量化级数"看：级数越少越省（token 少）但越失真。结论：量化级数就是精度 vs 压缩率的权衡旋钮——级数减少，阶梯变粗、重建误差变大；这一步也是整条链路里唯一的有损环节。</div>
 <canvas id="cvQuant" width="900" height="300"></canvas>
 <div class="ln-controls">
 <label>量化级数（bins） <input type="range" id="qBins" min="2" max="64" value="8"> <span class="ln-val" id="qBinsV">8</span></label>
@@ -193,13 +206,13 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
 </div>
 
 !!! warning "FAST 的精妙之处"
-    FAST 不是直接量化原始动作，而是量化 **DCT 系数**。因为高频系数≈0，取整后变成一大片 0——既丢得起（高频对平滑动作几乎没贡献），又制造了可压缩的重复模式。"在频域取整"比"在时域取整"聪明得多。
+    FAST 不是直接量化原始动作，而是量化 **DCT 系数**<sup>[[1]](#refs)</sup>。因为高频系数≈0，取整后变成一大片 0——既丢得起（高频对平滑动作几乎没贡献），又制造了可压缩的重复模式。"在频域取整"比"在时域取整"聪明得多。
 
 ---
 
 ## 6. BPE 字节对编码 <span class="ln-tag ln-learned">LEARNED</span>（统计 fit，非 NN，无损）
 
-取整后得到一长串整数（含大量重复，尤其是 0）。BPE 是一种**无损压缩**算法，把"高频重复的模式"合并成单个新 token，让序列变短。
+取整后得到一长串整数（含大量重复，尤其是 0）。BPE 是一种**无损压缩**算法<sup>[[3]](#refs)</sup>，把"高频重复的模式"合并成单个新 token，让序列变短。
 
 反复执行："找出当前序列里**出现最频繁的相邻 pair**，把它合并成一个新符号"，直到达到目标词表大小。
 
@@ -210,8 +223,8 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
 ```
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · BPE 合并压缩</div>
-<div class="ln-demo-hint">下面是一段量化后的整数序列（很多重复）。点"合并一次"执行一步 BPE，看序列如何变短、字典如何增长。</div>
+<div class="ln-demo-title">图 4 · BPE 合并压缩（交互 demo）</div>
+<div class="ln-demo-hint">下面是一段量化后的整数序列（很多重复）。点"合并一次"执行一步 BPE，看序列如何变短、字典如何增长。结论：每合并一次，序列缩短、字典多一条合并规则；整个过程可逆，压缩完全无损——损失只发生在上一步取整。</div>
 <canvas id="cvBpe" width="900" height="170"></canvas>
 <div class="ln-controls">
 <button id="bpeStep">▶ 合并最频繁的 pair</button>
@@ -223,7 +236,7 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
 "哪些 pair 该合并、合并顺序如何" = **BPE 词表/合并规则**，它是**从训练数据统计出来的**（所以是 learned），但**只是查表式的统计规则，不含任何神经网络/梯度**。给定词表，编码和解码都**完全无损**。
 
 !!! note "FAST 名字的由来"
-    FAST = **F**requency-space **A**ction **S**equence **T**okenization。DCT+BPE 是它的算法本体——纯信号处理 + 统计压缩，没有神经网络。
+    FAST = **F**requency-space **A**ction **S**equence **T**okenization<sup>[[1]](#refs)</sup>。DCT+BPE 是它的算法本体——纯信号处理 + 统计压缩，没有神经网络。
 
 ---
 
@@ -254,11 +267,11 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
 解码方向就是**完全反过来**：BPE 解码 → reshape → 除以 scale → IDCT → 反归一化。
 
 !!! danger "最容易记混的结论"
-    **FAST 不是神经网络！** 它是"确定性可逆压缩（DCT+取整+Flatten）+ 一个统计拟合的 BPE 词表"。唯一的信息损失来自步骤②的取整。这正是它相对 VQ/FSQ 的卖点——**不用训练神经自编码器**，开箱即用。
+    **FAST 不是神经网络！** 它是"确定性可逆压缩（DCT+取整+Flatten）+ 一个统计拟合的 BPE 词表"。唯一的信息损失来自步骤②的取整。这正是它相对 VQ/FSQ 的卖点——**不用训练神经自编码器**，开箱即用<sup>[[1]](#refs)</sup>。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · FAST 完整往返流水线（连续 ↔ 离散，可调 scale）</div>
-<div class="ln-demo-hint">一段平滑的多维动作轨迹，沿时间轴做 DCT → 量化取整 → IDCT 还原。拖动量化 scale 看四个面板同时变化——这是"连续怎么变离散、损失从哪来、token 多少"的最直观演示。</div>
+<div class="ln-demo-title">图 5 · FAST 完整往返流水线（连续 ↔ 离散，可调 scale，交互 demo）</div>
+<div class="ln-demo-hint">一段平滑的多维动作轨迹，沿时间轴做 DCT → 量化取整 → IDCT 还原。拖动量化 scale 看四个面板同时变化——这是"连续怎么变离散、损失从哪来、token 多少"的最直观演示。结论：scale 越大，重建曲线越贴合原轨迹，但整数系数的幅值范围随之变大；全链路的损失只来自取整这一步。</div>
 <canvas id="cvRT" width="900" height="250"></canvas>
 <canvas id="cvTrade" width="900" height="200" style="margin-top:14px"></canvas>
 <div class="ln-controls">
@@ -324,7 +337,7 @@ token → BPE解码 → [0,15,1,0,0,0,0,0] → reshape(8,1) → ÷scale → IDCT
 
 FSQ 路线是**真正的神经网络方案**。要懂 FSQ，先懂它的前身 VQ-VAE 的"码本"思想。
 
-VQ-VAE（Vector Quantized VAE）的想法：维护一本**可学习的"码本"**——比如 256 个向量，每个叫一个 codeword（码字），编号 0~255。
+VQ-VAE（Vector Quantized VAE）<sup>[[7]](#refs)</sup>的想法：维护一本**可学习的"码本"**——比如 256 个向量，每个叫一个 codeword（码字），编号 0~255。
 
 ```text
 编码器(NN) → 连续向量 z
@@ -345,7 +358,7 @@ VQ-VAE（Vector Quantized VAE）的想法：维护一本**可学习的"码本"**
 
 ### straight-through estimator（直通梯度）
 
-"取最近邻 / 四舍五入"是阶梯函数，导数处处为 0，梯度传不回编码器。技巧：**前向用离散值，反向假装它是恒等函数**（梯度直接穿过去）。
+"取最近邻 / 四舍五入"是阶梯函数，导数处处为 0，梯度传不回编码器。技巧：**前向用离散值，反向假装它是恒等函数**（梯度直接穿过去）<sup>[[8]](#refs)</sup>。
 
 ```python
 z_q = z + stop_gradient(quantize(z) - z)
@@ -357,7 +370,7 @@ z_q = z + stop_gradient(quantize(z) - z)
 
 ## 9. FSQ 有限标量量化 <span class="ln-tag ln-learned">LEARNED</span>
 
-FSQ（Finite Scalar Quantization）是 VQ-VAE 的优雅替代：**砍掉可学习码本，改成"在极少数几维上各自做固定网格的四舍五入"**。它无需学习码本，却天然不会坍缩。
+FSQ（Finite Scalar Quantization）<sup>[[9]](#refs)</sup>是 VQ-VAE 的优雅替代：**砍掉可学习码本，改成"在极少数几维上各自做固定网格的四舍五入"**。它无需学习码本，却天然不会坍缩。
 
 核心 trick：
 
@@ -379,8 +392,8 @@ token = undigitize(digits)            # 多维 digit → 单整数（混合进�
     FSQ：码本是**固定的规则网格**（每维等距格点的笛卡尔积），不用学、不会坍缩。只有投影编码器/解码器是神经网络。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · FSQ 的 2D 固定网格码本</div>
-<div class="ln-demo-hint">把动作压到 2 维后，FSQ 的"码字"就是这些规则网格点。移动鼠标（或拖动），看连续点被吸附到最近的网格码字（=一个整数 token）。调每维格点数看码本大小变化。</div>
+<div class="ln-demo-title">图 6 · FSQ 的 2D 固定网格码本（交互 demo）</div>
+<div class="ln-demo-hint">把动作压到 2 维后，FSQ 的"码字"就是这些规则网格点。移动鼠标（或拖动），看连续点被吸附到最近的网格码字（=一个整数 token）。调每维格点数看码本大小变化。结论：FSQ 的码本就是固定的规则网格本身——不用学习、天然不会坍缩，码本大小 = 各维格点数之积。</div>
 <canvas id="cvFsq" width="420" height="420" style="margin:auto"></canvas>
 <div class="ln-controls">
 <label>第1维格点数 <input type="range" id="fsqB1" min="2" max="9" value="6"> <span class="ln-val" id="fsqB1V">6</span></label>
@@ -393,7 +406,7 @@ token = undigitize(digits)            # 多维 digit → 单整数（混合进�
 
 ## 10. Binning 均匀分桶（最朴素基线）<span class="ln-tag ln-direct">DIRECT</span>
 
-RT-2 / OpenVLA 风格，**零学习**：每个维度、每个时间步**独立**地把 $[-1,1]$ 均匀切成 256 个桶，取整成桶编号。
+RT-2<sup>[[10]](#refs)</sup> / OpenVLA<sup>[[11]](#refs)</sup> 风格，**零学习**：每个维度、每个时间步**独立**地把 $[-1,1]$ 均匀切成 256 个桶，取整成桶编号。
 
 ```python
 token = round((a+1)/2 * n_bins)     # 编码
@@ -471,8 +484,8 @@ $$
 - $\tau>0$：从分布随机采样 → 不同 RNG 得到不同可行解；$\tau$ 越大越多样。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · temperature 如何调节多模态采样</div>
-<div class="ln-demo-hint">某个 token 位置的双峰 logits（"向左"和"向右"两个高概率区）。拖动 temperature 看 softmax 分布怎么变；点"采样 20 次"看实际抽到的 token 分布。</div>
+<div class="ln-demo-title">图 7 · temperature 如何调节多模态采样（交互 demo）</div>
+<div class="ln-demo-hint">某个 token 位置的双峰 logits（"向左"和"向右"两个高概率区）。拖动 temperature 看 softmax 分布怎么变；点"采样 20 次"看实际抽到的 token 分布。结论：τ 小时分布坍缩成单一尖峰（只剩最高峰的解），τ 大时两个峰都有机会被抽中——多模态的不同解正是靠随机采样取出来的。</div>
 <canvas id="cvTemp" width="900" height="280"></canvas>
 <div class="ln-controls">
 <label>temperature τ <input type="range" id="tempT" min="0" max="200" value="100"> <span class="ln-val" id="tempTV">1.00</span></label>
@@ -493,13 +506,13 @@ $$
 - **前缀 = 双向注意力（像 encoder）**：prompt + state 是已知条件，互相都能看到（BERT 式），让模型充分理解任务上下文。
 - **后缀 = 因果注意力（像 decoder）**：action token 只能看到自己**左边**的（GPT 式），保证自回归生成时"不偷看未来"。
 
-这种"前缀双向 + 后缀因果"的混合掩码是 **prefix-LM** 结构，PaliGemma / π₀-FAST 都用它。
+这种"前缀双向 + 后缀因果"的混合掩码是 **prefix-LM** 结构，PaliGemma<sup>[[6]](#refs)</sup> / π₀-FAST<sup>[[1]](#refs)</sup> 都用它。
 
 ---
 
 ## 14. 对比：另一条路线 flow matching（π₀）
 
-为了把离散路线放进坐标系，简单看看连续路线。π₀ **不 tokenize**，用 **flow matching**（扩散家族）直接生成连续动作：从高斯噪声出发，沿学到的"速度场"积分，逐步把噪声"流"成动作。
+为了把离散路线放进坐标系，简单看看连续路线。π₀<sup>[[2]](#refs)</sup> **不 tokenize**，用 **flow matching**<sup>[[12]](#refs)</sup>（扩散家族）直接生成连续动作：从高斯噪声出发，沿学到的"速度场"积分，逐步把噪声"流"成动作。
 
 | | π₀-FAST（本笔记主线） | π₀（flow matching） |
 |---|---|---|
@@ -522,8 +535,8 @@ $$
     实践中通常**只有 FAST 真正把 action 编码成 token**；Binning / FSQ 更多作为**推理基线**（只负责把已有 token 解码回动作）。下面的"编码-解码往返对比"是**按各自算法的数学定义**做的概念实测，用来理解三者的精度/压缩取舍。
 
 <div class="ln-demo">
-<div class="ln-demo-title">Demo · FAST vs Binning vs FSQ 重建往返对比</div>
-<div class="ln-demo-hint">同一段动作（可调平滑度/噪声），三种方法各自编码再解码。上图叠加三条重建曲线，下图用柱状对比「重建 MSE」和「token 数」。FSQ 为<b>示意</b>（无训练 checkpoint，用「固定 token 数 + 网格量化」近似其行为）。</div>
+<div class="ln-demo-title">图 8 · FAST vs Binning vs FSQ 重建往返对比（交互 demo）</div>
+<div class="ln-demo-hint">同一段动作（可调平滑度/噪声），三种方法各自编码再解码。上图叠加三条重建曲线（颜色区分方法，与下图柱色一致），下图用柱状对比「重建 MSE」和「token 数」。FSQ 为<b>示意</b>（无训练 checkpoint，用「固定 token 数 + 网格量化」近似其行为）。结论：信号越平滑，FAST 用越少的 token 拿到越低的重建误差；Binning 的误差不随平滑度改善且 token 最多——是否利用时间相关性是三者的关键差别。</div>
 <canvas id="cvCmp" width="900" height="250"></canvas>
 <canvas id="cvCmpBar" width="900" height="190" style="margin-top:14px"></canvas>
 <div class="ln-controls">
@@ -554,11 +567,11 @@ tokenizer 把动作变成 token 之后，是谁在消费这些 token？这一节
 
 ### 16.1 基础模型：PaliGemma（Gemma-2B 解码器 + SigLIP 视觉）
 
-π₀-FAST 的骨干是 **PaliGemma**——一个视觉语言模型（VLM），由两部分组成：
+π₀-FAST 的骨干是 **PaliGemma**<sup>[[6]](#refs)</sup>——一个视觉语言模型（VLM），由两部分组成：
 
 | 组件 | 是什么 | 规格 |
 |---|---|---|
-| 视觉编码器 | **SigLIP So400m/14**（ViT） | patch=14，224×224 → 16×16 = **256 个图像 token / 张** |
+| 视觉编码器 | **SigLIP So400m/14**（ViT）<sup>[[13]](#refs)</sup> | patch=14，224×224 → 16×16 = **256 个图像 token / 张** |
 | 语言模型 (LLM) | **Gemma-2B，decoder-only** | width=2048, depth=18, heads=8, vocab=**257,152** |
 
 !!! note "是 Decoder-only 吗？——是，但用 prefix-LM 掩码"
@@ -589,7 +602,7 @@ tokenizer 把动作变成 token 之后，是谁在消费这些 token？这一节
   <text x="430" y="178" text-anchor="middle" fill="#bc8cff" font-size="11">Gemma 词表 embedding（文本 + action 共享同一张表）</text>
   <text x="10" y="208" fill="#6B675F" font-size="11">注：state 不是单独向量，而是被离散成 256 桶后写进文本 prompt 里（字符串）。</text>
 </svg>
-<div class="ln-fig-cap">先图像、后文本前缀，再 action；前缀双向、后缀因果。</div>
+<div class="ln-fig-cap">图 9 · π₀-FAST 输入序列结构：先图像、后文本前缀，再 action。绿色块 = 前缀（图像 token + 文本 prompt/state，双向注意、不计损失），蓝色块 = 后缀（action token + "|"，因果注意、计损失）；紫色标注每段 embedding 的来源。结论：前缀双向、后缀因果，文本与 action 共享同一张 Gemma 词表 embedding。</div>
 </div>
 
 - **先图像、后文本**：先把每张图过 SigLIP 得到一串图像 token，**再**把 tokenized 文本 prompt 的 embedding 接在后面。
@@ -648,3 +661,21 @@ while 未遇到 EOS 且 步数 < 上限(256):
 - [FAST Tokenization 论文快照](/paper-snapshots/fast-tokenization/) — paper-snapshots 上对 FAST 原论文的精读
 - [Fourier 变换与 DCT](../math/fourier-dct.md) — 把 §4 的 DCT 讲透：能量压缩、为何接近最优(KLT)、JPEG 到 FAST 的同源套路
 - [自回归模型 · BERT / GPT](../ml/autoregressive-models.md) — §11/§13 的展开：三大范式、BERT 双向 vs GPT 因果、为何 VLA 选 Prefix-LM
+
+---
+
+## References { #refs }
+
+1. K. Pertsch, K. Stachowicz, B. Ichter, D. Driess, S. Nair, Q. Vuong, O. Mees, C. Finn, S. Levine. *FAST: Efficient Action Tokenization for Vision-Language-Action Models*. arXiv:2501.09747, 2025.
+2. K. Black et al. *π₀: A Vision-Language-Action Flow Model for General Robot Control*. RSS 2025. arXiv:2410.24164.
+3. R. Sennrich, B. Haddow, A. Birch. *Neural Machine Translation of Rare Words with Subword Units*. ACL 2016. arXiv:1508.07909.
+4. N. Ahmed, T. Natarajan, K. R. Rao. *Discrete Cosine Transform*. IEEE Transactions on Computers, 1974.
+5. A. Gersho, R. M. Gray. *Vector Quantization and Signal Compression*. Kluwer Academic Publishers, 1992.
+6. L. Beyer et al. *PaliGemma: A versatile 3B VLM for transfer*. arXiv:2407.07726, 2024.
+7. A. van den Oord, O. Vinyals, K. Kavukcuoglu. *Neural Discrete Representation Learning*. NeurIPS 2017. arXiv:1711.00937.
+8. Y. Bengio, N. Léonard, A. Courville. *Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation*. arXiv:1308.3432, 2013.
+9. F. Mentzer, D. Minnen, E. Agustsson, M. Tschannen. *Finite Scalar Quantization: VQ-VAE Made Simple*. ICLR 2024. arXiv:2309.15505.
+10. A. Brohan et al. *RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control*. arXiv:2307.15818, 2023.
+11. M. J. Kim et al. *OpenVLA: An Open-Source Vision-Language-Action Model*. arXiv:2406.09246, 2024.
+12. Y. Lipman, R. T. Q. Chen, H. Ben-Hamu, M. Nickel, M. Le. *Flow Matching for Generative Modeling*. ICLR 2023. arXiv:2210.02747.
+13. X. Zhai, B. Mustafa, A. Kolesnikov, L. Beyer. *Sigmoid Loss for Language Image Pre-Training*. ICCV 2023. arXiv:2303.15343.
