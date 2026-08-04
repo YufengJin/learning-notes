@@ -2,6 +2,33 @@
  * navigation.instant 下内联 <script> 翻页不重跑，故走 extra_javascript + document$.subscribe，
  * 并对每个 demo 做存在性守卫。 */
 (function () {
+  /* 页面语言：构建后英文页在 /en/ 子路径下 */
+  const EN = location.pathname.indexOf('/en/') !== -1;
+  /* 所有渲染给读者看的文案集中在这里；坐标/颜色/数据不随语言改变 */
+  const T = EN ? {
+    sqTarget: 'square wave',
+    sqSum: (n) => 'sum of the first ' + n + ' odd harmonics',
+    sqOut: (n, last) => `Using ${n} sine harmonics (frequencies 1,3,5,…,${last}). Note the overshoot at the jumps (Gibbs phenomenon) never goes away: ≈9%.`,
+    basisDc: ' (DC / mean)',
+    ckSignal: 'original signal (blue) vs reconstruction from the first k coefficients (red)',
+    ckCoef: 'DCT coefficients (kept highlighted, discarded gray):',
+    ckRough: 'A high-frequency / noisy', ckSmooth: 'A smooth',
+    ckOut: (kind, k, N, pct, mse, tail) => `${kind} signal | keeping the first ${k}/${N} coefficients | energy captured ${pct}% | reconstruction MSE = ${mse}. ${tail}`,
+    ckTailRough: 'High-frequency signals need many more coefficients to reconstruct well.',
+    ckTailSmooth: 'A smooth signal needs very few coefficients to overlap almost exactly — that is energy compaction.'
+  } : {
+    sqTarget: '目标方波',
+    sqSum: (n) => '前 ' + n + ' 个奇次谐波之和',
+    sqOut: (n, last) => `用了 ${n} 个正弦谐波（频率 1,3,5,…,${last}）。注意跳变处的过冲（吉布斯现象）始终存在 ≈9%。`,
+    basisDc: ' (直流/均值)',
+    ckSignal: '原始信号（蓝） vs 用前 k 个系数重建（红）',
+    ckCoef: 'DCT 系数（保留的高亮，丢弃的灰）：',
+    ckRough: '含高频/噪声', ckSmooth: '平滑',
+    ckOut: (kind, k, N, pct, mse, tail) => `${kind}信号 ｜ 保留前 ${k}/${N} 个系数 ｜ 捕获能量 ${pct}% ｜ 重建 MSE = ${mse}。${tail}`,
+    ckTailRough: '高频信号需要更多系数才能重建好。',
+    ckTailSmooth: '平滑信号只需极少系数即几乎重合——这就是能量压缩。'
+  };
+
   function run() {
     const $ = (id) => document.getElementById(id);
     if (!$('cvSquare') && !$('cvBasis') && !$('cvCompact')) return;
@@ -22,8 +49,8 @@
         const M=900;for(let i=0;i<M;i++){const t=i/M;const sq=(t%1)<0.5?1:-1;const px=20+t*(W-30),py=mid-sq*amp;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
         x.strokeStyle=RED;x.lineWidth=2;x.beginPath();
         for(let i=0;i<M;i++){const t=i/M;let v=0;for(let h=1;h<=2*nh-1;h+=2)v+=(4/Math.PI)*Math.sin(2*Math.PI*h*t)/h;const px=20+t*(W-30),py=mid-v*amp;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
-        x.fillStyle=REF;x.font='12px sans-serif';x.fillText('目标方波',26,20);x.fillStyle=RED;x.fillText('前 '+nh+' 个奇次谐波之和',100,20);
-        out.textContent=`用了 ${nh} 个正弦谐波（频率 1,3,5,…,${2*nh-1}）。注意跳变处的过冲（吉布斯现象）始终存在 ≈9%。`;
+        x.fillStyle=REF;x.font='12px sans-serif';x.fillText(T.sqTarget,26,20);x.fillStyle=RED;x.fillText(T.sqSum(nh),100,20);
+        out.textContent=T.sqOut(nh, 2*nh-1);
       }
       N.oninput=draw;draw();
     })();
@@ -40,7 +67,7 @@
           x.strokeStyle=LINE;x.beginPath();x.moveTo(cx+16,midY);x.lineTo(cx+cw-12,midY);x.stroke();
           const v=basis(k);x.strokeStyle=k===0?GREEN:PURPLE;x.lineWidth=2;x.beginPath();
           for(let n=0;n<Nn;n++){const px=cx+16+n/(Nn-1)*(cw-28),py=midY-v[n]*(ch*0.32);n?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
-          x.fillStyle=MUTED;x.font='12px sans-serif';x.fillText('k='+k+(k===0?' (直流/均值)':''),cx+16,cy+22);}
+          x.fillStyle=MUTED;x.font='12px sans-serif';x.fillText('k='+k+(k===0?T.basisDc:''),cx+16,cy+22);}
       }
       cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();const sx=cv.width/r.width,sy=cv.height/r.height;
         const px=(e.clientX-r.left)*sx,py=(e.clientY-r.top)*sy;
@@ -60,17 +87,17 @@
       function draw(){
         const W=cv.width,H=cv.height,k=+K.value;KV.textContent=k;x.clearRect(0,0,W,H);
         const A=sig(),C=dctO(A),Ck=C.map((c,i)=>i<k?c:0),rec=idctO(Ck);
-        const mid=110,amp=80;x.fillStyle=MUTED;x.font='12px sans-serif';x.fillText('原始信号（蓝） vs 用前 k 个系数重建（红）',14,20);
+        const mid=110,amp=80;x.fillStyle=MUTED;x.font='12px sans-serif';x.fillText(T.ckSignal,14,20);
         x.strokeStyle=LINE;x.beginPath();x.moveTo(20,mid);x.lineTo(W-10,mid);x.stroke();
         x.strokeStyle=BLUE;x.lineWidth=2.5;x.beginPath();for(let n=0;n<N;n++){const px=20+n/(N-1)*(W-30),py=mid-A[n]*amp;n?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
         x.strokeStyle=RED;x.lineWidth=2;x.setLineDash([5,3]);x.beginPath();for(let n=0;n<N;n++){const px=20+n/(N-1)*(W-30),py=mid-rec[n]*amp;n?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();x.setLineDash([]);
         const by=320,maxC=Math.max(...C.map(Math.abs),1e-6),bw=(W-40)/N;
-        x.fillStyle=MUTED;x.fillText('DCT 系数（保留的高亮，丢弃的灰）：',14,210);
+        x.fillStyle=MUTED;x.fillText(T.ckCoef,14,210);
         let kept=0,tot=0;for(let i=0;i<N;i++){tot+=C[i]*C[i];if(i<k)kept+=C[i]*C[i];}
         for(let i=0;i<N;i++){const h=Math.abs(C[i])/maxC*90,px=20+i*bw;x.fillStyle=i<k?PURPLE:ZERO;x.fillRect(px,by-h,bw-2,h);}
         x.strokeStyle=LINE;x.beginPath();x.moveTo(20,by);x.lineTo(W-10,by);x.stroke();
         const mse=A.reduce((s,a,i)=>s+(a-rec[i])**2,0)/N;
-        out.textContent=`${rough?'含高频/噪声':'平滑'}信号 ｜ 保留前 ${k}/${N} 个系数 ｜ 捕获能量 ${(kept/tot*100).toFixed(1)}% ｜ 重建 MSE = ${mse.toExponential(2)}。${rough?'高频信号需要更多系数才能重建好。':'平滑信号只需极少系数即几乎重合——这就是能量压缩。'}`;
+        out.textContent=T.ckOut(rough?T.ckRough:T.ckSmooth, k, N, (kept/tot*100).toFixed(1), mse.toExponential(2), rough?T.ckTailRough:T.ckTailSmooth);
       }
       K.oninput=draw;bS.onclick=()=>{rough=false;bS.classList.add('on');bR.classList.remove('on');draw();};
       bR.onclick=()=>{rough=true;bR.classList.add('on');bS.classList.remove('on');draw();};

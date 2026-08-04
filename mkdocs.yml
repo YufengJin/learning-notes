@@ -119,6 +119,8 @@ plugins:
             线性回归: Linear Regression
             "Fourier 变换与 DCT：从频域到能量压缩": "Fourier Transform & DCT: From Frequency to Energy Compaction"
             "流匹配 ODE 求解器 · 图解": "Flow Matching ODE Solvers, Illustrated"
+            "自回归模型：BERT / GPT 与 Prefix-LM 架构详解": "Autoregressive Models: BERT / GPT and Prefix-LM Architectures Explained"
+            "Action Tokenization：把连续动作离散成 token": "Action Tokenization: Discretizing Continuous Actions into Tokens"
 
 nav:
   - 首页: index.md

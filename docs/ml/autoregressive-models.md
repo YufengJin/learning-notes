@@ -79,7 +79,7 @@ Transformer 的积木是「多头自注意力 + 前馈层」<sup>[[1]](#refs)</s
 
 <div class="ln-demo">
 <div class="ln-demo-title">图 2 · Demo：三种注意力掩码对比</div>
-<div class="ln-demo-hint">点按钮切换。序列假设是 <code>[CLS] 任务 提示 ; A1 A2 A3 |</code>，前 3 个是 prompt 前缀、后 4 个是要生成的 action。看什么：行 = query（谁在看），列 = key（被注意）；token 标签绿色 = prompt 前缀、蓝色 = action 后缀；亮格 = 允许注意（Prefix-LM 模式下前缀内部的双向区显示为绿色），灰格 = 被掩码禁止。结论：因果 = 下三角，双向 = 全亮，Prefix-LM = 左上双向块 + 右下因果三角。</div>
+<div class="ln-demo-hint">点按钮切换。序列假设是 <code>[CLS] 任务 提示 ; A1 A2 A3 |</code>，前 4 个（含分隔符 <code>;</code>）是 prompt 前缀、后 4 个是要生成的 action。看什么：行 = query（谁在看），列 = key（被注意）；token 标签绿色 = prompt 前缀、蓝色 = action 后缀；亮格 = 允许注意（Prefix-LM 模式下前缀内部的双向区显示为绿色），灰格 = 被掩码禁止。结论：因果 = 下三角，双向 = 全亮，Prefix-LM = 左上双向块 + 右下因果三角。</div>
 <canvas id="cvMask" width="460" height="460" style="margin:auto"></canvas>
 <div class="ln-controls" style="justify-content:center">
 <button id="mCausal" class="on">因果 (GPT)</button>

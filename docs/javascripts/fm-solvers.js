@@ -6,6 +6,37 @@
  *   - 图 5/6 的 REAL 数据逐字来自 fm_solver_exp/summary.csv 的真实实验，不得改动。
  * 结构沿用仓库惯例：extra_javascript + document$.subscribe（存在性守卫，翻页安全）。 */
 (function () {
+  /* 页面语言：构建后英文页在 /en/ 子路径下 */
+  const EN = location.pathname.indexOf('/en/') !== -1;
+  /* 所有渲染给读者看的文案集中在这里；坐标/颜色/实验数据不随语言改变 */
+  const T = EN ? {
+    descEuler: "One evaluation: the start velocity k₁ is used for the whole step. The tangent drifts further and further off the arc.",
+    descMidpoint: "A half-step probe takes the midpoint velocity k₂ — the direction is already “pre-bent”, and the error goes from O(dt²) to O(dt³).",
+    descHeun: "A full-step probe gives k₂, averaged with k₁ — the trapezoidal rule, also order 2 but with a different error constant.",
+    descRk4: "Four evaluations weighted as (k₁+2k₂+2k₃+k₄)/6 — essentially Simpson integration inside the step.",
+    trueSol: "exact",
+    errName: "error",
+    convTitle: "Endpoint error of dx/dt = x² (exact x(1)=1)",
+    nfeLog: "NFE (log)",
+    convYlabel: "|x(1) − 1| (log)",
+    dpXlabel: "t (integration time)",
+    dpYlabel: "dt (log)",
+    epYlabel: "endpoint_err (log)"
+  } : {
+    descEuler: "一次评估：起点速度 k₁ 用到底。切线离弧线越走越远。",
+    descMidpoint: "半步探路取中点速度 k₂——方向已经「预弯」，误差从 O(dt²) 变 O(dt³)。",
+    descHeun: "满步探路得 k₂，与 k₁ 取平均——梯形法，同为 2 阶但误差常数不同。",
+    descRk4: "四次评估加权 (k₁+2k₂+2k₃+k₄)/6——本质是在步内做 Simpson 积分。",
+    trueSol: "真解",
+    errName: "误差",
+    convTitle: "dx/dt = x² 的终点误差（真解 x(1)=1）",
+    nfeLog: "NFE（log）",
+    convYlabel: "|x(1) − 1|（log）",
+    dpXlabel: "t（积分时间）",
+    dpYlabel: "dt（log）",
+    epYlabel: "endpoint_err（log）"
+  };
+
   function run() {
     if (!document.getElementById("heroCv") && !document.getElementById("anatomyCv")) return;
     "use strict";
@@ -152,10 +183,8 @@
         b.textContent=SNAME[s];b.style.color="";
         b.addEventListener("click",()=>{method=s;sync();});seg.appendChild(b);});
       const slider=$("anatomyDt");
-      const DESC={euler:"一次评估：起点速度 k₁ 用到底。切线离弧线越走越远。",
-        midpoint:"半步探路取中点速度 k₂——方向已经「预弯」，误差从 O(dt²) 变 O(dt³)。",
-        heun:"满步探路得 k₂，与 k₁ 取平均——梯形法，同为 2 阶但误差常数不同。",
-        rk4:"四次评估加权 (k₁+2k₂+2k₃+k₄)/6——本质是在步内做 Simpson 积分。"};
+      const DESC={euler:T.descEuler,midpoint:T.descMidpoint,
+        heun:T.descHeun,rk4:T.descRk4};
       /* rotation field: exact solution = circular arc */
       const om=1;const f=(x,y)=>[-om*y,om*x];
       function draw(){
@@ -236,7 +265,7 @@
         dot(x0,y0,css("--fms-ink"),4.5);label(x0,y0,"x₀",css("--fms-ink"),20);
         dot(end[0],end[1],col,5);
         dot(trueEnd[0],trueEnd[1],css("--fms-muted"),4);
-        label(trueEnd[0],trueEnd[1],"真解",css("--fms-muted"),-10);
+        label(trueEnd[0],trueEnd[1],T.trueSol,css("--fms-muted"),-10);
         /* error segment */
         ctx.strokeStyle=css("--fms-bad");ctx.lineWidth=1.4;ctx.setLineDash([3,3]);
         const[Xa,Ya]=toPx(end[0],end[1]),[Xb,Yb]=toPx(trueEnd[0],trueEnd[1]);
@@ -407,10 +436,10 @@
         pts:grid.map(n=>[n*mult[s],Math.abs(solve(s,n)-E)])}));
       legendInto($("convLegend"),SOLVERS);
       const anchor=[2,Math.abs(solve("euler",2)-E)];
-      $("convCv")._yname="误差";
+      $("convCv")._yname=T.errName;
       chart($("convCv"),{panels:[{
-        title:"dx/dt = x² 的终点误差（真解 x(1)=1）",
-        series,xlog:true,ylog:true,xlabel:"NFE（log）",ylabel:"|x(1) − 1|（log）",
+        title:T.convTitle,
+        series,xlog:true,ylog:true,xlabel:T.nfeLog,ylabel:T.convYlabel,
         refs:[{slope:-1,anchor,label:"−1"},{slope:-2,anchor,label:"−2"},
               {slope:-4,anchor,label:"−4"}]}]});
     });
@@ -483,9 +512,9 @@
         ctx.textAlign="center";
         for(let tt=0;tt<=1.001;tt+=0.2){ctx.beginPath();ctx.moveTo(X(tt),m.t);
           ctx.lineTo(X(tt),m.t+ph);ctx.stroke();ctx.fillText(tt.toFixed(1),X(tt),m.t+ph+16);}
-        ctx.fillText("t（积分时间）",m.l+pw/2,m.t+ph+32);
+        ctx.fillText(T.dpXlabel,m.l+pw/2,m.t+ph+32);
         ctx.save();ctx.translate(14,m.t+ph/2);ctx.rotate(-Math.PI/2);
-        ctx.fillText("dt（log）",0,0);ctx.restore();
+        ctx.fillText(T.dpYlabel,0,0);ctx.restore();
         /* bars */
         let acc=0,rej=0;
         res.steps.forEach(s=>{
@@ -635,14 +664,14 @@
       chart($("w2Cv"),{panels:["eight_gaussians","two_moons"].map(ds=>({
         title:"W2 vs NFE — "+DSNAME[ds],
         series:mkSeries(ds,1),xlog:true,ylog:false,
-        xlabel:"NFE（log）",ylabel:"W2",
+        xlabel:T.nfeLog,ylabel:"W2",
         floors:[{y:REAL[ds].floor,label:"sample floor "+REAL[ds].floor}]}))});
       $("epCv")._yname="endpoint_err";
       chart($("epCv"),{panels:["eight_gaussians","two_moons"].map(ds=>{
         const a=REAL[ds].euler[0];
         return{title:"endpoint_err vs NFE — "+DSNAME[ds],
           series:mkSeries(ds,2),xlog:true,ylog:true,
-          xlabel:"NFE（log）",ylabel:"endpoint_err（log）",
+          xlabel:T.nfeLog,ylabel:T.epYlabel,
           refs:[{slope:-1,anchor:a,label:"−1"},{slope:-2,anchor:a,label:"−2"},
                 {slope:-4,anchor:a,label:"−4"}]};})});
     });
