@@ -47,20 +47,38 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 
 ## 文章结构契约（按序，仅由这些部件构成）
 
-1. **导语**：两三句话说清这篇是什么、读完得到什么（正文首段，不加 Byline——
-   本站笔记不署名不标日期，git 历史即记录）。
-2. **引言**：一个具体场景钩子 + 主题为什么值得学。
-3. **动机**：这个问题难在哪、现有讲法缺什么。
-4. **预备知识**：每个概念写成**三元组：中文名 = 英文名 = 最小定义**，写完逐条自查
+1. **Byline**：H1 之后第一行，`<div class="ln-byline">日期 · 阅读约 N 分钟 · 作者</div>`。
+   阅读时长 = 全文字数 ÷ 350（中文）或 ÷ 200（英文），四舍五入到分钟。
+   **日期与作者由用户给，缺就问，不编。**
+2. **导语**：`<p class="ln-lead">`，两三句话说清这篇是什么、读完得到什么。
+3. **读法建议**：`<div class="ln-howto">`，谁可以跳过哪节、各节按什么骨架展开。
+   长笔记（>300 行）必写；短笔记可省。
+4. **引言**：一个具体场景钩子 + 主题为什么值得学。
+5. **动机**：这个问题难在哪、现有讲法缺什么。
+6. **预备知识**：每个概念写成**三元组：中文名 = 英文名 = 最小定义**，写完逐条自查
    三者配对无误（术语配反是实测出现过的失败）；正文用词必须与此处一致；
-   教科书级概念也要挂引用。
-5. **正文章节**：每章固定四拍——直觉 → 机制/数学 → 实测（引材料数字）→ 教训。
+   教科书级概念也要挂引用。反复出现的核心概念对（如「认知 / 偶然」）用
+   `<span class="ln-c1">` / `<span class="ln-c2">` 全文同色标注。
+7. **正文章节**：每章固定四拍——直觉 → 机制/数学 → 实测（引材料数字）→ 教训。
+   **四拍要落成可见部件**（这是本站的排版契约，不是可选装饰）：
+   - 章首 `<div class="ln-eyebrow">` 定位标签（如「预备知识 2」「方法 02 · 分歧类」），
+     紧贴其后的 `##`；
+   - 「实测」一拍的关键数字另起 `<div class="ln-chips">`，每个数字一枚
+     `<span class="ln-chip">`（正向 `.good` / 负向 `.bad`）；
+   - 「教训」一拍收进 `<div class="ln-lesson">`，**每章恰好一个**。
    章节主题清单 = 草稿点名的主题，一一对应；不加「未来方向」等模板章节。
-6. **图**：每图 = 编号 + 图注。图注写实质：读者该看什么、颜色/轴什么含义、结论是什么。
+8. **前瞻盒 `<div class="ln-card">`**（可选）：跨章节埋钩子，先招呼后面会引爆的问题。
+   长笔记用它维持叙事粘合；短笔记不用。
+9. **误解盒 `<div class="ln-myth">`**（有则必写）：`<span class="x">很多人以为</span>…
+   `<span class="o">实际上</span>…`。凡是你在材料里看到「反直觉」的点，都该有一个。
+10. **图**：每图 = 编号 + 图注。图注写实质：读者该看什么、颜色/轴什么含义、结论是什么。
    草稿只给构思时，输出图位描述 + 完整图注。
-7. **总结**（如有）：只回收各章已出现的「教训」，不引入新主张。
-8. **References**：文末编号列表（作者、标题、venue/arXiv）；
+11. **总结**（如有）：只回收各章已出现的「教训」，不引入新主张。
+12. **References**：文末编号列表（作者、标题、venue/arXiv）；
    正文借来的论断处挂 `<sup>[[n]](#refs)</sup>`，参考文献标题带 `{ #refs }` 锚点。
+
+部件的完整 HTML 写法与实物预览见 `docs/style/index.md` 第 14 节——**照抄那一节，
+不要自创类名**；样式在 `docs/stylesheets/extra.css` 的「文章结构部件」区块。
 
 ## 三级论断标签（每个论断属于且仅属于一级）
 
@@ -96,6 +114,11 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 | 特殊排版表（如 Butcher 表） | HTML table + 笔记前缀类名 |
 | 交互 demo | `<figure class="<前缀>-panel">` 包 controls + canvas + stats + figcaption |
 | 引用上标 | `<sup>[[n]](#refs)</sup>` |
+| Byline / 导语 / 读法建议 | `.ln-byline` / `.ln-lead` / `.ln-howto` |
+| 章节定位标签 | `.ln-eyebrow`（紧贴其后的 `##`） |
+| 实测数字行 | `.ln-chips` + `.ln-chip`（`.good` / `.bad` 变体） |
+| 教训 / 前瞻 / 误解 | `.ln-lesson` / `.ln-card` / `.ln-myth` |
+| 概念标签 / 判定 / 指标名 | `.ln-c1`·`.ln-c2` / `.ln-verdict ok`·`no` / `kbd.ln-metric` |
 
 ## 交互 demo 规则（canvas js）
 
@@ -132,6 +155,9 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 - [ ] 每个文献论断有 [n] 且 References 完整
 - [ ] 每图有编号 + 实质图注
 - [ ] 章节与契约部件一一对应，无模板填充章节
+- [ ] Byline 的日期与作者来自用户而非编造；阅读时长按字数算过
+- [ ] 每章有 eyebrow；实测数字进了 chips；教训进了 lesson 且每章恰好一个
+- [ ] 部件类名照抄 style 第 14 节，无自创类名
 - [ ] 分类判据核对过；文件名 kebab-case
 - [ ] nav + nav_translations + extra_javascript 三件套齐
 - [ ] demo：存在性守卫、命名空间前缀、无暗色残留、id 与页面逐一比对过

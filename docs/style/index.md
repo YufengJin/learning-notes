@@ -1,6 +1,10 @@
 # 样式模板 / Style Guide
 
-这一页**枚举所有常用格式**，作为统一风格的参照。请逐节看，告诉我哪一项要调整（颜色 / 间距 / 字号 / 圆角等），我据此改 `docs/stylesheets/extra.css`，两个站点同步统一。
+这一页**枚举所有常用格式**，作为统一风格的参照。请逐节看，告诉我哪一项要调整（颜色 / 间距 / 字号 / 圆角等），我据此改 `docs/stylesheets/extra.css`。
+
+!!! note "2026-08-06 改版"
+    本站已从暖灰无衬线改为**冷灰蓝底 + 衬线正文 + 蓝/琥珀双强调**，并新增一组
+    结构部件（第 14 节）。paper-snapshots 不再与本站共用 token，两站各自演化。
 
 ---
 
@@ -231,3 +235,98 @@ $$
 ## 13. 分割线
 
 上面各节之间的 `---` 即分割线（hairline）。
+
+---
+
+## 14. 文章结构部件
+
+这一组把写作契约的「四拍」（直觉 → 机制 → 实测 → 教训）变成**看得见的节奏**。
+都是裸 HTML，直接写进 md 即可（Material 允许行内 HTML）。
+
+### 14.1 Byline（每篇 H1 之后第一行）
+
+```html
+<div class="ln-byline">2026-08-06 · 阅读约 18 分钟 · Yufeng Jin</div>
+```
+
+<div class="ln-byline">2026-08-06 · 阅读约 18 分钟 · Yufeng Jin</div>
+
+### 14.2 导语 + 读法建议
+
+```html
+<p class="ln-lead">一句话说清这篇是什么、读完得到什么。</p>
+<div class="ln-howto"><b>读法建议</b>：预备知识 1–2 熟悉者可跳过；
+方法各节独立成篇，都按「直觉 → 机制 → 实测 → 教训」展开。</div>
+```
+
+<p class="ln-lead">一句话说清这篇是什么、读完得到什么。</p>
+<div class="ln-howto"><b>读法建议</b>：预备知识 1–2 熟悉者可跳过；
+方法各节独立成篇，都按「直觉 → 机制 → 实测 → 教训」展开。</div>
+
+### 14.3 eyebrow（节的定位标签，紧贴 H2 上方）
+
+```html
+<div class="ln-eyebrow">方法 02 · 分歧类</div>
+## MC Dropout
+```
+
+<div class="ln-eyebrow">方法 02 · 分歧类</div>
+## MC Dropout
+
+### 14.4 chips（本节实测数字浓缩成一行）
+
+```html
+<div class="ln-chips">
+  <span class="ln-chip">NFE <b>12</b></span>
+  <span class="ln-chip good">W2 <b>0.031</b></span>
+  <span class="ln-chip bad">AUROC <b>0.146</b>（反向）</span>
+</div>
+```
+
+<div class="ln-chips">
+  <span class="ln-chip">NFE <b>12</b></span>
+  <span class="ln-chip good">W2 <b>0.031</b></span>
+  <span class="ln-chip bad">AUROC <b>0.146</b>（反向）</span>
+</div>
+
+### 14.5 lesson（每节收尾的「教训」，全站唯一的结论视觉）
+
+```html
+<div class="ln-lesson"><b>教训</b>：全局单温度治不了区域性误校准。</div>
+```
+
+<div class="ln-lesson"><b>教训</b>：全局单温度治不了区域性误校准。</div>
+
+### 14.6 card（前瞻盒 · 埋雷）
+
+```html
+<div class="ln-card"><b>预先埋一个雷：共同无知</b>
+<p>若所有后验样本在无数据区收敛到同一插值，分歧为零 —— 第 7 节会引爆它。</p></div>
+```
+
+<div class="ln-card"><b>预先埋一个雷：共同无知</b>
+<p>若所有后验样本在无数据区收敛到同一插值，分歧为零 —— 第 7 节会引爆它。</p></div>
+
+### 14.7 误解盒
+
+```html
+<div class="ln-myth"><span class="x">很多人以为</span>温度标定能改善 OOD 检测。
+<span class="o">实际上</span> AUROC 对单调变换不变，温标不改变任何排名。</div>
+```
+
+<div class="ln-myth"><span class="x">很多人以为</span>温度标定能改善 OOD 检测。
+<span class="o">实际上</span> AUROC 对单调变换不变，温标不改变任何排名。</div>
+
+### 14.8 概念标签 / 判定 / 指标名
+
+同一概念全文同色；`ln-c1` 蓝、`ln-c2` 琥珀。
+
+```html
+<span class="ln-c1">认知</span> <span class="ln-c2">偶然</span>
+<span class="ln-verdict ok">确认</span> <span class="ln-verdict no">推翻</span>
+<kbd class="ln-metric">aleaLeak</kbd>
+```
+
+<span class="ln-c1">认知</span> <span class="ln-c2">偶然</span>
+<span class="ln-verdict ok">确认</span> <span class="ln-verdict no">推翻</span>
+<kbd class="ln-metric">aleaLeak</kbd>

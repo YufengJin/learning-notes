@@ -1,20 +1,37 @@
 /* ============================================================
-   Learning Notes — 统一主题：Claude 暖灰底 (#F8F8F6) + 石墨灰 (#5A5953)
-   与 paper-snapshots 共用同一套设计 token。极简近单色：浅色头部、1px 细线、
-   小圆角、几乎无阴影；石墨灰点缀链接 / 激活态 / 重点。
+   Learning Notes — 主题：冷灰蓝底 (#F4F6F8) + 蓝/琥珀双强调 + 衬线正文
+   定位是「长文读物」，不是文档站：衬线正文、宽松行高、大节间距、
+   四个结构部件（eyebrow / chips / lesson / card）把「四拍」变成可见节奏。
+   ⚠️ 本站与 paper-snapshots 已于 2026-08-06 分家，不再共用设计 token。
    ============================================================ */
 
 :root {
-  /* —— 设计 token（与 paper-snapshots 对齐）—— */
-  --ln-bg:        #F8F8F6;   /* 页面背景 */
+  /* —— 设计 token —— */
+  --ln-bg:        #F4F6F8;   /* 页面背景（冷灰蓝）*/
   --ln-surface:   #FFFFFF;   /* 卡片 / 头部 / 侧栏 */
-  --ln-surface-2: #F1EFEA;   /* 代码块 / 表头 / hover */
-  --ln-ink:       #201F1C;   /* 正文（暖近黑）*/
-  --ln-ink-2:     #3A3833;   /* 次级标题 */
-  --ln-muted:     #6B675F;   /* 次要文字 */
-  --ln-line:      #E8E4DC;   /* 1px 细边框 */
-  --ln-acc:       #5A5953;   /* 强调 / 链接 / 激活（石墨灰）*/
-  --ln-acc-weak:  #ECEAE3;   /* 石墨灰淡底 */
+  --ln-surface-2: #EEF1F5;   /* 代码块 / 表头 / hover */
+  --ln-ink:       #1B2430;   /* 正文（冷近黑）*/
+  --ln-ink-2:     #5A6675;   /* 次级文字 / 副标题 */
+  --ln-muted:     #5A6675;   /* 次要文字（同 ink-2，保持单一次级色）*/
+  --ln-line:      #D8DEE6;   /* 1px 细边框 */
+
+  /* 双强调：蓝 = 结构/定位（eyebrow、概念标签、链接）；琥珀 = 结论/教训 */
+  --ln-acc:       #4F63D2;   /* 强调 A · 蓝 */
+  --ln-acc-weak:  #E4E8FA;   /* 蓝淡底 */
+  --ln-acc2:      #C97B27;   /* 强调 B · 琥珀 */
+  --ln-acc2-weak: #F7EAD8;   /* 琥珀淡底 */
+  --ln-hl:        #FFF6E4;   /* 教训盒底色 */
+  --ln-good:      #2E7D57;   /* 语义：确认 / 正向 */
+  --ln-bad:       #B0433C;   /* 语义：推翻 / 负向 */
+
+  /* 字体族：正文衬线（读物感），标题无衬线（界面感），全部系统字体不走网络 */
+  --ln-serif: Charter, Georgia, "Songti SC", "Noto Serif CJK SC",
+    "Noto Serif SC", "Source Han Serif SC", serif;
+  --ln-sans: "Avenir Next", "Segoe UI", system-ui, -apple-system,
+    "PingFang SC", "Noto Sans SC", sans-serif;
+  --ln-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --ln-section-gap: 72px;    /* 节间距：章与章之间的呼吸 */
 
   /* —— 映射到 Material 变量 —— */
   --md-default-bg-color:          var(--ln-bg);
@@ -40,12 +57,14 @@
   --md-code-fg-color:   var(--ln-ink-2);
 }
 
-/* 中文字体回退（Inter 没有的字形交给系统中文字体）*/
+/* 字体：Material 的 font 已在 mkdocs.yml 关掉（font: false），全部由此处接管 */
 :root {
-  --md-text-font-family: "Inter", -apple-system, BlinkMacSystemFont,
-    "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
-  --md-code-font-family: "JetBrains Mono", ui-monospace, SFMono-Regular,
-    "SF Mono", Menlo, Consolas, monospace;
+  --md-text-font-family: var(--ln-serif);
+  --md-code-font-family: var(--ln-mono);
+}
+/* 界面 chrome（头部 / 导航 / 搜索 / 页脚）保持无衬线，只有正文是衬线 */
+.md-header, .md-tabs, .md-nav, .md-search, .md-footer, .md-typeset .md-button {
+  font-family: var(--ln-sans);
 }
 
 /* —— 头部：浅色 + 底部细线 + 无阴影（扁平极简）—— */
@@ -89,17 +108,40 @@
 /* 右侧 TOC 激活态 */
 .md-nav__link--active { color: var(--ln-acc); }
 
-/* —— 正文排版 —— */
-.md-typeset { font-size: .82rem; line-height: 1.75; color: var(--ln-ink); }
-.md-typeset h1 { font-weight: 700; letter-spacing: -.01em; color: var(--ln-ink); }
-.md-typeset h2 {
-  font-weight: 650;
-  margin-top: 2.2em;
-  padding-bottom: .25em;
-  border-bottom: 1px solid var(--ln-line);
+/* —— 正文排版：衬线读物 —— */
+.md-typeset {
+  font-family: var(--ln-serif);
+  font-size: 17px;
+  line-height: 1.8;
   color: var(--ln-ink);
 }
-.md-typeset h3 { color: var(--ln-ink-2); }
+/* 栏宽收窄，每行字数受控（长文可读性的关键，比字号更重要）*/
+.md-typeset > * { max-width: 46rem; }
+.md-typeset > .ln-chips,
+.md-typeset > table, .md-typeset > .highlight,
+.md-typeset > figure, .md-typeset > .md-typeset__scrollwrap { max-width: none; }
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  font-family: var(--ln-sans);
+  line-height: 1.3;
+  text-wrap: balance;
+  color: var(--ln-ink);
+}
+.md-typeset h1 { font-weight: 700; letter-spacing: -.01em; font-size: 2rem; }
+/* h2 = 一「节」的开始：上方留 72px 呼吸，双线分隔 */
+.md-typeset h2 {
+  font-weight: 650;
+  font-size: 1.55rem;
+  margin-top: var(--ln-section-gap);
+  padding-bottom: .3em;
+  border-bottom: 2px solid var(--ln-line);
+}
+/* eyebrow 紧贴其后的 h2，所以此时 h2 自己不再留大间距 */
+.md-typeset .ln-eyebrow + h2 { margin-top: .1em; }
+.md-typeset h3 { font-size: 1.15rem; margin: 1.6em 0 .4em; color: var(--ln-ink-2); }
+.md-typeset h4 { font-size: 1rem; margin: 1.3em 0 .35em; }
+
 .md-typeset a { text-decoration: none; }
 .md-typeset a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
@@ -162,8 +204,130 @@
 .md-footer { background-color: var(--ln-ink); }
 .md-footer-meta { background-color: var(--ln-ink-2); }
 
-/* 选区高亮用石墨灰淡底 */
+/* 选区高亮 */
 ::selection { background: var(--ln-acc-weak); }
+
+/* ============================================================
+   文章结构部件 —— 把写作契约的「四拍」变成可见节奏。
+   写法见 .claude/skills/learning-note/SKILL.md 与 docs/style/index.md。
+   ============================================================ */
+
+/* ① Byline：日期 | 阅读时长 | 作者。紧跟 h1，下方细线收口 */
+.md-typeset .ln-byline {
+  font: 12.5px/1.6 var(--ln-sans);
+  color: var(--ln-ink-2);
+  letter-spacing: .03em;
+  margin: .2em 0 1.1em;
+  padding-bottom: .8em;
+  border-bottom: 1px solid var(--ln-line);
+}
+
+/* ② 导语：比正文大一号、颜色次级，读者 30 秒判断要不要读 */
+.md-typeset .ln-lead {
+  font-size: 19px;
+  line-height: 1.75;
+  color: var(--ln-ink-2);
+}
+
+/* ③ 读法建议：谁可以跳过哪节 */
+.md-typeset .ln-howto {
+  font: 14px/1.75 var(--ln-sans);
+  color: var(--ln-ink-2);
+  background: var(--ln-surface);
+  border: 1px solid var(--ln-line);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 20px 0 26px;
+}
+.md-typeset .ln-howto b { color: var(--ln-ink); }
+
+/* ④ eyebrow：节的定位标签，如「预备知识 2」「方法 02 · 分歧类」 */
+.md-typeset .ln-eyebrow {
+  font: 600 11px/1.4 var(--ln-sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ln-acc);
+  margin: var(--ln-section-gap) 0 0;
+}
+.md-typeset .ln-eyebrow:first-child { margin-top: 0; }
+
+/* ⑤ chips：本节实测数字浓缩成一行，扫读者不钻正文也能拿到结论 */
+.md-typeset .ln-chips {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0;
+}
+.md-typeset .ln-chip {
+  font: 11.5px/1 var(--ln-sans);
+  padding: 6px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--ln-line);
+  color: var(--ln-ink-2);
+  white-space: nowrap;
+}
+.md-typeset .ln-chip b { color: var(--ln-ink); font-weight: 650; }
+.md-typeset .ln-chip.good { border-color: var(--ln-good); color: var(--ln-good); }
+.md-typeset .ln-chip.bad  { border-color: var(--ln-bad);  color: var(--ln-bad); }
+
+/* ⑥ lesson：每节收尾的「教训」，琥珀左边框 —— 全站唯一的结论视觉 */
+.md-typeset .ln-lesson {
+  border-left: 4px solid var(--ln-acc2);
+  background: var(--ln-hl);
+  padding: 12px 18px;
+  border-radius: 0 6px 6px 0;
+  margin: 18px 0;
+}
+.md-typeset .ln-lesson > :first-child { margin-top: 0; }
+.md-typeset .ln-lesson > :last-child  { margin-bottom: 0; }
+
+/* ⑦ card：前瞻盒（埋雷）—— 先招呼后面章节会引爆的问题 */
+.md-typeset .ln-card {
+  background: var(--ln-surface);
+  border: 1px solid var(--ln-line);
+  border-radius: 6px;
+  padding: 18px 22px;
+  margin: 22px 0;
+}
+.md-typeset .ln-card > :first-child { margin-top: 0; }
+.md-typeset .ln-card > :last-child  { margin-bottom: 0; }
+
+/* ⑧ 误解盒：「很多人以为 X，实际上 Y」 */
+.md-typeset .ln-myth {
+  border-left: 4px solid var(--ln-bad);
+  background: var(--ln-surface);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 18px;
+  margin: 18px 0;
+}
+.md-typeset .ln-myth > :first-child { margin-top: 0; }
+.md-typeset .ln-myth > :last-child  { margin-bottom: 0; }
+.md-typeset .ln-myth .x { color: var(--ln-bad);  font-weight: 650; }
+.md-typeset .ln-myth .o { color: var(--ln-good); font-weight: 650; }
+
+/* ⑨ 概念标签：同一概念全文同色（如「认知」蓝 /「偶然」琥珀）*/
+.md-typeset .ln-c1, .md-typeset .ln-c2 {
+  padding: 1px 7px; border-radius: 4px; font-size: .95em;
+}
+.md-typeset .ln-c1 { background: var(--ln-acc-weak);  color: var(--ln-acc); }
+.md-typeset .ln-c2 { background: var(--ln-acc2-weak); color: var(--ln-acc2); }
+
+/* ⑩ verdict：预测 vs 实测的判定标记（表格里用）*/
+.md-typeset .ln-verdict {
+  display: inline-block;
+  font: 600 11px/1 var(--ln-sans);
+  letter-spacing: .06em;
+  padding: 5px 9px; border-radius: 4px;
+  text-transform: uppercase; color: #fff;
+}
+.md-typeset .ln-verdict.ok { background: var(--ln-good); }
+.md-typeset .ln-verdict.no { background: var(--ln-bad); }
+
+/* ⑪ 指标名内联样式：与普通行内代码区分开 */
+.md-typeset kbd.ln-metric {
+  background: var(--ln-surface-2);
+  border: 1px solid var(--ln-line);
+  box-shadow: none;
+  padding: 1px 6px; border-radius: 4px;
+  font: 13px var(--ln-mono); color: var(--ln-ink);
+}
 
 /* ===== 交互 demo（action-tokenization / autoregressive / fourier-dct）=====
    浅色主题：画布白底，画布内绘图用深色文字/线条（见各 .js 的配色）。 */
@@ -228,14 +392,17 @@
    来源：fm_solver_exp/solver_blog_offline.html 的浅色主题。
    ============================================================ */
 :root{
-  --fms-bg:#F8F8F6; --fms-panel:#FFFFFF; --fms-ink:#201F1C; --fms-muted:#6B675F;
-  --fms-line:#E8E4DC; --fms-grid:#ECEAE3;
+  /* chrome 色一律指向站点 token（2026-08-06 随主题改为冷灰蓝）；
+     求解器五色是数据语义色，与主题无关，保持不动。 */
+  --fms-bg:var(--ln-bg); --fms-panel:var(--ln-surface);
+  --fms-ink:var(--ln-ink); --fms-muted:var(--ln-ink-2);
+  --fms-line:var(--ln-line); --fms-grid:var(--ln-surface-2);
   --fms-euler:#C33C54; --fms-midpoint:#2E6FDF; --fms-heun:#1F8A5D;
   --fms-rk4:#7B3FBF; --fms-dopri5:#D97706;
-  --fms-good:#1F8A5D; --fms-bad:#C33C54;
-  --fms-serif:"Georgia","Songti SC","STSong","Noto Serif CJK SC",serif;
-  --fms-sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  --fms-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --fms-good:var(--ln-good); --fms-bad:var(--ln-bad);
+  --fms-serif:var(--ln-serif);
+  --fms-sans:var(--ln-sans);
+  --fms-mono:var(--ln-mono);
 }
 figure.fms-panel{background:var(--fms-panel);border:1px solid var(--fms-line);
   border-radius:8px;padding:18px 18px 14px;margin:1.4rem 0 2rem}

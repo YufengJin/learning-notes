@@ -12,20 +12,37 @@
 - `.github/workflows/deploy.yml` — push 到 `main` 即 `mkdocs gh-deploy` 自动构建并部署到 `gh-pages` 分支。
 - `requirements.txt` — `mkdocs-material` + `mkdocs-static-i18n`（双语，见下）。
 
-## 统一风格（与 paper-snapshots 一致，务必保持）
-Claude 暖灰底 + 石墨灰强调，极简近单色，**单一浅色主题**（不加深色切换、不引入橙色或其它强调色）。
-全部在 `docs/stylesheets/extra.css` 的设计 token 里：
+## 风格：长文读物（2026-08-06 改版）
+定位是**读物不是文档站**：冷灰蓝底 + 衬线正文 + 蓝/琥珀双强调，**单一浅色主题**
+（不加深色切换）。全部在 `docs/stylesheets/extra.css` 的设计 token 里：
 
 | token | 值 | token | 值 |
 |---|---|---|---|
-| `--ln-bg` | `#F8F8F6` | `--ln-ink` | `#201F1C` |
-| `--ln-surface` | `#FFFFFF` | `--ln-ink-2` | `#3A3833` |
-| `--ln-surface-2` | `#F1EFEA` | `--ln-muted` | `#6B675F` |
-| `--ln-line` | `#E8E4DC` | `--ln-acc`（石墨灰） | `#5A5953` |
+| `--ln-bg` | `#F4F6F8` | `--ln-ink` | `#1B2430` |
+| `--ln-surface` | `#FFFFFF` | `--ln-ink-2` / `--ln-muted` | `#5A6675` |
+| `--ln-surface-2` | `#EEF1F5` | `--ln-acc`（蓝 · 结构） | `#4F63D2` |
+| `--ln-line` | `#D8DEE6` | `--ln-acc2`（琥珀 · 结论） | `#C97B27` |
+| `--ln-hl`（教训盒底） | `#FFF6E4` | `--ln-good` / `--ln-bad` | `#2E7D57` / `#B0433C` |
 
-- 头部/顶部 tab 用浅色（不要彩色横幅），石墨灰只点缀链接 / 激活态 / 重点。
-- 字体：正文 Inter + 中文系统字体回退；代码 JetBrains Mono。
-- 调样式只改 `extra.css`，并同步参照 `docs/style/` 页确认观感。
+- **双强调分工**：蓝 = 结构与定位（eyebrow、概念标签、链接、激活态）；
+  琥珀 = 结论（lesson 左边框）。别混用，混用了强调就失效。
+- **排版三要素**：正文 `--ln-serif`（Charter/Georgia/宋体）17px/1.8；标题
+  `--ln-sans`（Avenir Next/苹方）；节间距 `--ln-section-gap` 72px；正文栏宽 46rem。
+- 字体全部走系统字体，`mkdocs.yml` 里 `font: false`（不从 Google Fonts 拉），离线可用。
+- 头部/顶部 tab 保持浅色，界面 chrome 用无衬线——**只有正文是衬线**。
+- **⚠️ 与 paper-snapshots 已分家**：两站不再共用 token，各自演化。跨站链接照旧。
+- 调样式只改 `extra.css`，并对照 `docs/style/` 页确认观感。
+
+### 文章结构部件
+`extra.css` 的「文章结构部件」区块提供 11 个类，把写作契约的四拍变成可见节奏：
+`.ln-byline` `.ln-lead` `.ln-howto` `.ln-eyebrow` `.ln-chips`/`.ln-chip`
+`.ln-lesson` `.ln-card` `.ln-myth` `.ln-c1`/`.ln-c2` `.ln-verdict` `kbd.ln-metric`。
+**完整写法与实物预览在 `docs/style/index.md` 第 14 节，照抄，别自创类名。**
+
+### Byline（2026-08-06 起）
+每篇 H1 之后第一行必须有 `<div class="ln-byline">日期 · 阅读约 N 分钟 · 作者</div>`。
+时长 = 中文字数 ÷ 350（英文 ÷ 200）。**日期与作者由人给，不编。**
+（此前的「不署名不标日期、git 历史即记录」约定已作废。）
 
 ## 双语
 `mkdocs-static-i18n` 提供中英双语，**语言选择器是 Material 原生的，在右上角 header**

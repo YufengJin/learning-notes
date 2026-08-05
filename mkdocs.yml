@@ -11,10 +11,10 @@ theme:
   language: zh
   custom_dir: overrides       # 覆盖 site_nav：文章页左栏只显示「目录」+ 返回箭头
   palette:
-    scheme: default          # 单一浅色主题（暖灰 + 石墨灰，见 docs/stylesheets/extra.css）
-  font:
-    text: Inter
-    code: JetBrains Mono
+    scheme: default          # 单一浅色主题（冷灰蓝 + 蓝/琥珀，见 docs/stylesheets/extra.css）
+  # font: false —— 不从 Google Fonts 拉字体；正文衬线 / 标题无衬线全部由
+  # extra.css 的 --ln-serif / --ln-sans 定义，纯系统字体，离线可用。
+  font: false
   icon:
     repo: fontawesome/brands/github
   features:
