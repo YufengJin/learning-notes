@@ -33,8 +33,16 @@ Claude 暖灰底 + 石墨灰强调，极简近单色，**单一浅色主题**（
 
 - 中文在根路径 `/learning-notes/`，英文在 `/learning-notes/en/`。
 - `docs_structure: suffix` —— 英文版是同名 `.en.md`（如 `docs/ml/index.en.md`）。
-- `fallback_to_default: true` —— **没写 `.en.md` 的页面在 `/en/` 下自动显示中文原文**。
-  所以新笔记只写中文完全不会坏站，想翻哪篇再加 `.en.md` 即可。
+- **口径（2026-08-05 起）：每篇正文笔记必配 `.en.md`**，与 paper-snapshots「正文双语」对齐。
+  `docs/*/index.md` 这类分区首页豁免。英文版是中文稿的忠实全译——结构逐节对应、不增删章节、
+  数字与公式逐字一致。
+- `fallback_to_default: true` —— 没写 `.en.md` 的页面在 `/en/` 下自动显示中文原文。
+  这是**兜底而非许可**：漏写不会坏站、`--strict` 也不报错，所以只能靠自查。交付前跑：
+  ```bash
+  for f in docs/*/*.md; do case "$f" in *.en.md|*/index.md) continue;; esac; \
+    [ -f "${f%.md}.en.md" ] || echo "MISSING EN: $f"; done
+  ```
+  当前基线：5 篇正文笔记全部有 `.en.md`，该命令无输出。
 - nav 标题的英文在 `mkdocs.yml` 的 `nav_translations` 里；新增分区记得同步加一条。
 - 插件声明在 `search` 之后（它会接管并按语言重配 search）。改动 plugins 顺序后
   务必验证中文搜索仍可用——CJK separator 容易被插件覆盖掉。
@@ -57,7 +65,8 @@ git add . && git commit -m "notes: add my-note" && git push   # 3) Action 自动
 ```
 - 本地预览：`pip install -r requirements.txt && mkdocs serve`（带子路径 `http://127.0.0.1:8000/learning-notes/`）。
 - 写作直接用样式页里的格式：admonition 记录框 / 代码高亮 / 标签页 / 表格 / `$...$` 数学。
-- 只写中文即可；`/en/` 会回退显示中文。要出英文版就加同名 `.en.md`。
+- **中文稿 + 同名 `.en.md` 英文全译，两份都要**（分区 index 页豁免）。漏写只会静默回退中文、
+  不报错，所以用上面「双语」小节的核对命令自查。
 
 ## 资产规则（保持仓库精简）
 - **图片一律先压缩再入库**：转 WebP `cwebp -q 80-85 -resize 1280-1600 0`，放在 `docs/<分区>/img/` 下相对引用。

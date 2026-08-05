@@ -16,20 +16,34 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 
 ## 落地件（本仓库的输出由这些部件构成）
 
-1. **笔记 md** → `docs/<分类>/<kebab-case>.md`。分类四选一（拿不准就问，别猜）：
+1. **笔记 md** → `docs/<分类>/<kebab-case>.md`（中文主稿）。分类四选一（拿不准就问，别猜）：
    - `ml/` 机器学习（模型、训练、生成模型、采样……）
    - `robotics/` 机器人（控制、感知、动作表示……）
    - `math/` 数学（纯数学工具：变换、群论、数值方法本体……）
    - `reading/` 阅读
    - 边界判据：**以读者会去哪里找它为准**。例：流匹配 ODE 求解器 → `ml/`
      （读者带着「flow matching 采样」的问题来）；Fourier/DCT → `math/`（纯数学工具）。
-2. **交互 demo（如有）** → `docs/javascripts/<同名>.js`，规则见下节。
-3. **注册三件套**（缺一不可，漏了页面就是孤儿）：
+2. **英文版 md** → 同目录同名 `docs/<分类>/<kebab-case>.en.md`。**每篇正文笔记必配，不是可选项**
+   （2026-08-05 起的仓库口径；`docs/*/index.md` 这类分区首页豁免，靠 `fallback_to_default`
+   显示中文）。英文版是中文稿的忠实全译：
+   - 结构逐节对应，**不增不删章节**；数字、公式、表格数值逐字一致（翻译不是重写）；
+   - 预备知识的「中文名 = 英文名 = 最小定义」三元组，英文版保留英文名与定义，中文名可留作锚点；
+   - 引用、链接、图路径原样；图注同样译。
+   - 只写中文不会让站点报错（`/en/` 会静默回退中文），所以**这条只能靠自查**——
+     交付前跑第 5 步的核对命令。
+3. **交互 demo（如有）** → `docs/javascripts/<同名>.js`，规则见下节。demo 内的可见文案
+   必须走双语 T 表（现有 demo 的写法照抄），不要把中文硬编码进 canvas 绘制。
+4. **注册三件套**（缺一不可，漏了页面就是孤儿）：
    - `mkdocs.yml` 的 `nav:` 加中文标题条目；
    - `extra_javascript:` 注册 demo js（如有）；
    - `i18n` 插件的 `nav_translations:` 加英文标题（站点双语，界面标题必须两份）。
-4. **构建检查**：`.venv/bin/mkdocs build --strict` 零 WARNING 才算完成；
+5. **构建检查**：`.venv/bin/mkdocs build --strict` 零 WARNING 才算完成；
    同时确认 `site/<分类>/<slug>/` 与 `site/en/<分类>/<slug>/` 都生成了。
+   再跑一次「每篇正文笔记都有 .en.md」的核对（应无输出）：
+   ```bash
+   for f in docs/*/*.md; do case "$f" in *.en.md|*/index.md) continue;; esac; \
+     [ -f "${f%.md}.en.md" ] || echo "MISSING EN: $f"; done
+   ```
 
 ## 文章结构契约（按序，仅由这些部件构成）
 
@@ -131,4 +145,7 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 - 用「改进方向」等模板章节填充篇幅 → 章节清单以草稿为准。
 - demo 样式用裸选择器或通用类名 → 与站点/其它笔记冲突（本站踩过 `.en` 被语言切换误隐藏的坑）。
 - 只加 nav 忘了 nav_translations → 英文站显示中文标题还不报错。
+- 只写中文正文、忘了 `.en.md` → `/en/` 静默回退中文，`--strict` **也不报错**，
+  站点悄悄退回半双语。用落地件第 5 步的核对命令兜底。
+- 写 `.en.md` 时顺手「精简」章节或重述数字 → 英文版是全译不是改写，同受保真规则约束。
 - 转换公式时「顺手改写」数值或不等式方向 → 公式与数字同受保真规则约束。
