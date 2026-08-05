@@ -1,11 +1,15 @@
 # 自回归模型 · BERT / GPT 架构详解
 
+<div class="ln-byline">2026-08-06 · 阅读约 6 分钟 · Yufeng Jin</div>
+
 有哪些序列建模范式、BERT 与 GPT 到底差在哪、为什么机器人 VLA（如 π₀-FAST）用的是两者的混合体 Prefix-LM。是 [Action Tokenization](../robotics/action-tokenization.md) 里"自回归 + 交叉熵""prefix 双向 / action 因果掩码"的展开。
 
 !!! note "一句话先记住"
     所有差别都归结到**一件事**：**每个 token 能"看到"哪些其他 token**（注意力掩码）。**双向**看全部 → 擅长理解（BERT）；**因果**只看左边 → 能自回归生成（GPT）。架构其实是同一套 Transformer block，区别只在掩码和训练目标。
 
 ---
+
+<div class="ln-eyebrow">预备知识</div>
 
 ## 预备知识
 
@@ -19,6 +23,8 @@
 - **交叉熵 = cross-entropy** = 衡量预测分布与目标分布差异的损失函数；next-token 训练即对正确 token 取负对数似然<sup>[[2]](#refs)</sup>。
 
 ---
+
+<div class="ln-eyebrow">框架 01 · 在估计什么</div>
 
 ## 0. 序列模型到底在估计什么
 
@@ -34,6 +40,8 @@
     auto-regressive = 用自己**已经生成的**历史 $x_{<t}$ 去回归预测**下一个** $x_t$，再把它接回输入，循环往复。和动作生成里"逐 token 采样、把 `|` 当终止符"是同一件事。
 
 ---
+
+<div class="ln-eyebrow">框架 02 · 三种搭法</div>
 
 ## 1. 三大架构范式（同一种积木，三种搭法）
 
@@ -73,6 +81,8 @@ Transformer 的积木是「多头自注意力 + 前馈层」<sup>[[1]](#refs)</s
 
 ---
 
+<div class="ln-eyebrow">机制 · 注意力掩码</div>
+
 ## 2. 核心机制：注意力掩码（亲手切换看区别）
 
 自注意力让每个 token 去"查询"其他 token。**掩码**决定哪些查询被允许。这是 BERT / GPT / Prefix-LM 唯一的本质差别。下面这张图：行 = 正在计算的 token（query），列 = 被注意的 token（key），**亮格 = 允许注意**。
@@ -93,6 +103,8 @@ Transformer 的积木是「多头自注意力 + 前馈层」<sup>[[1]](#refs)</s
 - **双向掩码（全亮）**：每个 token 看到整句。理解任务（分类、抽取）需要全局上下文，但**无法直接逐个生成**（会偷看答案）。BERT 用它。
 
 ---
+
+<div class="ln-eyebrow">架构 01 · BERT</div>
 
 ## 3. BERT — 编码器 / 双向 / 掩码语言模型
 
@@ -120,6 +132,8 @@ Transformer 的积木是「多头自注意力 + 前馈层」<sup>[[1]](#refs)</s
 | 代表后代 | RoBERTa, ALBERT, DeBERTa, ELECTRA |
 
 ---
+
+<div class="ln-eyebrow">架构 02 · GPT</div>
 
 ## 4. GPT — 解码器 / 因果 / 自回归
 
@@ -156,6 +170,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">架构 03 · T5 / BART</div>
+
 ## 5. T5 / BART — 编码-解码（seq2seq）
 
 把两支合起来：**编码器**双向读入输入（如英文句子），**解码器**因果地生成输出（如中文句子），中间用**交叉注意力**让解码器读到编码器的表征。天生适合"输入→输出"的转换任务（翻译、摘要）。
@@ -164,6 +180,8 @@ $$
     T5 把**所有任务都变成"文本→文本"**：分类 = 生成标签词，翻译 = 生成译文<sup>[[8]](#refs)</sup>。BART 则用"破坏文本再重建"的去噪目标预训练<sup>[[9]](#refs)</sup>。两者都是 encoder-decoder。
 
 ---
+
+<div class="ln-eyebrow">架构 04 · Prefix-LM</div>
 
 ## 6. Prefix-LM — 前缀双向 + 后缀因果（π₀-FAST 用的就是它）
 
@@ -179,6 +197,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">速查 · 家族全表</div>
+
 ## 7. 模型家族全表（速查）
 
 | 模型 | 范式 | 注意力 | 训练目标 | 典型用途 |
@@ -193,6 +213,8 @@ $$
     GPT 路线（decoder-only + 因果）用一个目标就能既学表征又能生成，规模化最简单，所以大模型几乎都走这支。BERT 这种 encoder-only 仍在"只需理解、不需生成"的场景（如检索、排序）很强。
 
 ---
+
+<div class="ln-eyebrow">收束 · 回到 tokenization</div>
 
 ## 8. 回到 action tokenization
 

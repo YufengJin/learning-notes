@@ -1,5 +1,7 @@
 # Robot Action Tokenization
 
+<div class="ln-byline">2026-08-06 · about 25 min read · Yufeng Jin</div>
+
 This note takes the chain "continuous action → discrete token → continuous action" and unpacks the background knowledge each link requires. The main thread is the **π₀-FAST style discrete autoregressive route**<sup>[[1]](#refs)</sup>, held up against FSQ, Binning, and the continuous alternative, flow matching<sup>[[2]](#refs)</sup>.
 
 Three labels appear throughout:
@@ -8,7 +10,15 @@ Three labels appear throughout:
 - <span class="ln-tag ln-learned">LEARNED</span> — fitted from data (statistical fit or neural network)
 - <span class="ln-tag ln-lossy">LOSSY</span> — information is lost
 
+<div class="ln-howto"><b>How to read this</b>: for the panorama, read Section 0 and Section 7.
+If you only care about one component (DCT / quantization / BPE / VQ-VAE / FSQ / binning), jump
+straight to that section — each is self-contained. Sections 11-14 take the system view of fitting
+the components into a model; Sections 15-16 are the cross-comparison and the full π₀-FAST picture.
+A glossary sits at the end.</div>
+
 ---
+
+<div class="ln-eyebrow">Big picture · problem landscape</div>
 
 ## 0. The big picture: what problem is actually being solved
 
@@ -50,6 +60,8 @@ motivation for discretization ─┐
 
 ---
 
+<div class="ln-eyebrow">Prerequisites</div>
+
 ## Prerequisites: the core concept triples
 
 A few concepts recur throughout the note; here they are as **English term = Chinese term = minimal definition**. The Chinese names are kept as a bridge back to the Chinese literature, and the wording in the body matches these entries.
@@ -62,6 +74,8 @@ A few concepts recur throughout the note; here they are as **English term = Chin
 - **prefix-LM = 前缀语言模型** = a mixed-mask Transformer in which the prefix (prompt/condition) uses bidirectional attention while the suffix (generation target) uses causal attention<sup>[[6]](#refs)</sup>.
 
 ---
+
+<div class="ln-eyebrow">Basics 01 · what an action is</div>
 
 ## 1. What a robot action is (the object being tokenized)
 
@@ -95,6 +109,8 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # anything outside gets clipped
 
 ---
 
+<div class="ln-eyebrow">Basics 02 · why discretize</div>
+
 ## 2. Why discretize continuous actions at all
 
 The most natural idea is to have the network output real-valued actions directly, supervised by L2/MSE regression. So why go to the trouble of discretizing into tokens? Three reasons:
@@ -125,6 +141,8 @@ The wider the gap, the deeper the L2 "optimal prediction" (the mean of the two c
 
 ---
 
+<div class="ln-eyebrow">Basics 03 · tokenization</div>
+
 ## 3. The tokenization concept (borrowed from NLP)
 
 In NLP, tokenization = cutting a continuous stream of characters into integer IDs from a finite vocabulary:
@@ -144,6 +162,8 @@ These integers then index an **embedding table** and become vectors fed into the
     The last **128** ids of the PaliGemma vocabulary are almost never used in practice. You can **commandeer those 128 slots** as action tokens — so action tokens and text tokens **share one embedding table and one softmax output head**. Robot actions really are stuffed into the language model as "words of a new language".
 
 ---
+
+<div class="ln-eyebrow">Component 01 · DCT</div>
 
 ## 4. DCT, the discrete cosine transform <span class="ln-tag ln-direct">DIRECT</span>
 
@@ -182,6 +202,8 @@ $k=0$ is the DC component (the overall mean); larger $k$ means higher frequency.
 
 ---
 
+<div class="ln-eyebrow">Component 02 · quantization</div>
+
 ## 5. Quantization / rounding <span class="ln-tag ln-direct">DIRECT</span> <span class="ln-tag ln-lossy">LOSSY</span>
 
 This is **the only step in the whole FAST chain that genuinely loses information**, and the place where "continuous → discrete" actually happens.
@@ -209,6 +231,8 @@ The error $|x-\hat x|$ is at most about $\frac{1}{2\,\text{scale}}$. A larger sc
     FAST does not quantize the raw action; it quantizes the **DCT coefficients**<sup>[[1]](#refs)</sup>. Because the high-frequency coefficients are ≈0, rounding turns them into a broad field of 0s — affordable to lose (high frequencies contribute almost nothing to a smooth action) while manufacturing a compressible repeated pattern. "Rounding in the frequency domain" is far smarter than "rounding in the time domain".
 
 ---
+
+<div class="ln-eyebrow">Component 03 · BPE</div>
 
 ## 6. BPE, byte pair encoding <span class="ln-tag ln-learned">LEARNED</span> (statistical fit, not an NN, lossless)
 
@@ -239,6 +263,8 @@ merge (Z,b)→Y:  Y Y Y             ← 9 symbols squeezed into 3, fully recover
     FAST = **F**requency-space **A**ction **S**equence **T**okenization<sup>[[1]](#refs)</sup>. DCT+BPE is the algorithm itself — pure signal processing plus statistical compression, no neural network.
 
 ---
+
+<div class="ln-eyebrow">System 01 · FAST panorama</div>
 
 ## 7. Putting FAST together (the panorama)
 
@@ -333,6 +359,8 @@ reconstruction MSE ≈ 1.7e-4   ← 8 values recovered almost perfectly from jus
 
 ---
 
+<div class="ln-eyebrow">Component 04 · VQ-VAE</div>
+
 ## 8. VQ-VAE and codebooks (the prerequisite for understanding FSQ) <span class="ln-tag ln-learned">LEARNED</span> (a genuine neural network)
 
 The FSQ route is **a genuine neural network approach**. To understand FSQ, first understand the "codebook" idea of its predecessor, VQ-VAE.
@@ -367,6 +395,8 @@ z_q = z + stop_gradient(quantize(z) - z)
 ```
 
 ---
+
+<div class="ln-eyebrow">Component 05 · FSQ</div>
 
 ## 9. FSQ, finite scalar quantization <span class="ln-tag ln-learned">LEARNED</span>
 
@@ -404,6 +434,8 @@ token = undigitize(digits)            # multi-dim digits → one integer (mixed 
 
 ---
 
+<div class="ln-eyebrow">Component 06 · binning</div>
+
 ## 10. Binning, uniform bucketing (the most naive baseline) <span class="ln-tag ln-direct">DIRECT</span>
 
 The RT-2<sup>[[10]](#refs)</sup> / OpenVLA<sup>[[11]](#refs)</sup> style, with **zero learning**: for every dimension and every time step **independently**, cut $[-1,1]$ into 256 uniform buckets and round to the bucket index.
@@ -427,6 +459,8 @@ Seeing all three side by side:
 | exploits temporal correlation | ❌ | ✅ (DCT) | ✅ (attention) |
 
 ---
+
+<div class="ln-eyebrow">System 02 · autoregressive modelling</div>
 
 ## 11. Autoregressive modelling + cross-entropy
 
@@ -464,6 +498,8 @@ loss = -sum(token_logp * loss_mask) / sum(loss_mask)  # loss only over the actio
 
 ---
 
+<div class="ln-eyebrow">System 03 · multimodality</div>
+
 ## 12. How multimodality is obtained "for free"
 
 Back to the mode averaging problem of §2.1. Discrete tokens + cross-entropy solve it **on three levels**:
@@ -499,6 +535,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">System 04 · attention masking</div>
+
 ## 13. Attention masking: bidirectional prefix vs causal action
 
 Within the sequence, the prompt/state (prefix) and the action (postfix) play different roles and get different attention masks (`ar_mask`):
@@ -509,6 +547,8 @@ Within the sequence, the prompt/state (prefix) and the action (postfix) play dif
 This "bidirectional prefix + causal postfix" mixed mask is the **prefix-LM** structure, used by both PaliGemma<sup>[[6]](#refs)</sup> and π₀-FAST<sup>[[1]](#refs)</sup>.
 
 ---
+
+<div class="ln-eyebrow">Contrast 01 · flow matching</div>
 
 ## 14. A contrast: the other route, flow matching (π₀)
 
@@ -526,6 +566,8 @@ To place the discrete route on a map, let us glance at the continuous one. π₀
     Both routes are solving the multimodality puzzle of "one observation admits several reasonable actions". FAST answers with "discretize + classify", π₀ with "continuous stochastic generation". Once you understand why the discrete route needs tokenization (mode averaging + LLM reuse), you understand the central tension of this field.
 
 ---
+
+<div class="ln-eyebrow">Contrast 02 · reconstruction</div>
 
 ## 15. Reconstruction quality of the three tokenizers compared
 
@@ -560,6 +602,8 @@ To place the discrete route on a map, let us glance at the continuous one. π₀
     The core trade-off is **"token count ↔ precision ↔ whether temporal structure is exploited"**. Binning is the most naive: one token per scalar, constant error but the most tokens, and no notion of temporal correlation. FAST uses DCT to turn temporal correlation into low-frequency sparsity, **buying higher precision with fewer tokens** (provided the action is smooth). FSQ uses a neural network to learn a compact latent space, with a fixed and controllable token count, but it has to be trained first.
 
 ---
+
+<div class="ln-eyebrow">System 05 · full model</div>
 
 ## 16. The full π₀-FAST model: base model / inputs / outputs
 
@@ -631,6 +675,8 @@ The generated run of variable-length action tokens is restored: take the tokens 
     However many tokens sit in the middle, the decoder uses `time_horizon` / `action_dim` to force a reshape back to `(T, D)`, matching exactly the **input** shape of the tokenizer in §1 — and the whole "continuous (T,D) → token → continuous (T,D)" loop closes.
 
 ---
+
+<div class="ln-eyebrow">Quick reference · glossary</div>
 
 ## Glossary (quick reference)
 

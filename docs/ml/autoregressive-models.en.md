@@ -1,11 +1,15 @@
 # Autoregressive Models · BERT / GPT Architectures Explained
 
+<div class="ln-byline">2026-08-06 · about 10 min read · Yufeng Jin</div>
+
 Which sequence-modelling paradigms exist, what exactly separates BERT from GPT, and why robot VLAs (such as π₀-FAST) use a hybrid of the two called Prefix-LM. This page unfolds the "autoregressive + cross-entropy" and "bidirectional prefix / causal action mask" remarks made in [Action Tokenization](../robotics/action-tokenization.md).
 
 !!! note "One sentence to remember first"
     Every difference reduces to **one thing**: **which other tokens each token is allowed to "see"** (the attention mask). **Bidirectional** sees everything → good at understanding (BERT); **causal** sees only the left → capable of autoregressive generation (GPT). The architecture is the same Transformer block throughout; only the mask and the training objective change.
 
 ---
+
+<div class="ln-eyebrow">Preliminaries</div>
 
 ## Preliminaries
 
@@ -19,6 +23,8 @@ The main text uses the following concepts over and over. Each is given as "**Eng
 - **cross-entropy = 交叉熵** = the loss function measuring the discrepancy between the predicted and the target distribution; next-token training is exactly the negative log-likelihood of the correct token<sup>[[2]](#refs)</sup>.
 
 ---
+
+<div class="ln-eyebrow">Framing 01 · what is estimated</div>
 
 ## 0. What is a sequence model actually estimating
 
@@ -34,6 +40,8 @@ Given a string of tokens $x_1,x_2,\dots,x_n$, a language model is essentially es
     auto-regressive = regress on your own **already-generated** history $x_{<t}$ to predict the **next** $x_t$, then feed it back into the input and repeat. It is the very same thing as "sample token by token, treat `|` as the terminator" in action generation.
 
 ---
+
+<div class="ln-eyebrow">Framing 02 · three stackings</div>
 
 ## 1. The three architectural paradigms (one set of bricks, three ways to stack them)
 
@@ -73,6 +81,8 @@ The Transformer brick is "multi-head self-attention + feed-forward layer"<sup>[[
 
 ---
 
+<div class="ln-eyebrow">Mechanism · attention mask</div>
+
 ## 2. The core mechanism: the attention mask (flip it yourself and see) { #2 }
 
 Self-attention lets every token "query" the other tokens. The **mask** decides which queries are permitted. This is the only essential difference between BERT, GPT and Prefix-LM. In the figure below: row = the token being computed (query), column = the token being attended to (key), **a lit cell = attention allowed**.
@@ -93,6 +103,8 @@ Self-attention lets every token "query" the other tokens. The **mask** decides w
 - **Bidirectional mask (fully lit)**: every token sees the whole sentence. Understanding tasks (classification, extraction) need global context, but **you cannot generate token by token directly** (you would peek at the answer). BERT uses it.
 
 ---
+
+<div class="ln-eyebrow">Architecture 01 · BERT</div>
 
 ## 3. BERT — encoder / bidirectional / masked language model
 
@@ -120,6 +132,8 @@ Because you have to "guess the middle from both sides", the attention must be bi
 | Notable descendants | RoBERTa, ALBERT, DeBERTa, ELECTRA |
 
 ---
+
+<div class="ln-eyebrow">Architecture 02 · GPT</div>
 
 ## 4. GPT — decoder / causal / autoregressive
 
@@ -156,6 +170,8 @@ This is precisely the objective by which π₀-FAST treats action tokens as lang
 
 ---
 
+<div class="ln-eyebrow">Architecture 03 · T5 / BART</div>
+
 ## 5. T5 / BART — encoder-decoder (seq2seq)
 
 Put the two branches together: the **encoder** reads the input bidirectionally (say, an English sentence), the **decoder** generates the output causally (say, a Chinese sentence), and **cross-attention** in between lets the decoder read the encoder's representations. This is naturally suited to "input → output" conversion tasks (translation, summarisation).
@@ -164,6 +180,8 @@ Put the two branches together: the **encoder** reads the input bidirectionally (
     T5 turns **every task into "text → text"**: classification = generate the label word, translation = generate the translated text<sup>[[8]](#refs)</sup>. BART instead pre-trains with a denoising objective of "corrupt the text, then reconstruct it"<sup>[[9]](#refs)</sup>. Both are encoder-decoder.
 
 ---
+
+<div class="ln-eyebrow">Architecture 04 · Prefix-LM</div>
 
 ## 6. Prefix-LM — bidirectional prefix + causal suffix (exactly what π₀-FAST uses)
 
@@ -179,6 +197,8 @@ The "Prefix-LM" button in the demo above (Figure 2) shows you the shape of this 
 
 ---
 
+<div class="ln-eyebrow">Quick reference · family table</div>
+
 ## 7. The full model-family table (quick reference)
 
 | Model | Paradigm | Attention | Training objective | Typical use |
@@ -193,6 +213,8 @@ The "Prefix-LM" button in the demo above (Figure 2) shows you the shape of this 
     The GPT route (decoder-only + causal) learns representations and gains generation from a single objective, which makes it the simplest to scale — so nearly all large models take this branch. Encoder-only models like BERT remain strong in settings that need understanding only and no generation (retrieval, ranking).
 
 ---
+
+<div class="ln-eyebrow">Wrap-up · back to tokenization</div>
 
 ## 8. Back to action tokenization
 

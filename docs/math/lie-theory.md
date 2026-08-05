@@ -1,5 +1,7 @@
 # Lie Theory：面向优化与机器人的直观入门
 
+<div class="ln-byline">2026-08-06 · 阅读约 5 分钟 · Yufeng Jin</div>
+
 !!! abstract "一句话导览"
     **Lie group** 是一个"光滑弯曲"的空间，里面装着代表 transformation 的元素（旋转、位姿等）。
     麻烦在于：**你没法在弯曲空间上直接做加减、求梯度**。
@@ -19,6 +21,8 @@
 
 ---
 
+<div class="ln-eyebrow">预备知识</div>
+
 ## 预备知识
 
 正文将反复用到下面几个概念，每个写成「中文名 = 英文名 = 最小定义」三元组：
@@ -31,6 +35,8 @@
 - **指数映射 / 对数映射 = exponential map / logarithm map** = 在 tangent space 与 manifold 之间往返的一对互逆映射；对旋转就是矩阵指数 / 矩阵对数。<sup>[[4]](#refs)</sup>
 
 ---
+
+<div class="ln-eyebrow">问题 01 · 起点</div>
 
 ## 1. 回顾：欧氏空间里的优化
 
@@ -50,6 +56,8 @@ $$
     比如它必须是一个**旋转**——一个 $3\times3$ 且满足特定约束的矩阵。这时"随便扰动一个数"立刻就出问题。
 
 ---
+
+<div class="ln-eyebrow">问题 02 · 困境</div>
 
 ## 2. 困境：在一个 rotation 上做优化
 
@@ -79,6 +87,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">概念 01 · 弯曲空间</div>
+
 ## 3. Manifolds 与 Lie groups
 
 所有合法的 2D 旋转组成的集合，叫 **special orthogonal group** $SO(2)$；3D 的叫 $SO(3)$：
@@ -100,6 +110,8 @@ $$
 </figure>
 
 ---
+
+<div class="ln-eyebrow">概念 02 · 切空间</div>
 
 ## 4. Lie algebra 与 tangent space
 
@@ -129,6 +141,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">概念 03 · 代理坐标</div>
+
 ## 5. hat 与 vee：$\mathbb{R}^n$ 作为代理 tangent space
 
 tangent space（那些反对称矩阵）虽然是平的，但写成矩阵仍不方便直接喂给优化器。好在它与普通向量空间 $\mathbb{R}^n$ **同构**——两者之间用两个互逆的算子搬运：
@@ -148,6 +162,8 @@ $$
 于是我们真正拿去做 gradient descent 的对象，就是那个朴素的 3 维向量 $\boldsymbol{\omega}$——它没有任何约束，爱怎么扰动怎么扰动。
 
 ---
+
+<div class="ln-eyebrow">概念 04 · 弯平互通</div>
 
 ## 6. exp 与 log：连接弯与平
 
@@ -196,6 +212,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">应用 01 · 一步优化</div>
+
 ## 7. 合起来：manifold 上的一步优化
 
 现在把三个空间串成一个闭环。设 cost function $f(X)$ 定义在 manifold 上（$X\in SO(3)$）。核心技巧是用 **right perturbation** 把 $X$ 参数化成一个**局部的、无约束的**小向量 $\boldsymbol{\tau}\in\mathbb{R}^3$：
@@ -218,6 +236,8 @@ $$
 这就是全篇那张图的落地：**log 摊平 → 在 $\mathbb{R}^n$ 优化 → exp 卷回**。约束被 $\exp$ 天然保证，优化器眼里始终只有一个自由的小向量。
 
 ---
+
+<div class="ln-eyebrow">应用 02 · 动手实现</div>
 
 ## 8. 代码小样：手写 $SO(3)$ 的 hat / vee / exp / log
 
@@ -270,6 +290,8 @@ $$
     - **[GTSAM](https://gtsam.org/)** / **[Ceres](http://ceres-solver.org/)**（把 manifold 优化封装成 factor graph / `Manifold` 类型）
 
 ---
+
+<div class="ln-eyebrow">收束 · 为什么重要</div>
 
 ## 9. 为什么这套东西重要
 

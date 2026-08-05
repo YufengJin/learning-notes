@@ -1,5 +1,7 @@
 # Lie Theory: An Intuitive Introduction for Optimization and Robotics
 
+<div class="ln-byline">2026-08-06 · about 11 min read · Yufeng Jin</div>
+
 !!! abstract "The whole story in one sentence"
     A **Lie group** is a "smoothly curved" space whose elements represent transformations (rotations, poses, and so on).
     The trouble is: **you cannot add, subtract, or take gradients directly on a curved space**.
@@ -19,6 +21,8 @@
 
 ---
 
+<div class="ln-eyebrow">Prerequisites</div>
+
 ## Prerequisites
 
 The main text keeps returning to the following concepts, each written as an "English term = Chinese name = minimal definition" triple:
@@ -31,6 +35,8 @@ The main text keeps returning to the following concepts, each written as an "Eng
 - **exponential map / logarithm map = 指数映射 / 对数映射** = a pair of mutually inverse maps travelling between the tangent space and the manifold; for rotations they are the matrix exponential and matrix logarithm.<sup>[[4]](#refs)</sup>
 
 ---
+
+<div class="ln-eyebrow">Problem 01 · starting point</div>
 
 ## 1. Recap: optimization in Euclidean space
 
@@ -50,6 +56,8 @@ The crucial premise here is that **$\mathbf{x}$ is a free vector**. Each of its 
     Say it must be a **rotation** — a $3\times3$ matrix satisfying particular constraints. Then "just perturb one number" breaks down immediately.
 
 ---
+
+<div class="ln-eyebrow">Problem 02 · the dilemma</div>
 
 ## 2. The dilemma: optimizing over a rotation
 
@@ -79,6 +87,8 @@ This is exactly where ordinary optimization hits a wall: the valid rotations do 
 
 ---
 
+<div class="ln-eyebrow">Concept 01 · curved spaces</div>
+
 ## 3. Manifolds and Lie groups
 
 The set of all valid 2D rotations is called the **special orthogonal group** $SO(2)$; the 3D version is $SO(3)$:
@@ -100,6 +110,8 @@ They are **manifolds**: smoothly curved spaces that **locally** look like flat $
 </figure>
 
 ---
+
+<div class="ln-eyebrow">Concept 02 · tangent space</div>
 
 ## 4. Lie algebra and tangent space
 
@@ -129,6 +141,8 @@ Note that the number of independent components of a skew-symmetric matrix (1 for
 
 ---
 
+<div class="ln-eyebrow">Concept 03 · proxy coordinates</div>
+
 ## 5. hat and vee: $\mathbb{R}^n$ as a proxy tangent space
 
 The tangent space (those skew-symmetric matrices) is flat, but written as matrices it is still awkward to feed straight into an optimizer. Fortunately it is **isomorphic** to the ordinary vector space $\mathbb{R}^n$ — two mutually inverse operators ferry elements between them:
@@ -148,6 +162,8 @@ $$
 So the object we actually hand to gradient descent is that plain 3-dimensional vector $\boldsymbol{\omega}$ — it carries no constraints and can be perturbed however we like.
 
 ---
+
+<div class="ln-eyebrow">Concept 04 · curved to flat</div>
 
 ## 6. exp and log: connecting the curved and the flat
 
@@ -196,6 +212,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">Application 01 · one step</div>
+
 ## 7. Putting it together: one optimization step on a manifold
 
 Now chain the three spaces into a closed loop. Let the cost function $f(X)$ be defined on the manifold ($X\in SO(3)$). The key trick is to use a **right perturbation** to parameterize $X$ by a **local, unconstrained** small vector $\boldsymbol{\tau}\in\mathbb{R}^3$:
@@ -218,6 +236,8 @@ Take the gradient of $f$ with respect to $\boldsymbol{\tau}$ at $\boldsymbol{\ta
 This is the diagram of the whole note, made concrete: **log to flatten → optimize in $\mathbb{R}^n$ → exp to wrap back**. The constraints are guaranteed automatically by $\exp$, and all the optimizer ever sees is one free little vector.
 
 ---
+
+<div class="ln-eyebrow">Application 02 · hands-on</div>
 
 ## 8. Code sample: hand-writing hat / vee / exp / log for $SO(3)$
 
@@ -270,6 +290,8 @@ This is the diagram of the whole note, made concrete: **log to flatten → optim
     - **[GTSAM](https://gtsam.org/)** / **[Ceres](http://ceres-solver.org/)** (wrap manifold optimization as factor graphs / a `Manifold` type)
 
 ---
+
+<div class="ln-eyebrow">Wrap-up · why it matters</div>
 
 ## 9. Why all this matters
 

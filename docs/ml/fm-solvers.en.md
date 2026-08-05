@@ -1,5 +1,7 @@
 # Flow Matching ODE Solvers · Illustrated
 
+<div class="ln-byline">2026-08-06 · about 21 min read · Yufeng Jin</div>
+
 Sampling an image = numerically integrating an ODE. This note takes five classic solvers apart and explains each one (<span class="fms-t-euler">Euler</span>, <span class="fms-t-midpoint">Midpoint</span>, <span class="fms-t-heun">Heun</span>, <span class="fms-t-rk4">RK4</span>, <span class="fms-t-dopri5">Dopri5</span>) — every animation is a **real integration**, and every data figure comes from a reproducible experiment.
 
 <figure class="fms-panel">
@@ -9,6 +11,8 @@ Sampling an image = numerically integrating an ODE. This note takes five classic
 
 ---
 
+<div class="ln-eyebrow">Opening</div>
+
 ## 1 · Introduction
 
 You have trained a flow matching model. When you sample, there is always that one line in the code — `x = solver.step(x, t)` — but what actually happens inside it? Why does Stable Diffusion 3 default to 28 steps rather than 1000? Why do some people use Euler, others Heun, and others the impressive-sounding DPM-Solver? How much compute does swapping the solver really save?
@@ -17,6 +21,13 @@ This note answers those questions through a **fully reproducible 2D toy experime
 
 Read it however you like, but two ground rules apply: every interactive figure on this page is **real numerical integration inside your browser** (not a pre-rendered GIF), and every number in every data figure comes from an actual run of the companion code `fm_solvers.py`. By the end you should be able to answer: *given an NFE budget, which solver should I pick, and why.*
 
+<div class="ln-howto"><b>How to read this</b>: if you are already comfortable with ODEs and
+numerical integration, jump straight to Section 4. If you only want the conclusions, read the
+five takeaways in Section 8.3 and the decision table in Section 9. Sections 4-6 are the main
+method line; each unfolds as intuition, mechanism/math, measurement, lesson.</div>
+
+<div class="ln-eyebrow">Opening · why it matters</div>
+
 ## 2 · Motivation: why a generative modeling engineer should understand solvers
 
 Three reasons, each more practical than the last:
@@ -24,6 +35,8 @@ Three reasons, each more practical than the last:
 - **NFE is money.** The cost of generating one image ≈ number of network forward passes × cost per forward pass. Once the model is fixed, the cost per forward pass is fixed too — what the solver decides is *how many forward passes the same quality costs you*.
 - **The gap is a factor of 3, and it is free.** In the experiments here, for one and the same trained model to reach quality close to the sampling floor: Euler needs NFE=40, RK4 only 12 (Section 8). No model changes, no retraining — just a few different lines of solver code.
 - **The conclusions are not obvious.** At very low budgets a higher-order method can actually be worse; when the field is poorly trained Euler overtakes RK4; and the "automatic transmission" of adaptive methods is not optimal everywhere either. Choosing by intuition is an easy way to choose wrong — which is why every claim here comes with data.
+
+<div class="ln-eyebrow">Prerequisites</div>
 
 ## 3 · Prerequisites
 
@@ -70,6 +83,8 @@ Numerical solution boils down to one sentence: chop $t\in[0,1]$ into $N$ small s
 
 When comparing solvers, the horizontal axis is always **NFE** (number of function evaluations, i.e. network forward passes) rather than step count: one RK4 step costs 4 forward passes, one Euler step only 1. "10 RK4 steps vs 10 Euler steps" is unfair; "RK4 at NFE=40 vs Euler at NFE=40" is fair — *NFE is money, and it is the horizontal axis of every figure in this note.*
 
+<div class="ln-eyebrow">Method 01 · fixed step</div>
+
 ## 4 · Fixed-step solvers: how a single step is taken
 
 With the prerequisites in place, on to the main event. Every "one-step method" answers the same question: *given the velocity at the current point, take a step forward of size dt — where do we land?* They differ only in how many times they "peek" at the field, and how they combine those peeks — peek more cleverly, get a higher order.
@@ -100,6 +115,8 @@ Rather than staring at formulas, let us take a step apart by hand. The field in 
 | <span class="fms-chip fms-c-heun"></span>Heun | 2 | 2 | Scout a full step ahead, then correct with the **average of the endpoints** (k₁+k₂)/2 | 20 |
 | <span class="fms-chip fms-c-rk4"></span>RK4 | 4 | 4 | Two midpoints + one endpoint, weighted as (k₁+2k₂+2k₃+k₄)/6 | 40 |
 
+<div class="ln-eyebrow">Method 02 · order of convergence</div>
+
 ## 5 · Order of convergence: why higher order "saves money"
 
 Section 3.3 said it: halve the step size of a $p$-th order method and the error drops by $2^p$, a line of slope $-p$ on a log-log plot. This is not just theory — the convergence-order unit test in the companion code `test_solvers.py` asserts exactly these ratios (Euler 2×, Heun/Midpoint 4×, RK4 16×), and Figure 2 lets you see it with your own eyes.
@@ -114,6 +131,15 @@ Figure 2 solves $dx/dt = x^2$, $x(0)=\tfrac12$ (true solution $x(1)=1$) live in 
   <canvas id="convCv" height="380" aria-label="Order-of-convergence plot: log-log curves of error vs NFE for four solvers on an analytic ODE"></canvas>
   <figcaption><b>Figure 2 · Order of convergence, measured (computed live in the browser; interactive: hover for readouts).</b> Endpoint error vs NFE (log-log) for four solvers on dx/dt=x². The dashed gray lines are slope −1/−2/−4 references: Euler hugs −1, Midpoint and Heun hug −2 (two parallel lines with different error constants), RK4 hugs −4. At the same NFE=40, the four curves can differ by as much as 6 orders of magnitude.</figcaption>
 </figure>
+
+<div class="ln-lesson"><b>Lesson</b>: order is not a paper specification — at the same NFE=40 the
+four curves differ in endpoint error by up to six orders of magnitude. Same-order Midpoint and
+Heun are two parallel lines: the order sets the slope, the error constant sets the intercept.
+Verifying convergence order requires a <b>nonlinear</b> equation: on a linear ODE the one-step
+updates of Midpoint and Heun are algebraically identical, so the two curves coincide digit for
+digit and the plot looks broken.</div>
+
+<div class="ln-eyebrow">Method 03 · adaptive step</div>
 
 ## 6 · Adaptive step size: how Dopri5 paces itself
 
@@ -163,6 +189,13 @@ These coefficients are the source of `_DP_A / _DP_B5 / _DP_B4` in `fm_solvers.py
 
 *Notice that $b_5$ is exactly the $a$ row of the final stage — so "this step's 5th-order solution" is precisely "the next step's stage 1 evaluation point", and that is where FSAL (First Same As Last) saves an evaluation. The b₄ row also has a trailing 1/40 (the weight of stage 7).*
 
+<div class="ln-lesson"><b>Lesson</b>: adaptivity is not "higher order" — it turns choosing the step
+size from a hand-run grid sweep into setting a single <code>rtol</code>. The price is computing a
+5th- and a 4th-order solution every step to get a free error estimate; FSAL makes seven stages cost
+only six fresh network evaluations, while a rejected step is evaluation spent for nothing.</div>
+
+<div class="ln-eyebrow">Hands-on · same field</div>
+
 ## 7 · Sample it yourself: one field, five ways to walk it
 
 Now let us put Sections 4–6 together for real: 1500 particles start from $\mathcal{N}(0,I)$ and are integrated to $t=1$ on the exact 8-Gaussians flow field. Change the solver, drag the step count, and watch the scatter cloud condense from "one blurry ring" into eight sharp peaks. A recommended comparison tour: *Euler·2 steps → Euler·8 steps → Midpoint·4 steps (NFE=8) → RK4·2 steps (NFE=8)* — same NFE, very different shapes, and that difference is what "how you spend the money" means.
@@ -183,9 +216,19 @@ Now let us put Sections 4–6 together for real: 1500 particles start from $\mat
   <figcaption><b>Figure 4 · The sampling playground (interactive: change solver, drag step count, overlay real samples).</b> Scatter of the integration endpoints of 1500 particles on the exact flow field; the red × marks are the eight true mode centers. The "on-peak fraction" is the experimental metric high_quality_frac (the fraction landing within the 2σ radius of any mode) — note that the theoretical ceiling for a perfect reproduction is about 0.865, not 1 (a 2D Gaussian itself puts only 86.5% of its mass within 2σ). The Dopri5 setting uses a fixed rtol=10⁻³.</figcaption>
 </figure>
 
+<div class="ln-eyebrow">Experiments · trained model</div>
+
 ## 8 · Experiments: comparison on a genuinely trained model
 
 Toy fields are easy to understand, but a conclusion only counts if it holds on a **genuinely trained model**. The setup: train one flow matching MLP on each of two 2D datasets, 8-Gaussians and Two-Moons (15000 steps, EMA, fixed seed); then freeze it and let five solvers sample from the **same batch** of 2000 evaluation noise vectors (a paired comparison), with NFE on the horizontal axis. Full code and data are in `fm_solvers.py` / `results.json`.
+
+<div class="ln-chips">
+  <span class="ln-chip">Two-Moons NFE to floor · Euler <b>40</b></span>
+  <span class="ln-chip">Midpoint/Heun <b>16</b></span>
+  <span class="ln-chip good">RK4 <b>12</b></span>
+  <span class="ln-chip">8-Gaussians sampling floor W2 <b>0.165</b></span>
+  <span class="ln-chip bad">At NFE=4, Euler <b>0.194</b> &lt; Heun <b>0.280</b></span>
+</div>
 
 ### 8.1 · Distribution quality W2: the "floor" arrives quickly
 
@@ -222,6 +265,8 @@ Take RK4 with 500 steps (NFE=2000) as the "true answer", and measure how far eac
     <p>The undertrained ablation (1000 training steps): the W2 floor jumps from 0.05 to 0.33+, and extra NFE does nothing; on Two-Moons Euler overtakes RK4 — a higher-order method merely integrates a <b>wrong field</b> more precisely.</p></div>
 </div>
 
+<div class="ln-eyebrow">Wrap-up · decision table</div>
+
 ## 9 · Practical guide
 
 The whole note compressed into a single decision table:
@@ -237,6 +282,8 @@ The whole note compressed into a single decision table:
 One step further takes us outside the scope of this note: in real image/video generation, the low-NFE regime also hosts a family of **specialized solvers that exploit the structure of the diffusion ODE** — DDIM<sup>[[8]](#refs)</sup>, DPM-Solver++<sup>[[10]](#refs)</sup>, UniPC<sup>[[11]](#refs)</sup>, plus the "Euler + shifted schedule" actually used by flow matching models such as SD3/Flux<sup>[[12]](#refs)</sup>. For how they relate to general-purpose solvers, see the last item in the Q&A.
 
 *Cross-reference to the code: the solver implementations live in `fm_solvers.py` as `solve_euler / solve_midpoint / solve_heun / solve_rk4 / solve_dopri5`; convergence order and NFE bookkeeping are guarded by `test_solvers.py`; the data on this page comes from `summary.csv`.*
+
+<div class="ln-eyebrow">Appendix · Q&A</div>
 
 ## 10 · Q&A
 

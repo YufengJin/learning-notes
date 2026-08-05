@@ -1,5 +1,7 @@
 # 机器人 Action Tokenization
 
+<div class="ln-byline">2026-08-06 · 阅读约 17 分钟 · Yufeng Jin</div>
+
 把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 **π₀-FAST 风格的离散自回归路线**<sup>[[1]](#refs)</sup>，并对照 FSQ、Binning 以及连续生成的 flow matching<sup>[[2]](#refs)</sup>。
 
 全程出现三种标签：
@@ -8,7 +10,14 @@
 - <span class="ln-tag ln-learned">LEARNED</span> — 从数据拟合（统计 fit 或神经网络）
 - <span class="ln-tag ln-lossy">LOSSY</span> — 有信息损失
 
+<div class="ln-howto"><b>读法建议</b>：想要全景先读第 0 节与第 7 节；只关心某个部件
+（DCT / 量化 / BPE / VQ-VAE / FSQ / Binning）就直接跳该节，各节自足。
+第 11–14 节是把部件装进模型的系统视角，第 15–16 节是横向对比与 π₀-FAST 全貌。
+文末有术语表速查。</div>
+
 ---
+
+<div class="ln-eyebrow">大局 · 问题全景</div>
 
 ## 0. 大局观：到底在解决什么问题
 
@@ -50,6 +59,8 @@ robot action（连续向量序列）
 
 ---
 
+<div class="ln-eyebrow">预备知识</div>
+
 ## 预备知识：核心概念三元组
 
 正文反复用到的几个概念，先在这里给出**中文名 = 英文名 = 最小定义**；正文用词与此处一致。
@@ -62,6 +73,8 @@ robot action（连续向量序列）
 - **前缀语言模型 = prefix-LM** = 前缀（prompt/条件）用双向注意力、后缀（生成目标）用因果注意力的混合掩码 Transformer 结构<sup>[[6]](#refs)</sup>。
 
 ---
+
+<div class="ln-eyebrow">基础 01 · 动作是什么</div>
 
 ## 1. 什么是 robot action（被 tokenize 的对象）
 
@@ -95,6 +108,8 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
 
 ---
 
+<div class="ln-eyebrow">基础 02 · 为何离散化</div>
+
 ## 2. 为什么要把连续动作离散化
 
 最自然的想法是让网络直接输出实数动作，用 L2/MSE 回归监督。那为什么要费劲离散化成 token？三个理由：
@@ -125,6 +140,8 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
 
 ---
 
+<div class="ln-eyebrow">基础 03 · tokenization</div>
+
 ## 3. tokenization 概念（从 NLP 借来的）
 
 在 NLP 里，tokenization = 把一段连续的文字符流切成有限词表里的整数 ID：
@@ -144,6 +161,8 @@ a_norm = 2 * (a - q01) / (q99 - q01) - 1   # 超出的 clip 掉
     PaliGemma 词表最后 **128 个** id 平时几乎用不到。可以**征用这 128 个槽位**当 action token——于是动作 token 和文字 token **共享同一张 embedding 表、同一个 softmax 输出头**。机器人动作真的被当成"一门新语言的单词"塞进了语言模型。
 
 ---
+
+<div class="ln-eyebrow">部件 01 · DCT</div>
 
 ## 4. DCT 离散余弦变换 <span class="ln-tag ln-direct">DIRECT</span>
 
@@ -182,6 +201,8 @@ $k=0$ 是直流分量（整体平均），$k$ 越大频率越高。逆变换 IDC
 
 ---
 
+<div class="ln-eyebrow">部件 02 · 量化</div>
+
 ## 5. 量化 / 取整 <span class="ln-tag ln-direct">DIRECT</span> <span class="ln-tag ln-lossy">LOSSY</span>
 
 这是整条 FAST 链路里**唯一真正丢信息的一步**，也是"连续 → 离散"真正发生的地方。
@@ -209,6 +230,8 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
     FAST 不是直接量化原始动作，而是量化 **DCT 系数**<sup>[[1]](#refs)</sup>。因为高频系数≈0，取整后变成一大片 0——既丢得起（高频对平滑动作几乎没贡献），又制造了可压缩的重复模式。"在频域取整"比"在时域取整"聪明得多。
 
 ---
+
+<div class="ln-eyebrow">部件 03 · BPE</div>
 
 ## 6. BPE 字节对编码 <span class="ln-tag ln-learned">LEARNED</span>（统计 fit，非 NN，无损）
 
@@ -239,6 +262,8 @@ x_hat = q / scale           # 整数 q → 近似连续 x̂（解码，回不到
     FAST = **F**requency-space **A**ction **S**equence **T**okenization<sup>[[1]](#refs)</sup>。DCT+BPE 是它的算法本体——纯信号处理 + 统计压缩，没有神经网络。
 
 ---
+
+<div class="ln-eyebrow">系统 01 · FAST 全景</div>
 
 ## 7. 把 FAST 拼起来（全景）
 
@@ -333,6 +358,8 @@ token → BPE解码 → [0,15,1,0,0,0,0,0] → reshape(8,1) → ÷scale → IDCT
 
 ---
 
+<div class="ln-eyebrow">部件 04 · VQ-VAE</div>
+
 ## 8. VQ-VAE 与码本（理解 FSQ 的前置）<span class="ln-tag ln-learned">LEARNED</span>（真神经网络）
 
 FSQ 路线是**真正的神经网络方案**。要懂 FSQ，先懂它的前身 VQ-VAE 的"码本"思想。
@@ -367,6 +394,8 @@ z_q = z + stop_gradient(quantize(z) - z)
 ```
 
 ---
+
+<div class="ln-eyebrow">部件 05 · FSQ</div>
 
 ## 9. FSQ 有限标量量化 <span class="ln-tag ln-learned">LEARNED</span>
 
@@ -404,6 +433,8 @@ token = undigitize(digits)            # 多维 digit → 单整数（混合进�
 
 ---
 
+<div class="ln-eyebrow">部件 06 · Binning</div>
+
 ## 10. Binning 均匀分桶（最朴素基线）<span class="ln-tag ln-direct">DIRECT</span>
 
 RT-2<sup>[[10]](#refs)</sup> / OpenVLA<sup>[[11]](#refs)</sup> 风格，**零学习**：每个维度、每个时间步**独立**地把 $[-1,1]$ 均匀切成 256 个桶，取整成桶编号。
@@ -427,6 +458,8 @@ a_hat = token / n_bins * 2 - 1      # 解码
 | 利用时间相关性 | ❌ | ✅（DCT） | ✅（注意力） |
 
 ---
+
+<div class="ln-eyebrow">系统 02 · 自回归建模</div>
 
 ## 11. 自回归建模 + 交叉熵
 
@@ -464,6 +497,8 @@ loss = -sum(token_logp * loss_mask) / sum(loss_mask)  # 只在 action 段算损�
 
 ---
 
+<div class="ln-eyebrow">系统 03 · 多模态</div>
+
 ## 12. 多模态是怎么"免费"得到的
 
 回到 §2.1 的 mode averaging 问题。离散 token + 交叉熵**从三个层面**解决它：
@@ -499,6 +534,8 @@ $$
 
 ---
 
+<div class="ln-eyebrow">系统 04 · 注意力掩码</div>
+
 ## 13. 注意力掩码：prefix 双向 vs action 因果
 
 序列里 prompt/state（前缀）和 action（后缀）扮演不同角色，用不同的注意力掩码（`ar_mask`）：
@@ -509,6 +546,8 @@ $$
 这种"前缀双向 + 后缀因果"的混合掩码是 **prefix-LM** 结构，PaliGemma<sup>[[6]](#refs)</sup> / π₀-FAST<sup>[[1]](#refs)</sup> 都用它。
 
 ---
+
+<div class="ln-eyebrow">对比 01 · flow matching</div>
 
 ## 14. 对比：另一条路线 flow matching（π₀）
 
@@ -526,6 +565,8 @@ $$
     两条路线都在解"一个观测对应多个合理动作"的多模态难题。FAST 用"离散化 + 分类"，π₀ 用"连续随机生成"。理解了离散路线为什么需要 tokenization（mode averaging + 复用 LLM），就理解了这个领域的核心张力。
 
 ---
+
+<div class="ln-eyebrow">对比 02 · 重建效果</div>
 
 ## 15. 三种 tokenizer 重建效果对比
 
@@ -560,6 +601,8 @@ $$
     核心权衡是**「token 数 ↔ 精度 ↔ 是否利用时间结构」**。Binning 最朴素：每标量一个 token、误差恒定但 token 最多、不懂时间相关性。FAST 用 DCT 把时间相关性变成低频稀疏，**用更少 token 拿到更高精度**（前提：动作平滑）。FSQ 用神经网络学一个紧凑潜空间，token 数固定可控，但要先训练。
 
 ---
+
+<div class="ln-eyebrow">系统 05 · 模型全貌</div>
 
 ## 16. π₀-FAST 模型全貌：基础模型 / 输入 / 输出
 
@@ -631,6 +674,8 @@ while 未遇到 EOS 且 步数 < 上限(256):
     无论中间 token 数是多少，解码端都用 `time_horizon` / `action_dim` 强制 reshape 回 `(T, D)`，正好对上 §1 里 tokenizer 的**输入**形状——整条"连续 (T,D) → token → 连续 (T,D)"的环就闭合了。
 
 ---
+
+<div class="ln-eyebrow">速查 · 术语表</div>
 
 ## 术语表（速查）
 

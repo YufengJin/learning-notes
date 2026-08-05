@@ -1,5 +1,7 @@
 # 流匹配 ODE 求解器 · 图解
 
+<div class="ln-byline">2026-08-06 · 阅读约 13 分钟 · Yufeng Jin</div>
+
 采样一张图 = 数值积分一条 ODE。这篇笔记把五个经典求解器（<span class="fms-t-euler">Euler</span>、<span class="fms-t-midpoint">Midpoint</span>、<span class="fms-t-heun">Heun</span>、<span class="fms-t-rk4">RK4</span>、<span class="fms-t-dopri5">Dopri5</span>）拆开讲清楚——每个动画都是**真实积分**，每张数据图都来自可复现实验。
 
 <figure class="fms-panel">
@@ -9,6 +11,8 @@
 
 ---
 
+<div class="ln-eyebrow">引子</div>
+
 ## 1 · 引言
 
 你训练好了一个 flow matching 模型。采样的时候，代码里总有那么一行 `x = solver.step(x, t)`——但那一行里到底发生了什么？为什么 Stable Diffusion 3 默认走 28 步而不是 1000 步？为什么有人用 Euler、有人用 Heun、有人用听起来很高级的 DPM-Solver？换一个求解器，到底能省多少算力？
@@ -17,6 +21,12 @@
 
 阅读方式随意，但有两个约定：页面里的每个交互图都是**浏览器内的真实数值积分**（不是预渲染的动图），每张数据图的数字都来自配套代码 `fm_solvers.py` 的真实运行。读完你应该能回答：*给定一个 NFE 预算，我该选哪个求解器，为什么。*
 
+<div class="ln-howto"><b>读法建议</b>：已经熟悉 ODE 与数值积分的读者可直接跳到
+第 4 节；只想要结论的，看第 8.3 节的五条与第 9 节的决策表即可。
+第 4–6 节是方法主线，每节都按「直觉 → 机制/数学 → 实测 → 教训」展开。</div>
+
+<div class="ln-eyebrow">引子 · 为什么值得学</div>
+
 ## 2 · 动机：为什么生成模型工程师要懂求解器
 
 三个理由，一个比一个实际：
@@ -24,6 +34,8 @@
 - **NFE 就是钱。** 生成一张图的成本 ≈ 网络前向次数 × 单次前向的开销。模型定了之后，单次前向的开销就定了——求解器决定的是*同样的质量要付多少次前向*。
 - **差距是 3 倍量级，而且是免费的。** 本文实验里，同一个训练好的模型要达到接近采样地板的质量：Euler 要 NFE=40，RK4 只要 12（第 8 节）。不改模型、不重训练，只换几行求解器代码。
 - **结论并不显然。** 极低预算下高阶方法反而更差；场没训练好时 Euler 会反超 RK4；「自动挡」的自适应方法也不是全场最优。凭直觉选，很容易选错——所以本文所有结论都配数据。
+
+<div class="ln-eyebrow">预备知识</div>
 
 ## 3 · 预备知识
 
@@ -70,6 +82,8 @@ $t=1$ 时粒子落在哪里，样本就是什么。于是：
 
 比较求解器时，横轴永远用 **NFE**（number of function evaluations，网络前向次数）而非步数：一步 RK4 要 4 次前向，一步 Euler 只要 1 次。「10 步 RK4 vs 10 步 Euler」不公平，「NFE=40 的 RK4 vs NFE=40 的 Euler」才公平——*NFE 就是钱，本文所有图的横轴都是它。*
 
+<div class="ln-eyebrow">方法 01 · 固定步长</div>
+
 ## 4 · 固定步长求解器：一步怎么走
 
 预备知识就绪，进入正题。所有「单步法」都在回答同一个问题：*已知当前点的速度，往前跨一步 dt，落在哪？* 差别只在于「偷看」几次场，以及怎么组合这些偷看——偷看得越聪明，阶数越高。
@@ -100,6 +114,8 @@ $t=1$ 时粒子落在哪里，样本就是什么。于是：
 | <span class="fms-chip fms-c-heun"></span>Heun | 2 | 2 | 先走满一步探路，用**首尾平均** (k₁+k₂)/2 修正 | 20 |
 | <span class="fms-chip fms-c-rk4"></span>RK4 | 4 | 4 | 两次中点 + 一次终点，加权 (k₁+2k₂+2k₃+k₄)/6 | 40 |
 
+<div class="ln-eyebrow">方法 02 · 收敛阶</div>
+
 ## 5 · 收敛阶：为什么高阶「省钱」
 
 3.3 节说过：$p$ 阶方法步长减半、误差降 $2^p$ 倍，log-log 图上是斜率 $-p$ 的直线。这不只是理论——配套代码 `test_solvers.py` 的收敛阶单元测试断言的就是这个比例（Euler 2×、Heun/Midpoint 4×、RK4 16×），而图 2 让你亲眼看到它。
@@ -114,6 +130,13 @@ $t=1$ 时粒子落在哪里，样本就是什么。于是：
   <canvas id="convCv" height="380" aria-label="收敛阶图：四种求解器在解析 ODE 上的误差随 NFE 的 log-log 曲线"></canvas>
   <figcaption><b>图 2 · 收敛阶实测（浏览器现场计算，交互：悬停读数）。</b>四种求解器在 dx/dt=x² 上的终点误差 vs NFE（log-log）。灰色虚线为斜率 −1/−2/−4 参考线：Euler 贴 −1，Midpoint 与 Heun 贴 −2（两条平行线、误差常数不同），RK4 贴 −4。同样 NFE=40 处，四条曲线相差可达 6 个数量级。</figcaption>
 </figure>
+
+<div class="ln-lesson"><b>教训</b>：阶数不是纸面参数——同样 NFE=40，四条曲线的终点误差
+相差可达 6 个数量级。同阶的 Midpoint 与 Heun 是两条平行线：阶决定斜率，误差常数决定
+截距。验证收敛阶时必须用<b>非线性</b>方程，线性 ODE 上 Midpoint 与 Heun 的一步更新
+代数恒等，两条线会逐位重合，看起来像图画错了。</div>
+
+<div class="ln-eyebrow">方法 03 · 自适应步长</div>
 
 ## 6 · 自适应步长：Dopri5 如何自己配速
 
@@ -163,6 +186,12 @@ $$
 
 *注意 $b_5$ 恰好等于最后一级的 $a$ 行——所以「本步的 5 阶解」正是「下一步的第 1 级评估点」，这就是 FSAL（First Same As Last）省一次评估的来历。b₄ 行末尾还有一个 1/40（第 7 级权重）。*
 
+<div class="ln-lesson"><b>教训</b>：自适应不是「更高阶」，而是把「选步长」这件事从人肉扫
+网格变成设一个 <code>rtol</code>。代价是每步同时算 5 阶与 4 阶两个解来拿免费的误差估计；
+FSAL 让 7 级评估只花 6 次新的网络前向，被拒绝的步则是白花的评估。</div>
+
+<div class="ln-eyebrow">动手 · 同场对比</div>
+
 ## 7 · 亲手采样：同一个场，五种走法
 
 现在把第 4–6 节合起来玩真的：1500 个粒子从 $\mathcal{N}(0,I)$ 出发，在 8-Gaussians 的精确流场上积分到 $t=1$。换求解器、拖步数，看散点云如何从「一圈糊」凝聚成八个尖峰。推荐一条对比路线：*Euler·2 步 → Euler·8 步 → Midpoint·4 步（NFE=8）→ RK4·2 步（NFE=8）*——同样的 NFE，形状差很多，这就是「怎么花钱」的差别。
@@ -183,9 +212,19 @@ $$
   <figcaption><b>图 4 · 采样试验场（交互：换求解器、拖步数、叠加真实样本）。</b>1500 个粒子在精确流场上的积分终点散点；红 × 为八个真实模式中心。「落峰比例」即实验指标 high_quality_frac（落在任一模式 2σ 半径内的比例）——注意完美复制的理论上限约 0.865 而非 1（2D 高斯本身只有 86.5% 的质量在 2σ 内）。Dopri5 档使用固定 rtol=10⁻³。</figcaption>
 </figure>
 
+<div class="ln-eyebrow">实验 · 真实模型</div>
+
 ## 8 · 实验：真实训练模型上的对比
 
 玩具场好懂，但结论要在**真实训练出来的模型**上成立才算数。实验设置：在 8-Gaussians 与 Two-Moons 两份 2D 数据上各训练一个流匹配 MLP（15000 步、EMA、固定种子），冻结后让五种求解器从**同一批** 2000 个评测噪声出发采样（配对比较），横轴 NFE。完整代码与数据见 `fm_solvers.py` / `results.json`。
+
+<div class="ln-chips">
+  <span class="ln-chip">Two-Moons 到地板 NFE · Euler <b>40</b></span>
+  <span class="ln-chip">Midpoint/Heun <b>16</b></span>
+  <span class="ln-chip good">RK4 <b>12</b></span>
+  <span class="ln-chip">8-Gaussians 采样地板 W2 <b>0.165</b></span>
+  <span class="ln-chip bad">NFE=4 时 Euler <b>0.194</b> &lt; Heun <b>0.280</b></span>
+</div>
 
 ### 8.1 · 分布质量 W2：很快就到「地板」
 
@@ -222,6 +261,8 @@ W2（2-Wasserstein 距离）衡量生成分布与真实数据的距离。图 5 �
     <p>欠训练消融（1000 步训练）：W2 地板从 0.05 飙到 0.33+，加 NFE 无用；Two-Moons 上 Euler 反超 RK4——高阶法只是更精确地积分了一个<b>错误的场</b>。</p></div>
 </div>
 
+<div class="ln-eyebrow">收束 · 决策表</div>
+
 ## 9 · 实践指南
 
 把全文压缩成一张决策表：
@@ -237,6 +278,8 @@ W2（2-Wasserstein 距离）衡量生成分布与真实数据的距离。图 5 �
 再往前一步就出了本文的范围：真实的图像/视频生成里，低 NFE 区间还有一批**利用扩散 ODE 结构的专用求解器**——DDIM<sup>[[8]](#refs)</sup>、DPM-Solver++<sup>[[10]](#refs)</sup>、UniPC<sup>[[11]](#refs)</sup>，以及 SD3/Flux 这类流匹配模型实际采用的「Euler + 移位时间表」<sup>[[12]](#refs)</sup>。它们与通用求解器的关系，见问答最后一条。
 
 *与代码对照：solver 实现在 `fm_solvers.py` 的 `solve_euler / solve_midpoint / solve_heun / solve_rk4 / solve_dopri5`；收敛阶与 NFE 记账由 `test_solvers.py` 把关；本页数据来自 `summary.csv`。*
+
+<div class="ln-eyebrow">附录 · 问答</div>
 
 ## 10 · 问答
 

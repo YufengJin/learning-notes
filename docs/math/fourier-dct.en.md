@@ -1,11 +1,15 @@
 # Fourier Transforms and DCT in Depth
 
+<div class="ln-byline">2026-08-06 · about 11 min read · Yufeng Jin</div>
+
 Starting from Fourier series and running all the way to the energy-compaction property of the DCT, this note builds a genuine understanding of why applying a DCT to a smooth signal (a robot motion, say) makes its energy pile up almost miraculously onto a handful of low-frequency coefficients. It is the expanded version of the step that [Action Tokenization](../robotics/action-tokenization.md) treats as a black box.
 
 !!! note "One through-line"
     **Any signal can be written as a superposition of "waves."** What the Fourier family studies is *which* waves to use and *how much* of each. The DCT is the member of that family tuned specifically for **real-valued, smooth signals**, and its killer feature is **energy compaction** — squeezing the information into very few low-frequency coefficients. That is precisely the foundation on which FAST and JPEG compression rest.
 
 ---
+
+<div class="ln-eyebrow">Opening · why transform</div>
 
 ## 0. Why move a signal into the "frequency domain"
 
@@ -17,6 +21,8 @@ The same stretch of signal admits two views:
 The payoff of switching to the frequency domain: many signals that look densely packed in time are **extremely sparse** in frequency (only a few frequencies carry any value). Smooth = slowly varying = low frequencies only = sparse in frequency → **compressible**.
 
 ---
+
+<div class="ln-eyebrow">Prerequisites</div>
 
 ## Prerequisites
 
@@ -30,6 +36,8 @@ The main text leans on the following concepts repeatedly; each is written as an 
 - **quantization** = 量化 = the lossy operation of mapping continuous or high-precision values onto a finite set of discrete levels (rounding, for instance)<sup>[[2]](#refs)</sup>.
 
 ---
+
+<div class="ln-eyebrow">Theory 01 · Fourier series</div>
 
 ## 1. Fourier series: a periodic signal = a sum of sines and cosines
 
@@ -56,6 +64,8 @@ The higher the frequency $n\omega$, the faster that term varies. Below we **appr
 
 ---
 
+<div class="ln-eyebrow">Theory 02 · continuous transform</div>
+
 ## 2. The continuous Fourier transform: from periodic to arbitrary signals
 
 Push the period to infinity and the series' "sum over discrete frequencies" becomes an "integral over continuous frequency," which gives the Fourier transform:
@@ -70,6 +80,8 @@ Here $e^{-i\omega t}=\cos\omega t - i\sin\omega t$ (Euler's formula) packs sine 
     In the complex plane $e^{-i\omega t}$ is a unit vector rotating at angular frequency $\omega$. The Fourier transform is asking: "how much of the signal is in sync with this phasor spinning at $\omega$?" Frequency components that stay in sync come out large.
 
 ---
+
+<div class="ln-eyebrow">Theory 03 · discrete and fast</div>
 
 ## 3. DFT and FFT: Fourier in the discrete world
 
@@ -90,6 +102,8 @@ Computed directly this costs $O(N^2)$. The **FFT (fast Fourier transform)** expl
 | **DCT** | $N$ real samples | $N$ **real** coefficients | $O(N\log N)$ |
 
 ---
+
+<div class="ln-eyebrow">DCT 01 · origin</div>
 
 ## 4. From DFT to DCT: dropping the complex numbers and the boundary jump
 
@@ -115,6 +129,8 @@ Note that the basis is pure cosine and the coefficients $X_k$ are real. $k=0$ is
 
 ---
 
+<div class="ln-eyebrow">DCT 02 · variants</div>
+
 ## 5. The four DCT variants (knowing they differ is enough)
 
 Depending on how the symmetric extension is performed at the two ends, there are four types, DCT-I through IV<sup>[[2]](#refs)</sup>. In practice:
@@ -131,6 +147,8 @@ Depending on how the symmetric extension is performed at the two ends, there are
 
 ---
 
+<div class="ln-eyebrow">DCT 03 · basis functions</div>
+
 ## 6. A gallery of DCT basis functions
 
 The DCT decomposes a signal onto this set of **fixed cosine basis vectors**. The $k$-th basis vector = a sampled cosine of frequency $k$. Any signal is a weighted sum of these bases, and the weights are the DCT coefficients. Here are the first 8 bases ($N=32$):
@@ -143,6 +161,8 @@ The DCT decomposes a signal onto this set of **fixed cosine basis vectors**. The
 </div>
 
 ---
+
+<div class="ln-eyebrow">Evidence · energy compaction</div>
 
 ## 7. Energy compaction: the DCT's killer feature (verify it yourself) { #7-dct }
 
@@ -167,6 +187,8 @@ So we need only **keep the first few large coefficients and discard the great ma
 
 ---
 
+<div class="ln-eyebrow">Rationale · near-optimal</div>
+
 ## 8. Why the DCT of all transforms (it is close to "optimal")
 
 In theory, for a given signal statistic the transform with **optimal energy compaction** is the **KLT (Karhunen–Loève transform, i.e. PCA)** — it projects the signal onto the eigenvectors of the covariance matrix. But the KLT depends on the data statistics and requires computing eigenvectors on the spot: expensive and not general-purpose.
@@ -177,6 +199,8 @@ In theory, for a given signal statistic the transform with **optimal energy comp
 Echoing learned vs direct: the DCT is **direct** (fixed basis, zero training), yet it approaches the optimal learned transform that would require data statistics — **deterministic mathematics buying you nearly the benefits of learning**.
 
 ---
+
+<div class="ln-eyebrow">Applications · JPEG to FAST</div>
 
 ## 9. Applications: from JPEG to FAST
 
