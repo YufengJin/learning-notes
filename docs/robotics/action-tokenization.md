@@ -1,8 +1,8 @@
-# 机器人 Action Tokenization
+# Action Tokenization：把连续动作离散成 token
 
-<div class="ln-byline">2026-08-06 · 阅读约 17 分钟 · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · 阅读约 22 分钟 · Yufeng Jin</div>
 
-把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 **π₀-FAST 风格的离散自回归路线**<sup>[[1]](#refs)</sup>，并对照 FSQ、Binning 以及连续生成的 flow matching<sup>[[2]](#refs)</sup>。
+<p class="ln-lead" markdown>把"连续动作 → 离散 token → 连续动作"这条链路，拆成每一块需要的前置知识。主线是 **π₀-FAST 风格的离散自回归路线**<sup>[[1]](#refs)</sup>，并对照 FSQ、Binning 以及连续生成的 flow matching<sup>[[2]](#refs)</sup>。</p>
 
 全程出现三种标签：
 
@@ -597,8 +597,9 @@ $$
 | 同等 token 预算下精度 | 高（平滑信号） | 高（需训练好） | 低（浪费在高频） |
 | 是否需训练 | 仅 BPE 词表/分位数（统计 fit） | ✅ 需训练神经 checkpoint | ❌ 零训练 |
 
-!!! tip "怎么读这张表"
-    核心权衡是**「token 数 ↔ 精度 ↔ 是否利用时间结构」**。Binning 最朴素：每标量一个 token、误差恒定但 token 最多、不懂时间相关性。FAST 用 DCT 把时间相关性变成低频稀疏，**用更少 token 拿到更高精度**（前提：动作平滑）。FSQ 用神经网络学一个紧凑潜空间，token 数固定可控，但要先训练。
+<div class="ln-lesson" markdown>
+**怎么读这张表**：核心权衡是**「token 数 ↔ 精度 ↔ 是否利用时间结构」**。Binning 最朴素：每标量一个 token、误差恒定但 token 最多、不懂时间相关性。FAST 用 DCT 把时间相关性变成低频稀疏，**用更少 token 拿到更高精度**（前提：动作平滑）。FSQ 用神经网络学一个紧凑潜空间，token 数固定可控，但要先训练。
+</div>
 
 ---
 

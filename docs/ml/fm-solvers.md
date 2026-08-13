@@ -1,8 +1,8 @@
 # 流匹配 ODE 求解器 · 图解
 
-<div class="ln-byline">2026-08-06 · 阅读约 13 分钟 · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · 阅读约 17 分钟 · Yufeng Jin</div>
 
-采样一张图 = 数值积分一条 ODE。这篇笔记把五个经典求解器（<span class="fms-t-euler">Euler</span>、<span class="fms-t-midpoint">Midpoint</span>、<span class="fms-t-heun">Heun</span>、<span class="fms-t-rk4">RK4</span>、<span class="fms-t-dopri5">Dopri5</span>）拆开讲清楚——每个动画都是**真实积分**，每张数据图都来自可复现实验。
+<p class="ln-lead" markdown>采样一张图 = 数值积分一条 ODE。这篇笔记把五个经典求解器（<span class="fms-t-euler">Euler</span>、<span class="fms-t-midpoint">Midpoint</span>、<span class="fms-t-heun">Heun</span>、<span class="fms-t-rk4">RK4</span>、<span class="fms-t-dopri5">Dopri5</span>）拆开讲清楚——每个动画都是**真实积分**，每张数据图都来自可复现实验。</p>
 
 <figure class="fms-panel">
   <canvas id="heroCv" height="380" aria-label="流匹配向量场动画：粒子从高斯噪声流向八个模式"></canvas>

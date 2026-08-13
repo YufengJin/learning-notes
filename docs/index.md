@@ -10,7 +10,7 @@ hide:
 
 <div class="grid cards" markdown>
 
--   :material-robot-outline: __机器学习__
+-   :material-brain: __机器学习__
 
     ---
 
@@ -38,11 +38,26 @@ hide:
 
     ---
 
-    书籍 / 博客 / 课程的读书笔记。
+    书籍 / 博客 / 课程的读书笔记。（筹备中）
 
     [:octicons-arrow-right-24: 进入](reading/index.md)
 
 </div>
+
+## 全部笔记
+
+<!-- 按日期倒序；新增笔记时在此登记一行（标题 · 分区 · 日期 · 一句话导语） -->
+
+- [Action Tokenization：把连续动作离散成 token](robotics/action-tokenization.md)
+  <small>机器人 · 2026-08-06</small> —— 沿「连续动作 → 离散 token → 连续动作」这条链，拆开 π₀-FAST 式离散自回归路线的每个环节。
+- [流匹配 ODE 求解器 · 图解](ml/fm-solvers.md)
+  <small>机器学习 · 2026-08-06</small> —— Euler / Midpoint / Heun / RK4 / DoPri5 在流匹配采样里的精度-成本取舍，配交互实验。
+- [自回归模型：BERT / GPT 与 Prefix-LM 架构详解](ml/autoregressive-models.md)
+  <small>机器学习 · 2026-08-06</small> —— 序列建模范式的分野，以及机器人 VLA 为什么用 Prefix-LM 混合体。
+- [Fourier 变换与 DCT：从频域到能量压缩](math/fourier-dct.md)
+  <small>数学 · 2026-08-06</small> —— 从傅里叶级数到 DCT 能量压缩：为什么平滑信号的能量会集中到少数低频系数。
+- [Lie Theory：面向优化与机器人的直观入门](math/lie-theory.md)
+  <small>数学 · 2026-08-06</small> —— 流形、切空间与 ⊞/⊟ 算子：旋转与位姿上的优化为什么要这么做。
 
 ---
 

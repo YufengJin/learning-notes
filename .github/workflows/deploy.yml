@@ -3,6 +3,7 @@ name: deploy docs
 on:
   push:
     branches: [main]
+  pull_request:            # PR 上跑同样的门禁（只构建不部署）
 
 permissions:
   contents: write          # 允许 gh-deploy 推送到 gh-pages 分支
@@ -16,6 +17,24 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: mkdocs gh-deploy --force --no-history
+      # 门禁 1：每篇正文笔记必须有同名 .en.md（fallback 会静默回退中文，--strict 不报，
+      # 所以显式核对）。豁免仅限分区首页 docs/<sec>/index.md；docs/index.md（首页）
+      # 不豁免——首页是英文读者的大门。
+      - name: check .en.md coverage
+        run: |
+          missing=0
+          while IFS= read -r -d '' f; do
+            if [ "$(basename "$f")" = "index.md" ] && [ "$(dirname "$(dirname "$f")")" = "docs" ]; then
+              continue   # 分区首页豁免；docs/index.md 与更深层 index.md 均不豁免
+            fi
+            if [ ! -f "${f%.md}.en.md" ]; then echo "MISSING EN: $f"; missing=1; fi
+          done < <(find docs -type f -name '*.md' ! -name '*.en.md' -print0)
+          exit $missing
+      # 门禁 2 + 部署：单次 strict 构建直接部署，保证上线的就是过检产物
+      # （PR 上只构建验证，不部署）
+      - if: github.event_name == 'pull_request'
+        run: mkdocs build --strict
+      - if: github.event_name == 'push'
+        run: mkdocs gh-deploy --strict --force --no-history

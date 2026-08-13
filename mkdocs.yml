@@ -1,7 +1,7 @@
 site_name: Yufeng's Learning Notes
 site_url: https://yufengjin.github.io/learning-notes/
 site_author: Yufeng Jin
-site_description: 个人学习笔记知识库 — 数学 / 机器学习 / 编程 / 阅读
+site_description: 个人学习笔记知识库 — 数学 / 机器学习 / 机器人 / 阅读
 repo_url: https://github.com/YufengJin/learning-notes
 repo_name: YufengJin/learning-notes
 edit_uri: edit/main/docs/
@@ -50,7 +50,9 @@ extra_css:
 
 extra_javascript:
   - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  # MathJax 3.2.2 自托管（docs/javascripts/vendor/mathjax/，含 woff-v2 字体）——
+  # 公式站的命门不走 CDN，与 font: false 的离线原则一致。升级时整目录替换。
+  - javascripts/vendor/mathjax/tex-mml-chtml.js
   - javascripts/action-tokenization.js   # robotics 笔记的交互 demo（document$.subscribe 兼容 instant 加载）
   - javascripts/autoregressive-models.js # ml 笔记的交互 demo
   - javascripts/fourier-dct.js           # math 笔记的交互 demo
@@ -66,7 +68,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-      title: 目录
+      # 不硬编码 title：交给 Material 语言包（zh=目录 / en=Table of contents），
+      # 否则英文站左栏也会显示「目录」。
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -109,14 +112,14 @@ plugins:
           name: English
           build: true
           site_name: "Yufeng's Learning Notes"
-          site_description: "Personal knowledge base — math / machine learning / programming / reading"
+          site_description: "Personal knowledge base — math / machine learning / robotics / reading"
           nav_translations:
             首页: Home
             机器学习: Machine Learning
             机器人: Robotics
             数学: Mathematics
             阅读: Reading
-            线性回归: Linear Regression
+            "Lie Theory：面向优化与机器人的直观入门": "Lie Theory: An Intuitive Introduction for Optimization and Robotics"
             "Fourier 变换与 DCT：从频域到能量压缩": "Fourier Transform & DCT: From Frequency to Energy Compaction"
             "流匹配 ODE 求解器 · 图解": "Flow Matching ODE Solvers, Illustrated"
             "自回归模型：BERT / GPT 与 Prefix-LM 架构详解": "Autoregressive Models: BERT / GPT and Prefix-LM Architectures Explained"
@@ -133,10 +136,10 @@ nav:
       - "Action Tokenization：把连续动作离散成 token": robotics/action-tokenization.md
   - 数学:
       - math/index.md
-      - Lie Theory: math/lie-theory.md
+      - "Lie Theory：面向优化与机器人的直观入门": math/lie-theory.md
       - "Fourier 变换与 DCT：从频域到能量压缩": math/fourier-dct.md
-  - 阅读:
-      - reading/index.md
+  # 「阅读」分区暂无内容，先不进顶部 tab（页面保留在 docs/reading/，首页卡片仍可达；
+  # 收录第一篇读书笔记时再把它加回 nav）
   # 样式模板页(style/index.md)不进顶部 tab，仅从首页底部链接
 
 validation:

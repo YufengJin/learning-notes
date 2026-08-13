@@ -1,8 +1,8 @@
-# Robot Action Tokenization
+# Action Tokenization: Discretizing Continuous Actions into Tokens
 
-<div class="ln-byline">2026-08-06 · about 25 min read · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · about 26 min read · Yufeng Jin</div>
 
-This note takes the chain "continuous action → discrete token → continuous action" and unpacks the background knowledge each link requires. The main thread is the **π₀-FAST style discrete autoregressive route**<sup>[[1]](#refs)</sup>, held up against FSQ, Binning, and the continuous alternative, flow matching<sup>[[2]](#refs)</sup>.
+<p class="ln-lead" markdown>This note takes the chain "continuous action → discrete token → continuous action" and unpacks the background knowledge each link requires. The main thread is the **π₀-FAST style discrete autoregressive route**<sup>[[1]](#refs)</sup>, held up against FSQ, Binning, and the continuous alternative, flow matching<sup>[[2]](#refs)</sup>.</p>
 
 Three labels appear throughout:
 
@@ -598,8 +598,9 @@ To place the discrete route on a map, let us glance at the continuous one. π₀
 | precision at an equal token budget | high (for smooth signals) | high (if well trained) | low (wasted on high frequencies) |
 | training required | only the BPE vocabulary / quantiles (statistical fit) | ✅ needs a trained neural checkpoint | ❌ zero training |
 
-!!! tip "How to read this table"
-    The core trade-off is **"token count ↔ precision ↔ whether temporal structure is exploited"**. Binning is the most naive: one token per scalar, constant error but the most tokens, and no notion of temporal correlation. FAST uses DCT to turn temporal correlation into low-frequency sparsity, **buying higher precision with fewer tokens** (provided the action is smooth). FSQ uses a neural network to learn a compact latent space, with a fixed and controllable token count, but it has to be trained first.
+<div class="ln-lesson" markdown>
+**How to read this table**: the core trade-off is **"token count ↔ precision ↔ whether temporal structure is exploited"**. Binning is the most naive: one token per scalar, constant error but the most tokens, and no notion of temporal correlation. FAST uses DCT to turn temporal correlation into low-frequency sparsity, **buying higher precision with fewer tokens** (provided the action is smooth). FSQ uses a neural network to learn a compact latent space, with a fixed and controllable token count, but it has to be trained first.
+</div>
 
 ---
 

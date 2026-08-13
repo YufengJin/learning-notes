@@ -40,16 +40,16 @@
   --md-default-fg-color--lighter: var(--ln-muted);
   --md-default-fg-color--lightest:var(--ln-line);
 
-  /* 头部用浅色（不要整条石墨灰横幅），文字用暖近黑 */
+  /* 头部用浅色（不要整条深色横幅），文字用冷近黑 */
   --md-primary-fg-color:        var(--ln-surface);
   --md-primary-fg-color--light: var(--ln-surface);
   --md-primary-fg-color--dark:  var(--ln-surface-2);
   --md-primary-bg-color:        var(--ln-ink);
   --md-primary-bg-color--light: var(--ln-muted);
 
-  /* 石墨灰作为强调 / hover */
+  /* 蓝（--ln-acc）作为强调 / hover；transparent 为其 10% 淡底 */
   --md-accent-fg-color:             var(--ln-acc);
-  --md-accent-fg-color--transparent:rgba(90, 89, 83, .1);
+  --md-accent-fg-color--transparent:rgba(79, 99, 210, .1);
 
   /* 链接与代码 */
   --md-typeset-a-color: var(--ln-acc);
@@ -77,7 +77,7 @@
 .md-header--shadow { box-shadow: none; }
 .md-header__title { font-weight: 600; }
 
-/* 顶部 tab：选中态石墨灰下划线 */
+/* 顶部 tab：选中态蓝色高亮 */
 .md-tabs {
   background-color: var(--ln-surface);
   color: var(--ln-ink);
@@ -99,7 +99,7 @@
   background-color: var(--ln-surface);
 }
 
-/* —— 左侧导航：激活项石墨灰 —— */
+/* —— 左侧导航：激活项蓝色 —— */
 .md-nav__link--active,
 .md-nav__link:focus,
 .md-nav__link:hover { color: var(--ln-acc); }
@@ -119,6 +119,7 @@
 .md-typeset > * { max-width: 46rem; }
 .md-typeset > .ln-chips,
 .md-typeset > table, .md-typeset > .highlight,
+.md-typeset > .ln-demo, .md-typeset > .ln-fig,
 .md-typeset > figure, .md-typeset > .md-typeset__scrollwrap { max-width: none; }
 
 .md-typeset h1, .md-typeset h2, .md-typeset h3,
@@ -161,7 +162,7 @@
   box-shadow: none;
 }
 
-/* 表格：扁平细线，石墨灰表头底线 */
+/* 表格：扁平细线，浅灰表头底 */
 .md-typeset table:not([class]) {
   border: 1px solid var(--ln-line);
   border-radius: 10px;
@@ -174,22 +175,25 @@
   font-weight: 600;
 }
 
-/* 引用块：石墨灰左边线 */
+/* 引用块：蓝色左边线 */
 .md-typeset blockquote {
   border-left: 3px solid var(--ln-acc);
   color: var(--ln-muted);
 }
 
-/* 提示框（admonition）：扁平、细线、小圆角 */
+/* 提示框（admonition）：扁平、细线、小圆角。
+   契约（SKILL.md）：admonition 只放旁注，主线机制解释写正文。字号仍不压太小
+   （.85rem ≈ 17px），旁注感靠边框与底色区分，不靠缩小字号——存量笔记里仍有
+   较长的 admonition，小字会惩罚它们的可读性。 */
 .md-typeset .admonition,
 .md-typeset details {
   border: 1px solid var(--ln-line);
   border-radius: 10px;
   box-shadow: none;
-  font-size: .76rem;
+  font-size: .85rem;
 }
 
-/* 链接 / 按钮 hover 用石墨灰 */
+/* 链接 / 按钮 */
 .md-typeset .md-button {
   border-radius: 10px;
   border-color: var(--ln-line);
@@ -454,3 +458,13 @@ table.fms-butcher td.tp{border-top:1px solid var(--fms-line)}
   font-family:var(--fms-mono);font-size:.74rem;line-height:1.5;
   box-shadow:0 4px 14px rgba(0,0,0,.13);opacity:0;z-index:50;
   font-variant-numeric:tabular-nums;max-width:260px}
+
+/* ===== 打印 / 存 PDF：长文读物应当可以干净地打出来 ===== */
+@media print {
+  .md-header, .md-tabs, .md-sidebar, .md-footer,
+  .md-top, .ln-back, .md-source-file { display: none !important; }
+  .md-main__inner { margin: 0; }
+  .md-content { max-width: none; }
+  .md-typeset { font-size: 11pt; line-height: 1.6; }
+  .md-typeset a { color: inherit; }
+}

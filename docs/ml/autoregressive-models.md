@@ -1,8 +1,8 @@
-# 自回归模型 · BERT / GPT 架构详解
+# 自回归模型：BERT / GPT 与 Prefix-LM 架构详解
 
-<div class="ln-byline">2026-08-06 · 阅读约 6 分钟 · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · 阅读约 9 分钟 · Yufeng Jin</div>
 
-有哪些序列建模范式、BERT 与 GPT 到底差在哪、为什么机器人 VLA（如 π₀-FAST）用的是两者的混合体 Prefix-LM。是 [Action Tokenization](../robotics/action-tokenization.md) 里"自回归 + 交叉熵""prefix 双向 / action 因果掩码"的展开。
+<p class="ln-lead" markdown>有哪些序列建模范式、BERT 与 GPT 到底差在哪、为什么机器人 VLA（如 π₀-FAST）用的是两者的混合体 Prefix-LM。是 [Action Tokenization](../robotics/action-tokenization.md) 里"自回归 + 交叉熵""prefix 双向 / action 因果掩码"的展开。</p>
 
 !!! note "一句话先记住"
     所有差别都归结到**一件事**：**每个 token 能"看到"哪些其他 token**（注意力掩码）。**双向**看全部 → 擅长理解（BERT）；**因果**只看左边 → 能自回归生成（GPT）。架构其实是同一套 Transformer block，区别只在掩码和训练目标。
@@ -225,8 +225,9 @@ $$
 3. 训练用 **GPT 式 next-token 交叉熵**，只在 action 段计损失<sup>[[12]](#refs)</sup>。
 4. 推理用 **自回归采样**（本页 Demo，图 3），靠 temperature 取出多模态的不同解。
 
-!!! tip "现在你应该能回答"
-    为什么 VLA 不用纯 BERT？（不能生成）为什么不用纯因果 GPT 而要 Prefix-LM？（让观测条件被双向充分理解）为什么训练像 GPT？（next-token 交叉熵 + 天然多模态）。
+<div class="ln-lesson" markdown>
+**现在你应该能回答**：为什么 VLA 不用纯 BERT？（不能生成）为什么不用纯因果 GPT 而要 Prefix-LM？（让观测条件被双向充分理解）为什么训练像 GPT？（next-token 交叉熵 + 天然多模态）。
+</div>
 
 ---
 

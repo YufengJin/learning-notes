@@ -65,7 +65,7 @@
 
 ## 4. 引用
 
-> 单层引用：用于摘录原文或强调一句话。石墨灰左边线。
+> 单层引用：用于摘录原文或强调一句话。蓝色左边线。
 
 > 带出处的引用。
 >
@@ -208,7 +208,7 @@ $$
 
     ---
 
-    暖灰底 + 石墨灰点缀，极简。
+    冷灰蓝底 + 衬线正文 + 蓝/琥珀双强调。
 
     [:octicons-arrow-right-24: 样式](#)
 
@@ -219,14 +219,14 @@ $$
 ## 11. 按钮
 
 [默认按钮](#){ .md-button }
-[主按钮（石墨灰）](#){ .md-button .md-button--primary }
+[主按钮（蓝）](#){ .md-button .md-button--primary }
 
 ---
 
 ## 12. 图片与图注
 
 <figure markdown="span">
-  ![占位图](https://dummyimage.com/720x300/f1efea/6b675f&text=figure){ width="100%" }
+  ![占位图](img/figure-placeholder.svg){ width="100%" }
   <figcaption>图 1. 图注文字示例。</figcaption>
 </figure>
 

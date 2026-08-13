@@ -1,6 +1,8 @@
 # Lie Theory：面向优化与机器人的直观入门
 
-<div class="ln-byline">2026-08-06 · 阅读约 5 分钟 · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · 阅读约 7 分钟 · Yufeng Jin</div>
+
+<p class="ln-lead" markdown>Lie theory 是把旋转、位姿这类"弯曲空间"上的优化搬回普通向量微积分的通用语言。这篇从 manifold、tangent space 讲到 hat/vee 与 exp/log，合成 manifold 上的一步优化，最后给出手写 $SO(3)$ 的代码小样。</p>
 
 !!! abstract "一句话导览"
     **Lie group** 是一个"光滑弯曲"的空间，里面装着代表 transformation 的元素（旋转、位姿等）。
@@ -105,7 +107,7 @@ $$
     同理 $SO(2)$ 是 1 维的（就一个角 $\theta$）。这个"内在维数"正是我们真正想优化的参数个数。
 
 <figure markdown="span">
-  ![三空间示意：manifold、tangent space、R^n](https://dummyimage.com/760x260/f1efea/6b675f&text=manifold%20%E2%86%94%20tangent%20space%20%E2%86%94%20R%5En){ width="100%" }
+  ![三空间示意：manifold、tangent space、R^n](img/lie-three-spaces.svg){ width="100%" }
   <figcaption>图 1. Lie group 上一点 $X$，其 tangent space 是一张贴在该点的"平面"；平面又与 $\mathbb{R}^n$ 同构。所有优化都在最右侧进行。</figcaption>
 </figure>
 
@@ -304,9 +306,10 @@ Lie theory 是现代机器人**状态估计**的通用语言<sup>[[2]](#refs)</s
 | **IMU preintegration** | 陀螺仪测的是角速度，在 $SO(3)$ 上积分而非欧氏累加 |
 | **state estimation / EKF** | uncertainty 建模成 tangent space 里的 Gaussian（error-state Kalman filter） |
 
-!!! success "记住这一条主线"
-    面对"被约束的对象"（旋转、位姿、单位四元数……），**不要在原始参数上硬做加减**。
-    先 $\log$ 到平坦的 tangent space，把优化 / 求导 / 建模都放到同构的 $\mathbb{R}^n$ 里做，再 $\exp$ 回 manifold。约束由 $\exp$ 天然守住，一切又回到熟悉的向量微积分。
+<div class="ln-lesson" markdown>
+**记住这一条主线**：面对"被约束的对象"（旋转、位姿、单位四元数……），**不要在原始参数上硬做加减**。
+先 $\log$ 到平坦的 tangent space，把优化 / 求导 / 建模都放到同构的 $\mathbb{R}^n$ 里做，再 $\exp$ 回 manifold。约束由 $\exp$ 天然守住，一切又回到熟悉的向量微积分。
+</div>
 
 ---
 

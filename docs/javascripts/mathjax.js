@@ -12,7 +12,7 @@ window.MathJax = {
   },
 };
 
-// navigation.instant 下每次切页重新排版
+// document$ 每次页面渲染都会触发（普通加载也适用），确保公式重新排版
 document$.subscribe(() => {
   MathJax.startup.output.clearCache();
   MathJax.typesetClear();

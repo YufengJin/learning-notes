@@ -1,8 +1,8 @@
-# Fourier Transforms and DCT in Depth
+# Fourier Transform & DCT: From Frequency to Energy Compaction
 
 <div class="ln-byline">2026-08-06 · about 11 min read · Yufeng Jin</div>
 
-Starting from Fourier series and running all the way to the energy-compaction property of the DCT, this note builds a genuine understanding of why applying a DCT to a smooth signal (a robot motion, say) makes its energy pile up almost miraculously onto a handful of low-frequency coefficients. It is the expanded version of the step that [Action Tokenization](../robotics/action-tokenization.md) treats as a black box.
+<p class="ln-lead" markdown>Starting from Fourier series and running all the way to the energy-compaction property of the DCT, this note builds a genuine understanding of why applying a DCT to a smooth signal (a robot motion, say) makes its energy pile up almost miraculously onto a handful of low-frequency coefficients. It is the expanded version of the step that [Action Tokenization](../robotics/action-tokenization.md) treats as a black box.</p>
 
 !!! note "One through-line"
     **Any signal can be written as a superposition of "waves."** What the Fourier family studies is *which* waves to use and *how much* of each. The DCT is the member of that family tuned specifically for **real-valued, smooth signals**, and its killer feature is **energy compaction** — squeezing the information into very few low-frequency coefficients. That is precisely the foundation on which FAST and JPEG compression rest.
@@ -196,7 +196,9 @@ In theory, for a given signal statistic the transform with **optimal energy comp
 !!! tip "The DCT ≈ a free KLT"
     For a **first-order Markov signal** (adjacent samples highly correlated — exactly the case for smooth signals), one can prove that **the DCT's basis functions come arbitrarily close to the KLT's optimal basis**<sup>[[5]](#refs)</sup><sup>[[2]](#refs)</sup>. In other words: with a **fixed, training-free** cosine basis, the DCT achieves nearly the compression of "the optimal transform tailored to this class of signals." That is why JPEG, MPEG, and FAST all reach for the DCT instead of actually computing a KLT.
 
+<div class="ln-lesson" markdown>
 Echoing learned vs direct: the DCT is **direct** (fixed basis, zero training), yet it approaches the optimal learned transform that would require data statistics — **deterministic mathematics buying you nearly the benefits of learning**.
+</div>
 
 ---
 

@@ -6,11 +6,17 @@
 
 ## 布局
 - `mkdocs.yml` — 配置（主题 / 顶部 tab + 左侧栏 / 扩展 / 插件 / nav）。
-- `docs/` — 内容：`index.md`（首页）+ 分区 `ml/ robotics/ math/ reading/`（每区一个 `index.md` 落地页）。
+- `docs/` — 内容：`index.md`（首页，带「全部笔记」倒序列表）+ 分区 `ml/ robotics/ math/ reading/`
+  （每区一个 `index.md` 落地页）。**「阅读」分区暂为空、不进顶部 tab**——收录第一篇读书笔记时再加回 nav。
 - `docs/style/index.md` — **样式模板页**，枚举所有常用格式；**不进顶部 tab**，仅从首页底部链接（`mkdocs.yml` 里 `validation.nav.omitted_files: ignore` 已放行）。
-- `docs/stylesheets/extra.css` — 统一主题（见下）。`docs/javascripts/mathjax.js` — 公式渲染。
-- `.github/workflows/deploy.yml` — push 到 `main` 即 `mkdocs gh-deploy` 自动构建并部署到 `gh-pages` 分支。
-- `requirements.txt` — `mkdocs-material` + `mkdocs-static-i18n`（双语，见下）。
+- `docs/stylesheets/extra.css` — 统一主题（见下）。`docs/javascripts/mathjax.js` — 公式配置；
+  **MathJax 3.2.2 自托管**在 `docs/javascripts/vendor/mathjax/`（约 1.5MB 含 woff 字体，
+  不走 CDN——公式站的命门 + 离线原则）。升级时整目录替换。
+- `scripts/reading_time.py` — **byline 阅读时长的唯一口径**（手算会漂，交稿前跑一遍照抄）。
+- `.github/workflows/deploy.yml` — push 到 `main` 后先过两道门禁
+  （`mkdocs build --strict` + 「每篇正文笔记有 .en.md」核对），再 `mkdocs gh-deploy`。
+- `requirements.txt` — **钉死精确版本**（`mkdocs-material==9.7.6` 等），升级走显式 commit。
+- 小型矢量示意图（SVG 手绘图）放 `docs/<分区>/img/*.svg`；照片/截图类仍按下方资产规则转 WebP。
 
 ## 风格：长文读物（2026-08-06 改版）
 定位是**读物不是文档站**：冷灰蓝底 + 衬线正文 + 蓝/琥珀双强调，**单一浅色主题**
@@ -41,8 +47,14 @@
 
 ### Byline（2026-08-06 起）
 每篇 H1 之后第一行必须有 `<div class="ln-byline">日期 · 阅读约 N 分钟 · 作者</div>`。
-时长 = 中文字数 ÷ 350（英文 ÷ 200）。**日期与作者由人给，不编。**
-（此前的「不署名不标日期、git 历史即记录」约定已作废。）
+时长**用 `python3 scripts/reading_time.py <md文件>` 算，照抄输出**
+（口径：中文字数 ÷ 350 + 英文词数 ÷ 200，剔除代码/公式/HTML 标签；手算已被实测抓到漂移）。
+**日期与作者由人给，不编。**（此前的「不署名不标日期、git 历史即记录」约定已作废。）
+
+### 标题一致性（2026-08-11 起）
+**nav 标题 = 笔记 H1（逐字）**；`nav_translations` 的值 = `.en.md` 的 H1（逐字）。
+`nav_translations` 键是完整中文标题字符串——改 nav 标题必须同步改键，否则英文站
+静默回退中文标题且不报错；删页面时同步删翻译条目。
 
 ## 双语
 `mkdocs-static-i18n` 提供中英双语，**语言选择器是 Material 原生的，在右上角 header**
@@ -54,12 +66,16 @@
   `docs/*/index.md` 这类分区首页豁免。英文版是中文稿的忠实全译——结构逐节对应、不增删章节、
   数字与公式逐字一致。
 - `fallback_to_default: true` —— 没写 `.en.md` 的页面在 `/en/` 下自动显示中文原文。
-  这是**兜底而非许可**：漏写不会坏站、`--strict` 也不报错，所以只能靠自查。交付前跑：
+  这是**兜底而非许可**：漏写不会坏站、`--strict` 也不报错。**CI 已把核对做成门禁**
+  （`.github/workflows/deploy.yml`，缺 `.en.md` 直接构建失败）。豁免仅限分区首页
+  `docs/<sec>/index.md`；**`docs/index.md`（首页）不豁免**。本地自查同款命令：
   ```bash
-  for f in docs/*/*.md; do case "$f" in *.en.md|*/index.md) continue;; esac; \
+  find docs -type f -name '*.md' ! -name '*.en.md' | while read -r f; do
+    [ "$(basename "$f")" = index.md ] && [ "$(dirname "$(dirname "$f")")" = docs ] && continue
     [ -f "${f%.md}.en.md" ] || echo "MISSING EN: $f"; done
   ```
-  当前基线：5 篇正文笔记全部有 `.en.md`，该命令无输出。
+  当前基线：5 篇正文笔记全部有 `.en.md`，该命令无输出。首页 `index.md` 配了 `index.en.md`
+  （首页是英文读者的大门，不豁免；分区 index 仍豁免）。
 - nav 标题的英文在 `mkdocs.yml` 的 `nav_translations` 里；新增分区记得同步加一条。
 - 插件声明在 `search` 之后（它会接管并按语言重配 search）。改动 plugins 顺序后
   务必验证中文搜索仍可用——CJK separator 容易被插件覆盖掉。
@@ -71,14 +87,16 @@
 材料忠实渲染（数字逐字回查、三级论断标签、范围词对齐证据面）、结构契约
 （导语/引言/动机/预备知识三元组/正文四拍/图注/References）、分类判据
 （**以读者会去哪里找它为准**）、交互 demo 规则（浅色、命名空间前缀、
-document$.subscribe + 存在性守卫）、注册三件套（nav + nav_translations +
-extra_javascript）。把材料/草稿/现成 blog 变成笔记时触发该 skill。
+document$.subscribe + 存在性守卫）、注册四件套（nav + nav_translations +
+extra_javascript + 首页「全部笔记」列表 zh/en 各一行）。把材料/草稿/现成 blog
+变成笔记时触发该 skill。
 
 ## 添加笔记
 ```bash
-$EDITOR docs/<分区>/my-note.md     # 1) 新建 markdown
-# 2) 在 mkdocs.yml 的 nav 里登记该页（否则不会出现在导航）
-git add . && git commit -m "notes: add my-note" && git push   # 3) Action 自动部署
+$EDITOR docs/<分区>/my-note.md     # 1) 新建 markdown（+ 同名 .en.md）
+# 2) 注册四件套：mkdocs.yml 的 nav + nav_translations、extra_javascript（如有 demo）、
+#    docs/index.md 与 index.en.md 的「全部笔记」列表各登记一行
+git add . && git commit -m "notes: add my-note" && git push   # 3) Action 门禁通过后自动部署
 ```
 - 本地预览：`pip install -r requirements.txt && mkdocs serve`（带子路径 `http://127.0.0.1:8000/learning-notes/`）。
 - 写作直接用样式页里的格式：admonition 记录框 / 代码高亮 / 标签页 / 表格 / `$...$` 数学。

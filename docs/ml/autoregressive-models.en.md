@@ -1,8 +1,8 @@
-# Autoregressive Models · BERT / GPT Architectures Explained
+# Autoregressive Models: BERT / GPT and Prefix-LM Architectures Explained
 
 <div class="ln-byline">2026-08-06 · about 10 min read · Yufeng Jin</div>
 
-Which sequence-modelling paradigms exist, what exactly separates BERT from GPT, and why robot VLAs (such as π₀-FAST) use a hybrid of the two called Prefix-LM. This page unfolds the "autoregressive + cross-entropy" and "bidirectional prefix / causal action mask" remarks made in [Action Tokenization](../robotics/action-tokenization.md).
+<p class="ln-lead" markdown>Which sequence-modelling paradigms exist, what exactly separates BERT from GPT, and why robot VLAs (such as π₀-FAST) use a hybrid of the two called Prefix-LM. This page unfolds the "autoregressive + cross-entropy" and "bidirectional prefix / causal action mask" remarks made in [Action Tokenization](../robotics/action-tokenization.md).</p>
 
 !!! note "One sentence to remember first"
     Every difference reduces to **one thing**: **which other tokens each token is allowed to "see"** (the attention mask). **Bidirectional** sees everything → good at understanding (BERT); **causal** sees only the left → capable of autoregressive generation (GPT). The architecture is the same Transformer block throughout; only the mask and the training objective change.
@@ -225,8 +225,9 @@ Threading it together (see [Action Tokenization](../robotics/action-tokenization
 3. Training uses **GPT-style next-token cross-entropy**, with the loss computed only over the action segment<sup>[[12]](#refs)</sup>.
 4. Inference uses **autoregressive sampling** (the demo on this page, Figure 3), relying on temperature to draw out the different modes of a multimodal solution set.
 
-!!! tip "You should now be able to answer"
-    Why not a pure BERT for a VLA? (It cannot generate.) Why not a purely causal GPT instead of Prefix-LM? (So that the observation condition is understood fully and bidirectionally.) Why does training look like GPT? (next-token cross-entropy + multimodality for free.)
+<div class="ln-lesson" markdown>
+**You should now be able to answer**: Why not a pure BERT for a VLA? (It cannot generate.) Why not a purely causal GPT instead of Prefix-LM? (So that the observation condition is understood fully and bidirectionally.) Why does training look like GPT? (next-token cross-entropy + multimodality for free.)
+</div>
 
 ---
 

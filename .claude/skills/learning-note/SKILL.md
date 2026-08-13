@@ -27,28 +27,37 @@ description: Use when turning experiment results, benchmark numbers, draft notes
    （2026-08-05 起的仓库口径；`docs/*/index.md` 这类分区首页豁免，靠 `fallback_to_default`
    显示中文）。英文版是中文稿的忠实全译：
    - 结构逐节对应，**不增不删章节**；数字、公式、表格数值逐字一致（翻译不是重写）；
-   - 预备知识的「中文名 = 英文名 = 最小定义」三元组，英文版保留英文名与定义，中文名可留作锚点；
+   - 预备知识的「中文名 = 英文名 = 最小定义」三元组，英文版**以英文名领头**
+     （English term = 中文名 = definition），保留英文名与定义，中文名留作锚点；
    - 引用、链接、图路径原样；图注同样译。
    - 只写中文不会让站点报错（`/en/` 会静默回退中文），所以**这条只能靠自查**——
      交付前跑第 5 步的核对命令。
 3. **交互 demo（如有）** → `docs/javascripts/<同名>.js`，规则见下节。demo 内的可见文案
    必须走双语 T 表（现有 demo 的写法照抄），不要把中文硬编码进 canvas 绘制。
-4. **注册三件套**（缺一不可，漏了页面就是孤儿）：
-   - `mkdocs.yml` 的 `nav:` 加中文标题条目；
+4. **注册四件套**（缺一不可，漏了页面就是孤儿）：
+   - `mkdocs.yml` 的 `nav:` 加中文标题条目——**nav 标题必须与笔记 H1 逐字一致**
+     （否则侧栏、面包屑、搜索结果与页面标题各说各话）；
+   - `i18n` 插件的 `nav_translations:` 加英文标题，**与 `.en.md` 的 H1 逐字一致**
+     （键是完整中文标题字符串，改 nav 标题时必须同步改键，否则静默回退中文；
+     删页面时同步删翻译条目）；
    - `extra_javascript:` 注册 demo js（如有）；
-   - `i18n` 插件的 `nav_translations:` 加英文标题（站点双语，界面标题必须两份）。
+   - `docs/index.md` 与 `docs/index.en.md` 的「全部笔记」列表各登记一行
+     （标题 · 分区 · 日期 · 一句话导语，按日期倒序）。
 5. **构建检查**：`.venv/bin/mkdocs build --strict` 零 WARNING 才算完成；
    同时确认 `site/<分类>/<slug>/` 与 `site/en/<分类>/<slug>/` 都生成了。
-   再跑一次「每篇正文笔记都有 .en.md」的核对（应无输出）：
+   再跑一次「每篇正文笔记都有 .en.md」的核对（应无输出；豁免仅限分区首页
+   `docs/<sec>/index.md`，`docs/index.md` 首页不豁免）：
    ```bash
-   for f in docs/*/*.md; do case "$f" in *.en.md|*/index.md) continue;; esac; \
+   find docs -type f -name '*.md' ! -name '*.en.md' | while read -r f; do
+     [ "$(basename "$f")" = index.md ] && [ "$(dirname "$(dirname "$f")")" = docs ] && continue
      [ -f "${f%.md}.en.md" ] || echo "MISSING EN: $f"; done
    ```
 
 ## 文章结构契约（按序，仅由这些部件构成）
 
 1. **Byline**：H1 之后第一行，`<div class="ln-byline">日期 · 阅读约 N 分钟 · 作者</div>`。
-   阅读时长 = 全文字数 ÷ 350（中文）或 ÷ 200（英文），四舍五入到分钟。
+   阅读时长**用脚本算，不手算**（手算已被实测抓到漂移）：
+   `python3 scripts/reading_time.py docs/<分类>/<slug>.md docs/<分类>/<slug>.en.md`，照抄输出。
    **日期与作者由用户给，缺就问，不编。**
 2. **导语**：`<p class="ln-lead">`，两三句话说清这篇是什么、读完得到什么。
 3. **读法建议**：`<div class="ln-howto">`，谁可以跳过哪节、各节按什么骨架展开。
@@ -65,8 +74,18 @@ description: Use when turning experiment results, benchmark numbers, draft notes
      紧贴其后的 `##`；
    - 「实测」一拍的关键数字另起 `<div class="ln-chips">`，每个数字一枚
      `<span class="ln-chip">`（正向 `.good` / 负向 `.bad`）；
-   - 「教训」一拍收进 `<div class="ln-lesson">`，**每章恰好一个**。
+   - 「教训」一拍收进 `<div class="ln-lesson">`，**每章恰好一个**
+     （约束**新写或整章重写**的实验型章节；存量笔记按下面的底线逐步迁移，
+     不因此整篇返工）。
    章节主题清单 = 草稿点名的主题，一一对应；不加「未来方向」等模板章节。
+
+   **契约的适用范围**（2026-08-11 明确，对齐存量语料）：四拍与 chips/lesson 的硬性要求
+   针对**实验型笔记**（有实测数字可引）的新写/重写章节。**理论/概念讲解型笔记**（如数学
+   工具讲解）没有「实测」拍——chips 豁免。**存量底线**：每篇至少把核心结论收进 1–2 个
+   lesson 盒（当前 5 篇均已达标）；「每章一个」只在新写/重写时执行。
+   Byline、`ln-lead` 导语、eyebrow、References 对所有笔记一律硬性。
+   另：**主线机制解释写在正文里，不塞进 admonition**——admonition 只放旁注
+   （补充、告诫、边注），正文骨架必须在 admonition 之外读得通。
 8. **前瞻盒 `<div class="ln-card">`**（可选）：跨章节埋钩子，先招呼后面会引爆的问题。
    长笔记用它维持叙事粘合；短笔记不用。
 9. **误解盒 `<div class="ln-myth">`**（有则必写）：`<span class="x">很多人以为</span>…
@@ -124,8 +143,11 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 
 - **单一浅色主题**：站点不提供暗色，demo 一律白底 + 深色线条；
   移除来源页的一切 `data-theme` / `prefers-color-scheme` 监听。
-- **命名空间隔离**：每篇笔记一个前缀（如 `fms-`）。CSS 类、CSS 变量（`--fms-*`）、
-  动态创建的 DOM id 全部带前缀，追加进 `docs/stylesheets/extra.css` 底部并注明来源；
+- **两套并行约定**：简单 demo 直接用全局已定义的通用部件 `.ln-demo` / `.ln-fig`
+  （容器、canvas、controls、readout 样式现成，不新增 CSS）；只有需要成套自定义样式的
+  复杂 demo 才开独立命名空间（如 `fms-`）。
+- **命名空间隔离**（走独立命名空间时）：每篇笔记一个前缀。CSS 类、CSS 变量（`--fms-*`）、
+  **DOM id（含 canvas id）**全部带前缀，追加进 `docs/stylesheets/extra.css` 底部并注明来源；
   **绝不写裸元素选择器**（`table{}` / `nav{}`）污染全局。
 - **数据语义色**（如五种求解器五色）允许出现在 demo 图内——它们是内容不是站点色；
   站点 chrome 仍守极简近单色。
@@ -155,11 +177,13 @@ description: Use when turning experiment results, benchmark numbers, draft notes
 - [ ] 每个文献论断有 [n] 且 References 完整
 - [ ] 每图有编号 + 实质图注
 - [ ] 章节与契约部件一一对应，无模板填充章节
-- [ ] Byline 的日期与作者来自用户而非编造；阅读时长按字数算过
-- [ ] 每章有 eyebrow；实测数字进了 chips；教训进了 lesson 且每章恰好一个
+- [ ] Byline 的日期与作者来自用户而非编造；阅读时长用 `scripts/reading_time.py` 算过（zh + en 两份）
+- [ ] 每章有 eyebrow；实测数字进了 chips；教训进了 lesson（实验型每章恰好一个；理论型全文至少 1–2 个）
+- [ ] 主线机制解释在正文，不在 admonition 里
 - [ ] 部件类名照抄 style 第 14 节，无自创类名
 - [ ] 分类判据核对过；文件名 kebab-case
-- [ ] nav + nav_translations + extra_javascript 三件套齐
+- [ ] H1 与 nav 标题逐字一致（zh 对 nav，en 对 nav_translations）
+- [ ] nav + nav_translations + extra_javascript + 首页「全部笔记」列表 四件套齐（zh/en 首页各一行）
 - [ ] demo：存在性守卫、命名空间前缀、无暗色残留、id 与页面逐一比对过
 - [ ] `mkdocs build --strict` 零 WARNING，zh/en 两份页面都生成
 

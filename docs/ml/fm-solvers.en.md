@@ -1,8 +1,8 @@
-# Flow Matching ODE Solvers · Illustrated
+# Flow Matching ODE Solvers, Illustrated
 
-<div class="ln-byline">2026-08-06 · about 21 min read · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · about 22 min read · Yufeng Jin</div>
 
-Sampling an image = numerically integrating an ODE. This note takes five classic solvers apart and explains each one (<span class="fms-t-euler">Euler</span>, <span class="fms-t-midpoint">Midpoint</span>, <span class="fms-t-heun">Heun</span>, <span class="fms-t-rk4">RK4</span>, <span class="fms-t-dopri5">Dopri5</span>) — every animation is a **real integration**, and every data figure comes from a reproducible experiment.
+<p class="ln-lead" markdown>Sampling an image = numerically integrating an ODE. This note takes five classic solvers apart and explains each one (<span class="fms-t-euler">Euler</span>, <span class="fms-t-midpoint">Midpoint</span>, <span class="fms-t-heun">Heun</span>, <span class="fms-t-rk4">RK4</span>, <span class="fms-t-dopri5">Dopri5</span>) — every animation is a **real integration**, and every data figure comes from a reproducible experiment.</p>
 
 <figure class="fms-panel">
   <canvas id="heroCv" height="380" aria-label="Flow matching vector field animation: particles flowing from Gaussian noise to eight modes"></canvas>

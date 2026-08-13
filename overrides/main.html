@@ -21,9 +21,14 @@
             {% set segs = page.url.strip('/').split('/') %}
             {% if segs | length > 1 %}
               {% set parent_url = (segs[:-1] | join('/')) ~ '/' %}
+              {# i18n 插件按语言重配 theme.language：en 构建下界面词用英文 #}
               <a class="ln-back" href="{{ parent_url | url }}">
                 <span class="ln-back__arrow">←</span>
-                <span>返回{{ page.parent.title if page.parent else "上级" }}</span>
+                {% if config.theme.language == "en" %}
+                  <span>Back to {{ page.parent.title if page.parent else "parent" }}</span>
+                {% else %}
+                  <span>返回{{ page.parent.title if page.parent else "上级" }}</span>
+                {% endif %}
               </a>
             {% endif %}
             {% include "partials/toc.html" %}

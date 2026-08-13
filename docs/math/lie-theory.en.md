@@ -1,6 +1,8 @@
 # Lie Theory: An Intuitive Introduction for Optimization and Robotics
 
-<div class="ln-byline">2026-08-06 · about 11 min read · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · about 8 min read · Yufeng Jin</div>
+
+<p class="ln-lead" markdown>Lie theory is the common language for carrying optimization over "curved spaces" — rotations, poses — back into ordinary vector calculus. This note walks from manifolds and tangent spaces to hat/vee and exp/log, assembles them into one optimization step on a manifold, and closes with a hand-written $SO(3)$ code sample.</p>
 
 !!! abstract "The whole story in one sentence"
     A **Lie group** is a "smoothly curved" space whose elements represent transformations (rotations, poses, and so on).
@@ -105,7 +107,7 @@ They are **manifolds**: smoothly curved spaces that **locally** look like flat $
     Likewise $SO(2)$ is 1-dimensional (just the one angle $\theta$). This "intrinsic dimension" is precisely the number of parameters we actually want to optimize.
 
 <figure markdown="span">
-  ![The three spaces: manifold, tangent space, R^n](https://dummyimage.com/760x260/f1efea/6b675f&text=manifold%20%E2%86%94%20tangent%20space%20%E2%86%94%20R%5En){ width="100%" }
+  ![The three spaces: manifold, tangent space, R^n](img/lie-three-spaces.svg){ width="100%" }
   <figcaption>Figure 1. A point $X$ on a Lie group; its tangent space is a "plane" attached at that point, and that plane is in turn isomorphic to $\mathbb{R}^n$. All the optimization happens on the far right.</figcaption>
 </figure>
 
@@ -304,9 +306,10 @@ Lie theory is the lingua franca of modern robotic **state estimation**<sup>[[2]]
 | **IMU preintegration** | A gyroscope measures angular velocity; integration happens on $SO(3)$ rather than by Euclidean accumulation |
 | **state estimation / EKF** | Uncertainty is modelled as a Gaussian in the tangent space (error-state Kalman filter) |
 
-!!! success "Remember this one thread"
-    When facing a **constrained object** (a rotation, a pose, a unit quaternion, …), **do not force additions and subtractions on the raw parameters**.
-    First $\log$ down to the flat tangent space, do the optimization / differentiation / modelling in the isomorphic $\mathbb{R}^n$, then $\exp$ back onto the manifold. The constraints are kept intact by $\exp$, and everything returns to familiar vector calculus.
+<div class="ln-lesson" markdown>
+**Remember this one thread**: when facing a **constrained object** (a rotation, a pose, a unit quaternion, …), **do not force additions and subtractions on the raw parameters**.
+First $\log$ down to the flat tangent space, do the optimization / differentiation / modelling in the isomorphic $\mathbb{R}^n$, then $\exp$ back onto the manifold. The constraints are kept intact by $\exp$, and everything returns to familiar vector calculus.
+</div>
 
 ---
 

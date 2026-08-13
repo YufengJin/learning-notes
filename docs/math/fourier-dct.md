@@ -1,8 +1,8 @@
-# Fourier 变换与 DCT 深入
+# Fourier 变换与 DCT：从频域到能量压缩
 
-<div class="ln-byline">2026-08-06 · 阅读约 7 分钟 · Yufeng Jin</div>
+<div class="ln-byline">2026-08-06 · 阅读约 8 分钟 · Yufeng Jin</div>
 
-从傅里叶级数讲起，一路到 DCT 的能量压缩性质，真正理解：为什么对平滑信号（如机器人动作）做 DCT，能量会奇迹般集中到几个低频系数上。是 [Action Tokenization](../robotics/action-tokenization.md) 里把 DCT 当黑盒用的那一步的展开。
+<p class="ln-lead" markdown>从傅里叶级数讲起，一路到 DCT 的能量压缩性质，真正理解：为什么对平滑信号（如机器人动作）做 DCT，能量会奇迹般集中到几个低频系数上。是 [Action Tokenization](../robotics/action-tokenization.md) 里把 DCT 当黑盒用的那一步的展开。</p>
 
 !!! note "一条主线"
     **任何信号都能写成一堆"波"的叠加。** 傅里叶家族研究的就是"用哪些波、各占多少"。DCT 是其中专为**实数、平滑信号**优化的一员，它的杀手锏是**能量压缩**——把信息挤进极少数低频系数，这正是 FAST / JPEG 压缩的根基。
@@ -196,7 +196,9 @@ DCT 把信号分解到这一组**固定的余弦基向量**上。第 $k$ 个基 
 !!! tip "DCT ≈ 免费的 KLT"
     对于**一阶马尔可夫信号**（相邻采样高度相关——平滑信号正是如此），可以证明 **DCT 的基函数无限接近 KLT 的最优基**<sup>[[5]](#refs)</sup><sup>[[2]](#refs)</sup>。也就是说：DCT 用一组**固定、无需训练**的余弦基，几乎达到了"为这类信号量身定制的最优变换"的压缩效果。这就是为什么 JPEG、MPEG、FAST 都选 DCT 而不是真的去算 KLT。
 
+<div class="ln-lesson" markdown>
 呼应 learned vs direct：DCT 是 **direct**（固定基、零训练），却逼近了需要数据统计的最优 learned 变换——**用确定性数学拿到了接近学习的收益**。
+</div>
 
 ---
 
