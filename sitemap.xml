@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/math/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/math/fourier-dct/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/fourier-dct/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/fourier-dct/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/math/lie-theory/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/lie-theory/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/lie-theory/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/ml/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/ml/autoregressive-models/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/autoregressive-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/autoregressive-models/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/ml/fm-solvers/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/fm-solvers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/fm-solvers/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/reading/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/reading/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/reading/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/robotics/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/robotics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/robotics/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/robotics/action-tokenization/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/robotics/action-tokenization/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/robotics/action-tokenization/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/style/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/style/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/style/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/math/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/math/fourier-dct/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/fourier-dct/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/fourier-dct/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/math/lie-theory/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/math/lie-theory/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/math/lie-theory/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/ml/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/ml/autoregressive-models/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/autoregressive-models/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/autoregressive-models/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/ml/fm-solvers/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/ml/fm-solvers/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/ml/fm-solvers/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/reading/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/reading/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/reading/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/robotics/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/robotics/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/robotics/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/robotics/action-tokenization/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/robotics/action-tokenization/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/robotics/action-tokenization/"/>
+    </url>
+    <url>
+        <loc>https://yufengjin.github.io/learning-notes/en/style/</loc>
+        <lastmod>2026-08-13</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://yufengjin.github.io/learning-notes/en/style/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://yufengjin.github.io/learning-notes/style/"/>
+    </url>
+</urlset>

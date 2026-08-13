@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <rect width="720" height="300" fill="#EEF1F5"/>
+  <rect x="1" y="1" width="718" height="298" fill="none" stroke="#D8DEE6" stroke-width="2"/>
+  <text x="360" y="158" text-anchor="middle" font-family="Avenir Next, Segoe UI, sans-serif"
+        font-size="24" fill="#5A6675">figure</text>
+</svg>

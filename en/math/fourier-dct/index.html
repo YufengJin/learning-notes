@@ -1,0 +1,952 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — math / machine learning / robotics / reading">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/en/math/fourier-dct/">
+      
+      
+        <link rel="prev" href="../lie-theory/">
+      
+      
+      
+        
+          <link rel="alternate" href="../../../math/fourier-dct/" hreflang="zh">
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Fourier Transform & DCT: From Frequency to Energy Compaction - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fourier-transform-dct-from-frequency-to-energy-compaction" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Fourier Transform & DCT: From Frequency to Energy Compaction
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../math/fourier-dct/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ml/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Machine Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../robotics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Robotics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mathematics
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                
+                  <span>Back to Mathematics</span>
+                
+              </a>
+            
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-why-move-a-signal-into-the-frequency-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Why move a signal into the "frequency domain"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-fourier-series-a-periodic-signal-a-sum-of-sines-and-cosines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fourier series: a periodic signal = a sum of sines and cosines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-continuous-fourier-transform-from-periodic-to-arbitrary-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The continuous Fourier transform: from periodic to arbitrary signals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-dft-and-fft-fourier-in-the-discrete-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. DFT and FFT: Fourier in the discrete world
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-from-dft-to-dct-dropping-the-complex-numbers-and-the-boundary-jump" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. From DFT to DCT: dropping the complex numbers and the boundary jump
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-the-four-dct-variants-knowing-they-differ-is-enough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. The four DCT variants (knowing they differ is enough)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-a-gallery-of-dct-basis-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. A gallery of DCT basis functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-dct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Energy compaction: the DCT's killer feature (verify it yourself)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-why-the-dct-of-all-transforms-it-is-close-to-optimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Why the DCT of all transforms (it is close to "optimal")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-applications-from-jpeg-to-fast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Applications: from JPEG to FAST
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Mathematics
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="fourier-transform-dct-from-frequency-to-energy-compaction">Fourier Transform &amp; DCT: From Frequency to Energy Compaction<a class="headerlink" href="#fourier-transform-dct-from-frequency-to-energy-compaction" title="Permanent link">&para;</a></h1>
+<div class="ln-byline">2026-08-06 · about 11 min read · Yufeng Jin</div>
+
+<p class="ln-lead">Starting from Fourier series and running all the way to the energy-compaction property of the DCT, this note builds a genuine understanding of why applying a DCT to a smooth signal (a robot motion, say) makes its energy pile up almost miraculously onto a handful of low-frequency coefficients. It is the expanded version of the step that <a href="../../robotics/action-tokenization/">Action Tokenization</a> treats as a black box.</p>
+<div class="admonition note">
+<p class="admonition-title">One through-line</p>
+<p><strong>Any signal can be written as a superposition of "waves."</strong> What the Fourier family studies is <em>which</em> waves to use and <em>how much</em> of each. The DCT is the member of that family tuned specifically for <strong>real-valued, smooth signals</strong>, and its killer feature is <strong>energy compaction</strong> — squeezing the information into very few low-frequency coefficients. That is precisely the foundation on which FAST and JPEG compression rest.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Opening · why transform</div>
+
+<h2 id="0-why-move-a-signal-into-the-frequency-domain">0. Why move a signal into the "frequency domain"<a class="headerlink" href="#0-why-move-a-signal-into-the-frequency-domain" title="Permanent link">&para;</a></h2>
+<p>The same stretch of signal admits two views:</p>
+<ul>
+<li><strong>Time domain</strong>: "what is the value at each instant." A robot motion is natively of this kind: the joint angles at step 0, step 1, and so on.</li>
+<li><strong>Frequency domain</strong>: "which fast and slow waves make up the signal, and in what proportion." Another coordinate system for the same information.</li>
+</ul>
+<p>The payoff of switching to the frequency domain: many signals that look densely packed in time are <strong>extremely sparse</strong> in frequency (only a few frequencies carry any value). Smooth = slowly varying = low frequencies only = sparse in frequency → <strong>compressible</strong>.</p>
+<hr />
+<div class="ln-eyebrow">Prerequisites</div>
+
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>The main text leans on the following concepts repeatedly; each is written as an "English term = Chinese name = minimal definition" triple:</p>
+<ul>
+<li><strong>periodic function</strong> = 周期函数 = a function for which there exists a positive number <span class="arithmatex">\(T\)</span> with <span class="arithmatex">\(f(t+T)=f(t)\)</span> for all <span class="arithmatex">\(t\)</span>; <span class="arithmatex">\(T\)</span> is called the period<sup><a href="#refs">[1]</a></sup>.</li>
+<li><strong>harmonic</strong> = 谐波 = a sine/cosine component whose frequency is an integer multiple of the fundamental; the <span class="arithmatex">\(n\)</span>-th harmonic has <span class="arithmatex">\(n\)</span> times the fundamental frequency<sup><a href="#refs">[1]</a></sup>.</li>
+<li><strong>complex exponential</strong> = 复指数 = a complex-valued function of the form <span class="arithmatex">\(e^{i\omega t}\)</span>; by Euler's formula <span class="arithmatex">\(e^{i\omega t}=\cos\omega t + i\sin\omega t\)</span>, it packs a sine and a cosine into a single complex quantity<sup><a href="#refs">[1]</a></sup>.</li>
+<li><strong>basis function</strong> = 基函数 = one of a fixed set of functions/vectors used for expansion; a signal is written as their weighted sum, and the weights are the transform coefficients<sup><a href="#refs">[1]</a></sup>.</li>
+<li><strong>energy compaction</strong> = 能量压缩 = the property that a transform concentrates most of a signal's energy onto a few coefficients; the better the concentration, the more compressible the signal<sup><a href="#refs">[2]</a></sup>.</li>
+<li><strong>quantization</strong> = 量化 = the lossy operation of mapping continuous or high-precision values onto a finite set of discrete levels (rounding, for instance)<sup><a href="#refs">[2]</a></sup>.</li>
+</ul>
+<hr />
+<div class="ln-eyebrow">Theory 01 · Fourier series</div>
+
+<h2 id="1-fourier-series-a-periodic-signal-a-sum-of-sines-and-cosines">1. Fourier series: a periodic signal = a sum of sines and cosines<a class="headerlink" href="#1-fourier-series-a-periodic-signal-a-sum-of-sines-and-cosines" title="Permanent link">&para;</a></h2>
+<p>Fourier's insight (1807): any <strong>periodic</strong> function can be written as a weighted sum of sines and cosines at different frequencies<sup><a href="#refs">[3]</a></sup>:</p>
+<div class="arithmatex">\[
+f(t)=\frac{a_0}{2}+\sum_{n=1}^{\infty}\Big(a_n\cos(n\omega t)+b_n\sin(n\omega t)\Big)
+\]</div>
+<p>The higher the frequency <span class="arithmatex">\(n\omega\)</span>, the faster that term varies. Below we <strong>approximate a square wave by superposing odd harmonics</strong> — the classic example, and one in which you can also watch the <strong>Gibbs phenomenon</strong>: the more terms you add the better the fit, yet the corners always overshoot.</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 1 · Fourier series approximating a square wave</div>
+<div class="ln-demo-hint">A square wave = the sum of infinitely many odd sine harmonics. The grey curve is the target square wave, the red curve is the superposition of the first few harmonics; drag the slider to add harmonics and watch the sum (red) close in on the square wave (grey). What to look for: more harmonics means a tighter overall fit, yet the overshoot of the red curve near the jumps never disappears — that is the Gibbs phenomenon discussed in the text.</div>
+<canvas id="cvSquare" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>Number of harmonics <input type="range" id="sqN" min="1" max="40" value="3"> <span class="ln-val" id="sqNV">3</span></label>
+</div>
+<div class="ln-readout" id="sqOut"></div>
+</div>
+
+<div class="admonition warning">
+<p class="admonition-title">The Gibbs phenomenon</p>
+<p>Near a discontinuity (the jump in a square wave) there is always an overshoot of about 9%, no matter how many terms you add<sup><a href="#refs">[1]</a></sup>. The lesson: <strong>the more discontinuous a signal is, the more high-frequency content it carries, and the harder it is to represent with a few low-frequency terms</strong> — conversely, <strong>the smoother it is, the better it compresses</strong>. Robot motions happen to be smooth.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Theory 02 · continuous transform</div>
+
+<h2 id="2-the-continuous-fourier-transform-from-periodic-to-arbitrary-signals">2. The continuous Fourier transform: from periodic to arbitrary signals<a class="headerlink" href="#2-the-continuous-fourier-transform-from-periodic-to-arbitrary-signals" title="Permanent link">&para;</a></h2>
+<p>Push the period to infinity and the series' "sum over discrete frequencies" becomes an "integral over continuous frequency," which gives the Fourier transform:</p>
+<div class="arithmatex">\[
+F(\omega)=\int_{-\infty}^{\infty} f(t)\,e^{-i\omega t}\,dt
+\]</div>
+<p>Here <span class="arithmatex">\(e^{-i\omega t}=\cos\omega t - i\sin\omega t\)</span> (Euler's formula) packs sine and cosine into a single <strong>complex exponential</strong>. <span class="arithmatex">\(F(\omega)\)</span> is complex: its <strong>magnitude</strong> gives the strength of that frequency, its <strong>argument</strong> the phase.</p>
+<div class="admonition tip">
+<p class="admonition-title">A complex exponential is a rotating phasor</p>
+<p>In the complex plane <span class="arithmatex">\(e^{-i\omega t}\)</span> is a unit vector rotating at angular frequency <span class="arithmatex">\(\omega\)</span>. The Fourier transform is asking: "how much of the signal is in sync with this phasor spinning at <span class="arithmatex">\(\omega\)</span>?" Frequency components that stay in sync come out large.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Theory 03 · discrete and fast</div>
+
+<h2 id="3-dft-and-fft-fourier-in-the-discrete-world">3. DFT and FFT: Fourier in the discrete world<a class="headerlink" href="#3-dft-and-fft-fourier-in-the-discrete-world" title="Permanent link">&para;</a></h2>
+<p>Inside a computer a signal is <strong>a finite set of samples</strong> <span class="arithmatex">\(x_0,\dots,x_{N-1}\)</span>, which calls for the <strong>discrete Fourier transform (DFT)</strong>:</p>
+<div class="arithmatex">\[
+X_k=\sum_{n=0}^{N-1}x_n\,e^{-i2\pi kn/N},\quad k=0,\dots,N-1
+\]</div>
+<p>Computed directly this costs <span class="arithmatex">\(O(N^2)\)</span>. The <strong>FFT (fast Fourier transform)</strong> exploits symmetries to bring it down to <span class="arithmatex">\(O(N\log N)\)</span><sup><a href="#refs">[4]</a></sup> — one of the most important algorithms of the 20<sup>th</sup> century, and what made real-time audio and video processing possible.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Input</th>
+<th>Output</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fourier series</td>
+<td>continuous periodic function</td>
+<td>discrete coefficients <span class="arithmatex">\(a_n,b_n\)</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Fourier transform (FT)</td>
+<td>continuous, non-periodic</td>
+<td>continuous spectrum <span class="arithmatex">\(F(\omega)\)</span></td>
+<td>—</td>
+</tr>
+<tr>
+<td>DFT</td>
+<td><span class="arithmatex">\(N\)</span> discrete samples</td>
+<td><span class="arithmatex">\(N\)</span> complex coefficients</td>
+<td><span class="arithmatex">\(O(N^2)\)</span></td>
+</tr>
+<tr>
+<td>FFT</td>
+<td>same as DFT (algorithmic speedup)</td>
+<td>same as DFT</td>
+<td><span class="arithmatex">\(O(N\log N)\)</span></td>
+</tr>
+<tr>
+<td><strong>DCT</strong></td>
+<td><span class="arithmatex">\(N\)</span> real samples</td>
+<td><span class="arithmatex">\(N\)</span> <strong>real</strong> coefficients</td>
+<td><span class="arithmatex">\(O(N\log N)\)</span></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="ln-eyebrow">DCT 01 · origin</div>
+
+<h2 id="4-from-dft-to-dct-dropping-the-complex-numbers-and-the-boundary-jump">4. From DFT to DCT: dropping the complex numbers and the boundary jump<a class="headerlink" href="#4-from-dft-to-dct-dropping-the-complex-numbers-and-the-boundary-jump" title="Permanent link">&para;</a></h2>
+<p>The DFT has two features that are unfriendly to compression, and the DCT exists precisely to fix them:</p>
+<ol>
+<li><strong>DFT coefficients are complex</strong> (real and imaginary parts), which is redundant for a real-valued signal.</li>
+<li><strong>The DFT implicitly extends the signal periodically</strong>, so if the first and last values differ, an <strong>artificial jump</strong> appears at the boundary → a flood of high frequencies → bad for compression.</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">The DCT's two tricks</p>
+<p>① <strong>Even symmetric extension</strong>: the DCT first "mirrors" the signal into an even function before transforming. The Fourier expansion of an even function <strong>contains cosine terms only</strong> → the coefficients are all <strong>real</strong>, with no imaginary-part redundancy.</p>
+<p>② <strong>Mirroring kills the jump</strong>: the mirrored extension makes the boundary <strong>join up smoothly</strong> (no more DFT-style discontinuity between the ends) → high frequencies are suppressed → energy concentrates further into the low frequencies.</p>
+<p>Together these two points make the DCT's <strong>energy compaction</strong> on real, smooth signals markedly better than the DFT's.</p>
+</div>
+<p>The workhorse is <strong>DCT-II</strong> (the one JPEG and FAST use)<sup><a href="#refs">[5]</a></sup>:</p>
+<div class="arithmatex">\[
+X_k=\sum_{n=0}^{N-1}x_n\cos\!\Big[\frac{\pi}{N}\big(n+\tfrac12\big)k\Big]
+\]</div>
+<p>Note that the basis is pure cosine and the coefficients <span class="arithmatex">\(X_k\)</span> are real. <span class="arithmatex">\(k=0\)</span> is the DC term (the mean), and larger <span class="arithmatex">\(k\)</span> means higher frequency. The inverse transform, the IDCT (i.e. DCT-III), reconstructs using the same cosine basis and is <strong>exactly invertible</strong>.</p>
+<hr />
+<div class="ln-eyebrow">DCT 02 · variants</div>
+
+<h2 id="5-the-four-dct-variants-knowing-they-differ-is-enough">5. The four DCT variants (knowing they differ is enough)<a class="headerlink" href="#5-the-four-dct-variants-knowing-they-differ-is-enough" title="Permanent link">&para;</a></h2>
+<p>Depending on how the symmetric extension is performed at the two ends, there are four types, DCT-I through IV<sup><a href="#refs">[2]</a></sup>. In practice:</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DCT-II</strong></td>
+<td>The most common. JPEG, MPEG, and <strong>FAST action tokenization</strong> all use it</td>
+</tr>
+<tr>
+<td><strong>DCT-III</strong></td>
+<td>The inverse of DCT-II (i.e. the IDCT)</td>
+</tr>
+<tr>
+<td>DCT-I</td>
+<td>Different endpoint handling, rarely used</td>
+</tr>
+<tr>
+<td>DCT-IV</td>
+<td>Used in the MDCT (audio, e.g. the lapped transform in MP3/AAC)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">What norm=\"ortho\" does</p>
+<p>In scipy one often adds <code>norm="ortho"</code>: it multiplies the coefficients by normalization factors (<span class="arithmatex">\(\sqrt{1/N}\)</span> for <span class="arithmatex">\(k{=}0\)</span>, <span class="arithmatex">\(\sqrt{2/N}\)</span> for the rest), making the transform <strong>orthogonal and energy-preserving</strong> (Parseval: energy in time = energy in frequency). The IDCT then becomes the transpose of the DCT, which is numerically cleaner.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">DCT 03 · basis functions</div>
+
+<h2 id="6-a-gallery-of-dct-basis-functions">6. A gallery of DCT basis functions<a class="headerlink" href="#6-a-gallery-of-dct-basis-functions" title="Permanent link">&para;</a></h2>
+<p>The DCT decomposes a signal onto this set of <strong>fixed cosine basis vectors</strong>. The <span class="arithmatex">\(k\)</span>-th basis vector = a sampled cosine of frequency <span class="arithmatex">\(k\)</span>. Any signal is a weighted sum of these bases, and the weights are the DCT coefficients. Here are the first 8 bases (<span class="arithmatex">\(N=32\)</span>):</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 2 · DCT-II basis functions (k = 0…7)</div>
+<div class="ln-demo-hint">In each panel the horizontal axis is the sample index n and the vertical axis the value of that basis vector: k=0 is constant (DC / mean), and the larger k is the faster the oscillation (the higher the frequency). Hover over any panel to highlight it. What to look for: all the DCT does is project the signal onto this fixed set of cosine waves ordered from slow to fast, and each projection is a coefficient.</div>
+<canvas id="cvBasis" width="900" height="320"></canvas>
+<div class="ln-readout">Each panel is one cosine basis vector $\cos[\pi/N\,(n+0.5)\,k]$. The DCT coefficient $X_k$ = the projection of the signal onto the k-th basis vector.</div>
+</div>
+
+<hr />
+<div class="ln-eyebrow">Evidence · energy compaction</div>
+
+<h2 id="7-dct">7. Energy compaction: the DCT's killer feature (verify it yourself)<a class="headerlink" href="#7-dct" title="Permanent link">&para;</a></h2>
+<p>This is the single most important concept on the page, and the fundamental reason FAST works. <strong>Energy compaction</strong>: for a smooth signal, the DCT concentrates the overwhelming majority of the energy onto <strong>a very small number of low-frequency coefficients</strong>, leaving the rest close to 0.</p>
+<p>So we need only <strong>keep the first few large coefficients and discard the great many that sit close to 0</strong> to reconstruct the signal almost perfectly from very little data. Verify it for yourself below:</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 3 · Reconstruction quality when keeping only the first k DCT coefficients</div>
+<div class="ln-demo-hint">Top: the original signal (blue) vs the reconstruction from only the first k DCT coefficients (red). Bottom: the energy of the DCT coefficients (the retained ones highlighted). Drag k and see how few coefficients a smooth signal needs before the curves nearly coincide; then switch to the "with high frequency / noise" signal for comparison. What to look for: for the smooth signal almost all the energy is crammed into the leftmost few low-frequency coefficients, so red and blue overlap at a very small k, whereas for the signal with high frequency content the coefficient energy is spread out and a far larger k is needed — that is exactly what energy compaction means, made visible.</div>
+<canvas id="cvCompact" width="900" height="360"></canvas>
+<div class="ln-controls">
+<label>Keep the first k coefficients <input type="range" id="ckK" min="1" max="32" value="4"> <span class="ln-val" id="ckKV">4</span> / 32</label>
+<button id="ckSmooth" class="on">Smooth signal</button>
+<button id="ckRough">With high frequency / noise</button>
+</div>
+<div class="ln-readout" id="ckOut"></div>
+</div>
+
+<div class="admonition note">
+<p class="admonition-title">The link to FAST</p>
+<p>FAST does not explicitly "discard" coefficients; it <strong>rounds them (quantization)</strong>: the high-frequency coefficients that sit close to 0 turn into <strong>exactly 0</strong> once rounded, which has the same effect as discarding them and, as a bonus, produces long runs of repeated 0s for BPE to compress<sup><a href="#refs">[6]</a></sup>. The stronger the energy compaction (the smoother the signal), the more 0s after rounding → the fewer tokens.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Rationale · near-optimal</div>
+
+<h2 id="8-why-the-dct-of-all-transforms-it-is-close-to-optimal">8. Why the DCT of all transforms (it is close to "optimal")<a class="headerlink" href="#8-why-the-dct-of-all-transforms-it-is-close-to-optimal" title="Permanent link">&para;</a></h2>
+<p>In theory, for a given signal statistic the transform with <strong>optimal energy compaction</strong> is the <strong>KLT (Karhunen–Loève transform, i.e. PCA)</strong> — it projects the signal onto the eigenvectors of the covariance matrix. But the KLT depends on the data statistics and requires computing eigenvectors on the spot: expensive and not general-purpose.</p>
+<div class="admonition tip">
+<p class="admonition-title">The DCT ≈ a free KLT</p>
+<p>For a <strong>first-order Markov signal</strong> (adjacent samples highly correlated — exactly the case for smooth signals), one can prove that <strong>the DCT's basis functions come arbitrarily close to the KLT's optimal basis</strong><sup><a href="#refs">[5]</a></sup><sup><a href="#refs">[2]</a></sup>. In other words: with a <strong>fixed, training-free</strong> cosine basis, the DCT achieves nearly the compression of "the optimal transform tailored to this class of signals." That is why JPEG, MPEG, and FAST all reach for the DCT instead of actually computing a KLT.</p>
+</div>
+<div class="ln-lesson">
+<p>Echoing learned vs direct: the DCT is <strong>direct</strong> (fixed basis, zero training), yet it approaches the optimal learned transform that would require data statistics — <strong>deterministic mathematics buying you nearly the benefits of learning</strong>.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Applications · JPEG to FAST</div>
+
+<h2 id="9-applications-from-jpeg-to-fast">9. Applications: from JPEG to FAST<a class="headerlink" href="#9-applications-from-jpeg-to-fast" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>How the DCT is used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JPEG</strong></td>
+<td>Cut the image into 8×8 blocks → 2D DCT → quantize (drop the high frequencies) → entropy coding<sup><a href="#refs">[7]</a></sup>. Nearly every photo you have ever seen has been through a DCT</td>
+</tr>
+<tr>
+<td><strong>MPEG / H.26x</strong></td>
+<td>DCT + quantization on video frames (residuals)</td>
+</tr>
+<tr>
+<td><strong>MP3 / AAC</strong></td>
+<td>Compress audio with the MDCT (the lapped version of DCT-IV)</td>
+</tr>
+<tr>
+<td><strong>FAST (robotics)</strong></td>
+<td>DCT of the action array (T,D) along the <strong>time axis</strong> → quantize by rounding → BPE<sup><a href="#refs">[6]</a></sup>. Smooth motions → concentrated energy → many 0s after rounding → short token sequences</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">One and the same recipe</p>
+<p>JPEG compressing images and FAST compressing actions have <strong>exactly the same skeleton</strong>: move to the frequency domain (DCT) → quantize away the unimportant high frequencies → lossless entropy coding (BPE/Huffman). Understand JPEG and you already understand half of FAST.</p>
+</div>
+<hr />
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../robotics/action-tokenization/">Action Tokenization</a> — the main thread on discretizing robot actions; FAST uses the DCT to compress motions into tokens</li>
+<li><a href="../../ml/autoregressive-models/">Autoregressive Models · BERT / GPT</a> — sequence-modeling paradigms and the Prefix-LM, i.e. who consumes the tokens afterwards</li>
+</ul>
+<hr />
+<h2 id="refs">References<a class="headerlink" href="#refs" title="Permanent link">&para;</a></h2>
+<ol>
+<li>A. V. Oppenheim, R. W. Schafer. <em>Discrete-Time Signal Processing</em>, 3<sup>rd</sup> ed. Prentice Hall, 2010.</li>
+<li>K. R. Rao, P. Yip. <em>Discrete Cosine Transform: Algorithms, Advantages, Applications</em>. Academic Press, 1990.</li>
+<li>J. B. J. Fourier. <em>Théorie analytique de la chaleur</em>. Firmin Didot, Paris, 1822. (The book-length expansion of the heat-conduction memoir submitted to the Paris Academy of Sciences in 1807.)</li>
+<li>J. W. Cooley, J. W. Tukey. "An Algorithm for the Machine Calculation of Complex Fourier Series." <em>Mathematics of Computation</em>, 19(90): 297–301, 1965.</li>
+<li>N. Ahmed, T. Natarajan, K. R. Rao. "Discrete Cosine Transform." <em>IEEE Transactions on Computers</em>, C-23(1): 90–93, 1974.</li>
+<li>K. Pertsch, K. Stachowicz, B. Ichter, D. Driess, S. Nair, Q. Vuong, O. Mees, C. Finn, S. Levine. "FAST: Efficient Action Tokenization for Vision-Language-Action Models." arXiv:2501.09747, 2025.</li>
+<li>G. K. Wallace. "The JPEG Still Picture Compression Standard." <em>IEEE Transactions on Consumer Electronics</em>, 38(1): xviii–xxxiv, 1992.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../lie-theory/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Lie Theory: An Intuitive Introduction for Optimization and Robotics">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Lie Theory: An Intuitive Introduction for Optimization and Robotics
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="/paper-snapshots/" target="_blank" rel="noopener" title="Paper Notes — 论文海报合集" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M64 480c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v213.5c0 17-6.7 33.3-18.7 45.3L322.7 461.3c-12 12-28.3 18.7-45.3 18.7zm325.5-176H296c-13.3 0-24 10.7-24 24v93.5z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/YufengJin" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/vendor/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../../javascripts/fourier-dct.js"></script>
+      
+        <script src="../../../javascripts/fm-solvers.js"></script>
+      
+    
+  </body>
+</html>

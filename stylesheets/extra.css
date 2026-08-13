@@ -1,0 +1,470 @@
+/* ============================================================
+   Learning Notes — 主题：冷灰蓝底 (#F4F6F8) + 蓝/琥珀双强调 + 衬线正文
+   定位是「长文读物」，不是文档站：衬线正文、宽松行高、大节间距、
+   四个结构部件（eyebrow / chips / lesson / card）把「四拍」变成可见节奏。
+   ⚠️ 本站与 paper-snapshots 已于 2026-08-06 分家，不再共用设计 token。
+   ============================================================ */
+
+:root {
+  /* —— 设计 token —— */
+  --ln-bg:        #F4F6F8;   /* 页面背景（冷灰蓝）*/
+  --ln-surface:   #FFFFFF;   /* 卡片 / 头部 / 侧栏 */
+  --ln-surface-2: #EEF1F5;   /* 代码块 / 表头 / hover */
+  --ln-ink:       #1B2430;   /* 正文（冷近黑）*/
+  --ln-ink-2:     #5A6675;   /* 次级文字 / 副标题 */
+  --ln-muted:     #5A6675;   /* 次要文字（同 ink-2，保持单一次级色）*/
+  --ln-line:      #D8DEE6;   /* 1px 细边框 */
+
+  /* 双强调：蓝 = 结构/定位（eyebrow、概念标签、链接）；琥珀 = 结论/教训 */
+  --ln-acc:       #4F63D2;   /* 强调 A · 蓝 */
+  --ln-acc-weak:  #E4E8FA;   /* 蓝淡底 */
+  --ln-acc2:      #C97B27;   /* 强调 B · 琥珀 */
+  --ln-acc2-weak: #F7EAD8;   /* 琥珀淡底 */
+  --ln-hl:        #FFF6E4;   /* 教训盒底色 */
+  --ln-good:      #2E7D57;   /* 语义：确认 / 正向 */
+  --ln-bad:       #B0433C;   /* 语义：推翻 / 负向 */
+
+  /* 字体族：正文衬线（读物感），标题无衬线（界面感），全部系统字体不走网络 */
+  --ln-serif: Charter, Georgia, "Songti SC", "Noto Serif CJK SC",
+    "Noto Serif SC", "Source Han Serif SC", serif;
+  --ln-sans: "Avenir Next", "Segoe UI", system-ui, -apple-system,
+    "PingFang SC", "Noto Sans SC", sans-serif;
+  --ln-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --ln-section-gap: 72px;    /* 节间距：章与章之间的呼吸 */
+
+  /* —— 映射到 Material 变量 —— */
+  --md-default-bg-color:          var(--ln-bg);
+  --md-default-fg-color:          var(--ln-ink);
+  --md-default-fg-color--light:   var(--ln-ink-2);
+  --md-default-fg-color--lighter: var(--ln-muted);
+  --md-default-fg-color--lightest:var(--ln-line);
+
+  /* 头部用浅色（不要整条深色横幅），文字用冷近黑 */
+  --md-primary-fg-color:        var(--ln-surface);
+  --md-primary-fg-color--light: var(--ln-surface);
+  --md-primary-fg-color--dark:  var(--ln-surface-2);
+  --md-primary-bg-color:        var(--ln-ink);
+  --md-primary-bg-color--light: var(--ln-muted);
+
+  /* 蓝（--ln-acc）作为强调 / hover；transparent 为其 10% 淡底 */
+  --md-accent-fg-color:             var(--ln-acc);
+  --md-accent-fg-color--transparent:rgba(79, 99, 210, .1);
+
+  /* 链接与代码 */
+  --md-typeset-a-color: var(--ln-acc);
+  --md-code-bg-color:   var(--ln-surface-2);
+  --md-code-fg-color:   var(--ln-ink-2);
+}
+
+/* 字体：Material 的 font 已在 mkdocs.yml 关掉（font: false），全部由此处接管 */
+:root {
+  --md-text-font-family: var(--ln-serif);
+  --md-code-font-family: var(--ln-mono);
+}
+/* 界面 chrome（头部 / 导航 / 搜索 / 页脚）保持无衬线，只有正文是衬线 */
+.md-header, .md-tabs, .md-nav, .md-search, .md-footer, .md-typeset .md-button {
+  font-family: var(--ln-sans);
+}
+
+/* —— 头部：浅色 + 底部细线 + 无阴影（扁平极简）—— */
+.md-header {
+  background-color: var(--ln-surface);
+  color: var(--ln-ink);
+  border-bottom: 1px solid var(--ln-line);
+  box-shadow: none;
+}
+.md-header--shadow { box-shadow: none; }
+.md-header__title { font-weight: 600; }
+
+/* 顶部 tab：选中态蓝色高亮 */
+.md-tabs {
+  background-color: var(--ln-surface);
+  color: var(--ln-ink);
+  border-bottom: 1px solid var(--ln-line);
+}
+.md-tabs__link { opacity: .82; }
+.md-tabs__link:hover,
+.md-tabs__link--active { opacity: 1; color: var(--ln-acc); }
+
+/* 搜索框 */
+.md-search__form {
+  background-color: var(--ln-surface-2);
+  border: 1px solid var(--ln-line);
+  box-shadow: none;
+  border-radius: 10px;
+}
+.md-search__form:hover { background-color: var(--ln-surface-2); }
+[data-md-toggle="search"]:checked ~ .md-header .md-search__form {
+  background-color: var(--ln-surface);
+}
+
+/* —— 左侧导航：激活项蓝色 —— */
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover { color: var(--ln-acc); }
+.md-nav__item--active > .md-nav__link { font-weight: 600; }
+
+/* 右侧 TOC 激活态 */
+.md-nav__link--active { color: var(--ln-acc); }
+
+/* —— 正文排版：衬线读物 —— */
+.md-typeset {
+  font-family: var(--ln-serif);
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--ln-ink);
+}
+/* 栏宽收窄，每行字数受控（长文可读性的关键，比字号更重要）*/
+.md-typeset > * { max-width: 46rem; }
+.md-typeset > .ln-chips,
+.md-typeset > table, .md-typeset > .highlight,
+.md-typeset > .ln-demo, .md-typeset > .ln-fig,
+.md-typeset > figure, .md-typeset > .md-typeset__scrollwrap { max-width: none; }
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  font-family: var(--ln-sans);
+  line-height: 1.3;
+  text-wrap: balance;
+  color: var(--ln-ink);
+}
+.md-typeset h1 { font-weight: 700; letter-spacing: -.01em; font-size: 2rem; }
+/* h2 = 一「节」的开始：上方留 72px 呼吸，双线分隔 */
+.md-typeset h2 {
+  font-weight: 650;
+  font-size: 1.55rem;
+  margin-top: var(--ln-section-gap);
+  padding-bottom: .3em;
+  border-bottom: 2px solid var(--ln-line);
+}
+/* eyebrow 紧贴其后的 h2，所以此时 h2 自己不再留大间距 */
+.md-typeset .ln-eyebrow + h2 { margin-top: .1em; }
+.md-typeset h3 { font-size: 1.15rem; margin: 1.6em 0 .4em; color: var(--ln-ink-2); }
+.md-typeset h4 { font-size: 1rem; margin: 1.3em 0 .35em; }
+
+.md-typeset a { text-decoration: none; }
+.md-typeset a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* 行内代码 */
+.md-typeset code {
+  background-color: var(--ln-surface-2);
+  border: 1px solid var(--ln-line);
+  border-radius: 5px;
+  padding: .1em .35em;
+}
+/* 代码块：扁平、细线、无重阴影 */
+.md-typeset pre > code { border: none; }
+.md-typeset .highlight,
+.md-typeset pre {
+  border: 1px solid var(--ln-line);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+/* 表格：扁平细线，浅灰表头底 */
+.md-typeset table:not([class]) {
+  border: 1px solid var(--ln-line);
+  border-radius: 10px;
+  box-shadow: none;
+  overflow: hidden;
+}
+.md-typeset table:not([class]) th {
+  background-color: var(--ln-surface-2);
+  color: var(--ln-ink);
+  font-weight: 600;
+}
+
+/* 引用块：蓝色左边线 */
+.md-typeset blockquote {
+  border-left: 3px solid var(--ln-acc);
+  color: var(--ln-muted);
+}
+
+/* 提示框（admonition）：扁平、细线、小圆角。
+   契约（SKILL.md）：admonition 只放旁注，主线机制解释写正文。字号仍不压太小
+   （.85rem ≈ 17px），旁注感靠边框与底色区分，不靠缩小字号——存量笔记里仍有
+   较长的 admonition，小字会惩罚它们的可读性。 */
+.md-typeset .admonition,
+.md-typeset details {
+  border: 1px solid var(--ln-line);
+  border-radius: 10px;
+  box-shadow: none;
+  font-size: .85rem;
+}
+
+/* 链接 / 按钮 */
+.md-typeset .md-button {
+  border-radius: 10px;
+  border-color: var(--ln-line);
+}
+.md-typeset .md-button--primary {
+  background-color: var(--ln-acc);
+  border-color: var(--ln-acc);
+  color: #fff;
+}
+
+/* 页脚：低调 */
+.md-footer { background-color: var(--ln-ink); }
+.md-footer-meta { background-color: var(--ln-ink-2); }
+
+/* 选区高亮 */
+::selection { background: var(--ln-acc-weak); }
+
+/* ============================================================
+   文章结构部件 —— 把写作契约的「四拍」变成可见节奏。
+   写法见 .claude/skills/learning-note/SKILL.md 与 docs/style/index.md。
+   ============================================================ */
+
+/* ① Byline：日期 | 阅读时长 | 作者。紧跟 h1，下方细线收口 */
+.md-typeset .ln-byline {
+  font: 12.5px/1.6 var(--ln-sans);
+  color: var(--ln-ink-2);
+  letter-spacing: .03em;
+  margin: .2em 0 1.1em;
+  padding-bottom: .8em;
+  border-bottom: 1px solid var(--ln-line);
+}
+
+/* ② 导语：比正文大一号、颜色次级，读者 30 秒判断要不要读 */
+.md-typeset .ln-lead {
+  font-size: 19px;
+  line-height: 1.75;
+  color: var(--ln-ink-2);
+}
+
+/* ③ 读法建议：谁可以跳过哪节 */
+.md-typeset .ln-howto {
+  font: 14px/1.75 var(--ln-sans);
+  color: var(--ln-ink-2);
+  background: var(--ln-surface);
+  border: 1px solid var(--ln-line);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 20px 0 26px;
+}
+.md-typeset .ln-howto b { color: var(--ln-ink); }
+
+/* ④ eyebrow：节的定位标签，如「预备知识 2」「方法 02 · 分歧类」 */
+.md-typeset .ln-eyebrow {
+  font: 600 11px/1.4 var(--ln-sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ln-acc);
+  margin: var(--ln-section-gap) 0 0;
+}
+.md-typeset .ln-eyebrow:first-child { margin-top: 0; }
+
+/* ⑤ chips：本节实测数字浓缩成一行，扫读者不钻正文也能拿到结论 */
+.md-typeset .ln-chips {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0;
+}
+.md-typeset .ln-chip {
+  font: 11.5px/1 var(--ln-sans);
+  padding: 6px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--ln-line);
+  color: var(--ln-ink-2);
+  white-space: nowrap;
+}
+.md-typeset .ln-chip b { color: var(--ln-ink); font-weight: 650; }
+.md-typeset .ln-chip.good { border-color: var(--ln-good); color: var(--ln-good); }
+.md-typeset .ln-chip.bad  { border-color: var(--ln-bad);  color: var(--ln-bad); }
+
+/* ⑥ lesson：每节收尾的「教训」，琥珀左边框 —— 全站唯一的结论视觉 */
+.md-typeset .ln-lesson {
+  border-left: 4px solid var(--ln-acc2);
+  background: var(--ln-hl);
+  padding: 12px 18px;
+  border-radius: 0 6px 6px 0;
+  margin: 18px 0;
+}
+.md-typeset .ln-lesson > :first-child { margin-top: 0; }
+.md-typeset .ln-lesson > :last-child  { margin-bottom: 0; }
+
+/* ⑦ card：前瞻盒（埋雷）—— 先招呼后面章节会引爆的问题 */
+.md-typeset .ln-card {
+  background: var(--ln-surface);
+  border: 1px solid var(--ln-line);
+  border-radius: 6px;
+  padding: 18px 22px;
+  margin: 22px 0;
+}
+.md-typeset .ln-card > :first-child { margin-top: 0; }
+.md-typeset .ln-card > :last-child  { margin-bottom: 0; }
+
+/* ⑧ 误解盒：「很多人以为 X，实际上 Y」 */
+.md-typeset .ln-myth {
+  border-left: 4px solid var(--ln-bad);
+  background: var(--ln-surface);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 18px;
+  margin: 18px 0;
+}
+.md-typeset .ln-myth > :first-child { margin-top: 0; }
+.md-typeset .ln-myth > :last-child  { margin-bottom: 0; }
+.md-typeset .ln-myth .x { color: var(--ln-bad);  font-weight: 650; }
+.md-typeset .ln-myth .o { color: var(--ln-good); font-weight: 650; }
+
+/* ⑨ 概念标签：同一概念全文同色（如「认知」蓝 /「偶然」琥珀）*/
+.md-typeset .ln-c1, .md-typeset .ln-c2 {
+  padding: 1px 7px; border-radius: 4px; font-size: .95em;
+}
+.md-typeset .ln-c1 { background: var(--ln-acc-weak);  color: var(--ln-acc); }
+.md-typeset .ln-c2 { background: var(--ln-acc2-weak); color: var(--ln-acc2); }
+
+/* ⑩ verdict：预测 vs 实测的判定标记（表格里用）*/
+.md-typeset .ln-verdict {
+  display: inline-block;
+  font: 600 11px/1 var(--ln-sans);
+  letter-spacing: .06em;
+  padding: 5px 9px; border-radius: 4px;
+  text-transform: uppercase; color: #fff;
+}
+.md-typeset .ln-verdict.ok { background: var(--ln-good); }
+.md-typeset .ln-verdict.no { background: var(--ln-bad); }
+
+/* ⑪ 指标名内联样式：与普通行内代码区分开 */
+.md-typeset kbd.ln-metric {
+  background: var(--ln-surface-2);
+  border: 1px solid var(--ln-line);
+  box-shadow: none;
+  padding: 1px 6px; border-radius: 4px;
+  font: 13px var(--ln-mono); color: var(--ln-ink);
+}
+
+/* ===== 交互 demo（action-tokenization / autoregressive / fourier-dct）=====
+   浅色主题：画布白底，画布内绘图用深色文字/线条（见各 .js 的配色）。 */
+.ln-demo{
+  background:var(--ln-surface-2); border:1px solid var(--ln-line);
+  border-radius:12px; padding:18px; margin:22px 0;
+}
+.ln-demo .ln-demo-title{font-weight:700; color:var(--ln-ink); margin-bottom:4px}
+.ln-demo .ln-demo-hint{font-size:13px; color:var(--ln-muted); line-height:1.6; margin-bottom:12px}
+.ln-demo canvas{background:#FFFFFF; border:1px solid var(--ln-line); border-radius:8px; display:block; max-width:100%; width:100%; height:auto}
+.ln-demo .ln-controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:12px 0; font-size:14px}
+.ln-demo .ln-controls label{display:flex; align-items:center; gap:8px; color:var(--ln-muted)}
+.ln-demo input[type=range]{accent-color:var(--ln-acc)}
+.ln-demo button{
+  background:var(--ln-surface); color:var(--ln-ink); border:1px solid var(--ln-line);
+  border-radius:8px; padding:7px 14px; cursor:pointer; font-size:14px;
+}
+.ln-demo button:hover{border-color:var(--ln-acc); color:var(--ln-acc)}
+.ln-demo .ln-val{color:var(--ln-acc); font-variant-numeric:tabular-nums; font-weight:600}
+.ln-demo .ln-readout{font-size:13px; color:var(--ln-muted); line-height:1.6; margin-top:8px; font-variant-numeric:tabular-nums}
+/* 切换型按钮的激活态（注意力掩码 / 平滑·粗糙 等 demo）*/
+.ln-demo button.on{border-color:var(--ln-acc); color:var(--ln-acc); background:var(--ln-acc-weak)}
+/* 图框：承载 SVG 示意图（如 BERT/GPT 架构图、输入序列结构图），浅色 */
+.ln-fig{background:#FFFFFF; border:1px solid var(--ln-line); border-radius:10px; padding:14px; margin:22px 0}
+.ln-fig svg{max-width:100%; height:auto; display:block; margin:0 auto}
+.ln-fig .ln-fig-cap{text-align:center; color:var(--ln-muted); font-size:13px; margin-top:8px}
+
+/* ===== 语义 tag 芯片（DIRECT / LEARNED / LOSSY）=====
+   沿用 demo 同款语义色：DIRECT 绿、LEARNED 紫、LOSSY 红；浅底高对比。 */
+.md-typeset .ln-tag{
+  display:inline-block; padding:.04em .55em; margin:0 .12em;
+  border-radius:999px; font-size:.7em; font-weight:700;
+  letter-spacing:.4px; vertical-align:middle; line-height:1.7;
+  border:1px solid transparent; white-space:nowrap;
+}
+.md-typeset .ln-direct { color:#2f7d3a; background:rgba(63,185,80,.13);  border-color:rgba(63,185,80,.38); }
+.md-typeset .ln-learned{ color:#6f49bf; background:rgba(188,140,255,.16); border-color:rgba(188,140,255,.45); }
+.md-typeset .ln-lossy  { color:#c0392f; background:rgba(248,81,73,.12);  border-color:rgba(248,81,73,.38); }
+
+/* ===== 文章左栏：返回箭头 + 目录（自定义 overrides/main.html）===== */
+/* 返回上级链接（在「目录」上方）*/
+.md-sidebar--primary .ln-back{
+  display:inline-flex; align-items:center; gap:.4em;
+  margin:.2rem .6rem .6rem; padding:.3em .7em;
+  font-size:.7rem; font-weight:600; color:var(--ln-muted);
+  border:1px solid var(--ln-line); border-radius:999px;
+  background:var(--ln-surface); text-decoration:none;
+}
+.md-sidebar--primary .ln-back:hover{ color:var(--ln-acc); border-color:var(--ln-acc); }
+.ln-back__arrow{ font-size:.95em; line-height:1; }
+/* 把本页 TOC（md-nav--secondary）在左栏里正常显示为块 */
+.md-sidebar--primary .md-nav--secondary{ display:block; }
+.md-sidebar--primary .md-nav--secondary > .md-nav__list{ display:block; }
+.md-sidebar--primary .md-nav--secondary .md-nav__title{
+  font-weight:700; color:var(--ln-ink); padding-top:0;
+}
+
+/* ============================================================
+   fm-solvers 笔记（ml/fm-solvers.md）的交互 demo 样式。
+   全部走 fms- 前缀 + --fms-* 变量，不触碰站点全局样式；
+   求解器五色是数据语义色（仅用于 demo 图内），非站点强调色。
+   来源：fm_solver_exp/solver_blog_offline.html 的浅色主题。
+   ============================================================ */
+:root{
+  /* chrome 色一律指向站点 token（2026-08-06 随主题改为冷灰蓝）；
+     求解器五色是数据语义色，与主题无关，保持不动。 */
+  --fms-bg:var(--ln-bg); --fms-panel:var(--ln-surface);
+  --fms-ink:var(--ln-ink); --fms-muted:var(--ln-ink-2);
+  --fms-line:var(--ln-line); --fms-grid:var(--ln-surface-2);
+  --fms-euler:#C33C54; --fms-midpoint:#2E6FDF; --fms-heun:#1F8A5D;
+  --fms-rk4:#7B3FBF; --fms-dopri5:#D97706;
+  --fms-good:var(--ln-good); --fms-bad:var(--ln-bad);
+  --fms-serif:var(--ln-serif);
+  --fms-sans:var(--ln-sans);
+  --fms-mono:var(--ln-mono);
+}
+figure.fms-panel{background:var(--fms-panel);border:1px solid var(--fms-line);
+  border-radius:8px;padding:18px 18px 14px;margin:1.4rem 0 2rem}
+figure.fms-panel canvas{display:block;width:100%}
+figure.fms-panel figcaption{font-size:.84rem;color:var(--fms-muted);line-height:1.7;
+  padding:.65rem 2px 0;border-top:1px solid var(--fms-grid);margin-top:.7rem;text-align:left}
+figure.fms-panel figcaption b{color:var(--fms-ink);font-weight:650}
+.fms-controls{display:flex;flex-wrap:wrap;gap:.7rem 1.4rem;align-items:center;
+  padding:.35rem 0 .8rem}
+.fms-controls label{font-size:.82rem;color:var(--fms-muted);display:flex;
+  align-items:center;gap:.5rem}
+.fms-controls input[type=range]{accent-color:var(--fms-ink);width:150px}
+.fms-seg{display:inline-flex;border:1px solid var(--fms-line);border-radius:6px;overflow:hidden}
+.fms-seg button{border:0;background:transparent;color:var(--fms-muted);
+  font-family:var(--fms-mono);font-size:.78rem;padding:.34rem .7rem;cursor:pointer;
+  border-right:1px solid var(--fms-line)}
+.fms-seg button:last-child{border-right:0}
+.fms-seg button[aria-pressed="true"]{background:var(--fms-ink);color:var(--fms-panel)}
+.fms-readout{font-family:var(--fms-mono);font-size:.8rem;color:var(--fms-ink);
+  font-variant-numeric:tabular-nums}
+.fms-stats{display:flex;flex-wrap:wrap;gap:.5rem 2rem;padding:.5rem 0 .2rem;
+  font-family:var(--fms-mono);font-size:.8rem;font-variant-numeric:tabular-nums}
+.fms-stats .k{color:var(--fms-muted)}
+.fms-legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.8rem;
+  font-family:var(--fms-mono);padding:.3rem 0 .5rem;color:var(--fms-muted)}
+.fms-legend span{display:flex;align-items:center}
+.fms-chip{display:inline-block;width:.68em;height:.68em;border-radius:2px;
+  margin-right:.35em;vertical-align:baseline;transform:translateY(.04em)}
+.fms-c-euler{background:var(--fms-euler)} .fms-c-midpoint{background:var(--fms-midpoint)}
+.fms-c-heun{background:var(--fms-heun)} .fms-c-rk4{background:var(--fms-rk4)}
+.fms-c-dopri5{background:var(--fms-dopri5)}
+.fms-t-euler{color:var(--fms-euler)} .fms-t-midpoint{color:var(--fms-midpoint)}
+.fms-t-heun{color:var(--fms-heun)} .fms-t-rk4{color:var(--fms-rk4)}
+.fms-t-dopri5{color:var(--fms-dopri5)}
+table.fms-butcher{width:auto;margin:0 auto}
+table.fms-butcher td{border:0;padding:.15rem .55rem;font-family:var(--fms-mono);
+  font-size:.78rem;text-align:center;font-variant-numeric:tabular-nums}
+table.fms-butcher td.cl{border-right:1.5px solid var(--fms-ink)}
+table.fms-butcher td.tp{border-top:1px solid var(--fms-line)}
+.fms-takeaways{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:12px;margin:1.4rem 0}
+.fms-tk{border:1px solid var(--fms-line);border-radius:8px;padding:14px 16px;
+  background:var(--fms-panel)}
+.fms-tk .n{font-family:var(--fms-serif);font-size:1.5rem;line-height:1;margin-bottom:.4rem}
+.fms-tk p{margin:.3rem 0;font-size:.86rem;line-height:1.65}
+.fms-tk .hd{font-weight:650;font-size:.92rem}
+#fmsTip{position:fixed;pointer-events:none;background:var(--fms-panel);
+  border:1px solid var(--fms-line);border-radius:6px;padding:.4rem .6rem;
+  font-family:var(--fms-mono);font-size:.74rem;line-height:1.5;
+  box-shadow:0 4px 14px rgba(0,0,0,.13);opacity:0;z-index:50;
+  font-variant-numeric:tabular-nums;max-width:260px}
+
+/* ===== 打印 / 存 PDF：长文读物应当可以干净地打出来 ===== */
+@media print {
+  .md-header, .md-tabs, .md-sidebar, .md-footer,
+  .md-top, .ln-back, .md-source-file { display: none !important; }
+  .md-main__inner { margin: 0; }
+  .md-content { max-width: none; }
+  .md-typeset { font-size: 11pt; line-height: 1.6; }
+  .md-typeset a { color: inherit; }
+}

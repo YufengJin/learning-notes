@@ -1,0 +1,1194 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — math / machine learning / robotics / reading">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/en/ml/fm-solvers/">
+      
+      
+        <link rel="prev" href="../autoregressive-models/">
+      
+      
+        <link rel="next" href="../../robotics/">
+      
+      
+        
+          <link rel="alternate" href="../../../ml/fm-solvers/" hreflang="zh">
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Flow Matching ODE Solvers, Illustrated - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flow-matching-ode-solvers-illustrated" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Flow Matching ODE Solvers, Illustrated
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../ml/fm-solvers/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Machine Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../robotics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Robotics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mathematics
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                
+                  <span>Back to Machine Learning</span>
+                
+              </a>
+            
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-motivation-why-a-generative-modeling-engineer-should-understand-solvers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Motivation: why a generative modeling engineer should understand solvers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3 · Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-what-an-ode-and-an-initial-value-problem-are" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 · What an ODE and an initial value problem are
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-how-a-generative-model-turns-into-an-ode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 · How a generative model turns into an ODE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-getting-started-with-numerical-integration-discretization-and-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 · Getting started with numerical integration: discretization and "order"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-the-unit-of-account-nfe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 · The unit of account: NFE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-fixed-step-solvers-how-a-single-step-is-taken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Fixed-step solvers: how a single step is taken
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4 · Fixed-step solvers: how a single step is taken">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nfe-bookkeeping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NFE bookkeeping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-order-of-convergence-why-higher-order-saves-money" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Order of convergence: why higher order "saves money"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-adaptive-step-size-how-dopri5-paces-itself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · Adaptive step size: how Dopri5 paces itself
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6 · Adaptive step size: how Dopri5 paces itself">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#butcher-tableau-dormandprince-54" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Butcher tableau (Dormand–Prince 5(4))
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-sample-it-yourself-one-field-five-ways-to-walk-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7 · Sample it yourself: one field, five ways to walk it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-experiments-comparison-on-a-genuinely-trained-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8 · Experiments: comparison on a genuinely trained model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8 · Experiments: comparison on a genuinely trained model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-distribution-quality-w2-the-floor-arrives-quickly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 · Distribution quality W2: the "floor" arrives quickly
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-pure-numerical-accuracy-endpoint_err-the-textbook-slopes-appear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 · Pure numerical accuracy, endpoint_err: the textbook slopes appear
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-five-conclusions-worth-remembering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 · Five conclusions worth remembering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-practical-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9 · Practical guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10 · Q&amp;A
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Machine Learning
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flow-matching-ode-solvers-illustrated">Flow Matching ODE Solvers, Illustrated<a class="headerlink" href="#flow-matching-ode-solvers-illustrated" title="Permanent link">&para;</a></h1>
+<div class="ln-byline">2026-08-06 · about 22 min read · Yufeng Jin</div>
+
+<p class="ln-lead">Sampling an image = numerically integrating an ODE. This note takes five classic solvers apart and explains each one (<span class="fms-t-euler">Euler</span>, <span class="fms-t-midpoint">Midpoint</span>, <span class="fms-t-heun">Heun</span>, <span class="fms-t-rk4">RK4</span>, <span class="fms-t-dopri5">Dopri5</span>) — every animation is a <strong>real integration</strong>, and every data figure comes from a reproducible experiment.</p>
+<figure class="fms-panel">
+  <canvas id="heroCv" height="380" aria-label="Flow matching vector field animation: particles flowing from Gaussian noise to eight modes"></canvas>
+  <figcaption><b>Cover figure · </b>512 particles integrated in real time along the exact closed-form solution of the 8-Gaussians flow matching velocity field: from Gaussian noise at the center out to the eight modes marked with red ×. This is not a schematic animation — these are genuine trajectories computed frame by frame in your browser.</figcaption>
+</figure>
+
+<hr />
+<div class="ln-eyebrow">Opening</div>
+
+<h2 id="1-introduction">1 · Introduction<a class="headerlink" href="#1-introduction" title="Permanent link">&para;</a></h2>
+<p>You have trained a flow matching model. When you sample, there is always that one line in the code — <code>x = solver.step(x, t)</code> — but what actually happens inside it? Why does Stable Diffusion 3 default to 28 steps rather than 1000? Why do some people use Euler, others Heun, and others the impressive-sounding DPM-Solver? How much compute does swapping the solver really save?</p>
+<p>This note answers those questions through a <strong>fully reproducible 2D toy experiment</strong>. We train a real flow matching model (two 2D datasets, 15000 steps, fixed seed), then put five classic ODE solvers — <span class="fms-t-euler">Euler</span>, <span class="fms-t-midpoint">Midpoint</span>, <span class="fms-t-heun">Heun</span>, <span class="fms-t-rk4">RK4</span>, <span class="fms-t-dopri5">Dopri5</span> — head to head on the same field.</p>
+<p>Read it however you like, but two ground rules apply: every interactive figure on this page is <strong>real numerical integration inside your browser</strong> (not a pre-rendered GIF), and every number in every data figure comes from an actual run of the companion code <code>fm_solvers.py</code>. By the end you should be able to answer: <em>given an NFE budget, which solver should I pick, and why.</em></p>
+<div class="ln-howto"><b>How to read this</b>: if you are already comfortable with ODEs and
+numerical integration, jump straight to Section 4. If you only want the conclusions, read the
+five takeaways in Section 8.3 and the decision table in Section 9. Sections 4-6 are the main
+method line; each unfolds as intuition, mechanism/math, measurement, lesson.</div>
+
+<div class="ln-eyebrow">Opening · why it matters</div>
+
+<h2 id="2-motivation-why-a-generative-modeling-engineer-should-understand-solvers">2 · Motivation: why a generative modeling engineer should understand solvers<a class="headerlink" href="#2-motivation-why-a-generative-modeling-engineer-should-understand-solvers" title="Permanent link">&para;</a></h2>
+<p>Three reasons, each more practical than the last:</p>
+<ul>
+<li><strong>NFE is money.</strong> The cost of generating one image ≈ number of network forward passes × cost per forward pass. Once the model is fixed, the cost per forward pass is fixed too — what the solver decides is <em>how many forward passes the same quality costs you</em>.</li>
+<li><strong>The gap is a factor of 3, and it is free.</strong> In the experiments here, for one and the same trained model to reach quality close to the sampling floor: Euler needs NFE=40, RK4 only 12 (Section 8). No model changes, no retraining — just a few different lines of solver code.</li>
+<li><strong>The conclusions are not obvious.</strong> At very low budgets a higher-order method can actually be worse; when the field is poorly trained Euler overtakes RK4; and the "automatic transmission" of adaptive methods is not optimal everywhere either. Choosing by intuition is an easy way to choose wrong — which is why every claim here comes with data.</li>
+</ul>
+<div class="ln-eyebrow">Prerequisites</div>
+
+<h2 id="3-prerequisites">3 · Prerequisites<a class="headerlink" href="#3-prerequisites" title="Permanent link">&para;</a></h2>
+<h3 id="31-what-an-ode-and-an-initial-value-problem-are">3.1 · What an ODE and an initial value problem are<a class="headerlink" href="#31-what-an-ode-and-an-initial-value-problem-are" title="Permanent link">&para;</a></h3>
+<p>An ordinary differential equation (ODE) looks like this:</p>
+<div class="arithmatex">\[
+\frac{dx}{dt} = f(x, t)
+\]</div>
+<p>It states something very plain: "a point sitting at position <span class="arithmatex">\(x\)</span> at time <span class="arithmatex">\(t\)</span> has <strong>velocity</strong> <span class="arithmatex">\(f(x,t)\)</span>". That <span class="arithmatex">\(f\)</span> is called a <strong>vector field</strong> (向量场) — every point in space carries a little arrow (the pale short strokes in the cover figure are exactly those). Add a starting point <span class="arithmatex">\(x(0)=x_0\)</span> and you have an <strong>initial value problem</strong> (IVP, 初值问题): set off from <span class="arithmatex">\(x_0\)</span>, follow the arrows at every instant, and the trajectory <span class="arithmatex">\(x(t)\)</span> you trace out is the solution.</p>
+<p>Only a handful of <span class="arithmatex">\(f\)</span> admit a closed-form solution (for instance <span class="arithmatex">\(dx/dt=x^2\)</span>, which Section 5 uses as a test case). When <span class="arithmatex">\(f\)</span> is a neural network, an analytic solution is out of the question — <strong>numerical solution is the only option</strong>, and that is exactly the subject of this note.</p>
+<h3 id="32-how-a-generative-model-turns-into-an-ode">3.2 · How a generative model turns into an ODE<a class="headerlink" href="#32-how-a-generative-model-turns-into-an-ode" title="Permanent link">&para;</a></h3>
+<p>Viewing "generation" as "solving an ODE" was not invented by flow matching; it is a river with several tributaries. Neural ODEs / continuous normalizing flows model generation directly as integrating a learned field<sup><a href="#refs">[1]</a></sup>; the stochastic sampling process of score-based diffusion models<sup><a href="#refs">[3]</a></sup> was shown to admit a deterministic "probability flow ODE" with exactly the same marginals<sup><a href="#refs">[2]</a></sup>; and flow matching<sup><a href="#refs">[4]</a></sup> / rectified flow<sup><a href="#refs">[5]</a></sup> skip the SDE altogether, training a velocity field with a plain regression objective. It is this last variety (the linear/OT path) that we use here:</p>
+<div class="arithmatex">\[
+x_t = (1-t)\,x_0 + t\,x_1, \qquad \text{regression target}\ \ v = x_1 - x_0
+\]</div>
+<p>At training time we draw random points on the segment joining noise <span class="arithmatex">\(x_0\)</span> and data <span class="arithmatex">\(x_1\)</span>, and let the network <span class="arithmatex">\(v_\theta(x,t)\)</span> regress "which way things flow on average". At sampling time we run it in reverse, starting from <span class="arithmatex">\(x_0 \sim \mathcal{N}(0, I)\)</span> and solving the initial value problem:</p>
+<div class="arithmatex">\[
+\frac{dx}{dt} = v_\theta(x, t), \qquad t: 0 \to 1
+\]</div>
+<p>Wherever the particle lands at <span class="arithmatex">\(t=1\)</span> is the sample. Hence:</p>
+<p><strong>Generation quality = how accurately the field was learned (model error) × how accurately it is integrated (discretization error).</strong> The former is the training's business, the latter the solver's — and this note is only about the latter: same field, different solvers, how far apart they end up.</p>
+<h3 id="33-getting-started-with-numerical-integration-discretization-and-order">3.3 · Getting started with numerical integration: discretization and "order"<a class="headerlink" href="#33-getting-started-with-numerical-integration-discretization-and-order" title="Permanent link">&para;</a></h3>
+<p>Numerical solution boils down to one sentence: chop <span class="arithmatex">\(t\in[0,1]\)</span> into <span class="arithmatex">\(N\)</span> small steps, and use a <strong>finite number</strong> of field evaluations per step to approximate the true trajectory. Two key notions:</p>
+<ul>
+<li><strong>Local truncation error</strong> (局部截断误差): the mistake made in a single step. Compare the method's update formula term by term against the Taylor expansion of the true solution; if they agree up to the <span class="arithmatex">\(dt^p\)</span> term, the error of that step is <span class="arithmatex">\(O(dt^{p+1})\)</span>.</li>
+<li><strong>Global error</strong> (全局误差): the mistake accumulated over the whole trip. There are <span class="arithmatex">\(N=1/dt\)</span> steps in total, and the errors roughly add up: <span class="arithmatex">\(O(dt^{p+1})\cdot(1/dt) = O(dt^p)\)</span>. Such a method is called a <strong><span class="arithmatex">\(p\)</span>-th order method</strong>.</li>
+</ul>
+<p>"Order" (阶) is the key that unlocks everything: halve the step size of a <span class="arithmatex">\(p\)</span>-th order method and the error drops by a factor of <span class="arithmatex">\(2^p\)</span>, which on a log-log plot is a straight line of slope <span class="arithmatex">\(-p\)</span> — Section 5 measures this live. One boundary remark: none of the flow matching fields in this note are "stiff", so explicit methods are entirely sufficient; stiff problems call for implicit methods, and that is a whole other book<sup><a href="#refs">[7]</a></sup>.</p>
+<h3 id="34-the-unit-of-account-nfe">3.4 · The unit of account: NFE<a class="headerlink" href="#34-the-unit-of-account-nfe" title="Permanent link">&para;</a></h3>
+<p>When comparing solvers, the horizontal axis is always <strong>NFE</strong> (number of function evaluations, i.e. network forward passes) rather than step count: one RK4 step costs 4 forward passes, one Euler step only 1. "10 RK4 steps vs 10 Euler steps" is unfair; "RK4 at NFE=40 vs Euler at NFE=40" is fair — <em>NFE is money, and it is the horizontal axis of every figure in this note.</em></p>
+<div class="ln-eyebrow">Method 01 · fixed step</div>
+
+<h2 id="4-fixed-step-solvers-how-a-single-step-is-taken">4 · Fixed-step solvers: how a single step is taken<a class="headerlink" href="#4-fixed-step-solvers-how-a-single-step-is-taken" title="Permanent link">&para;</a></h2>
+<p>With the prerequisites in place, on to the main event. Every "one-step method" answers the same question: <em>given the velocity at the current point, take a step forward of size dt — where do we land?</em> They differ only in how many times they "peek" at the field, and how they combine those peeks — peek more cleverly, get a higher order.</p>
+<p>Rather than staring at formulas, let us take a step apart by hand. The field in Figure 1 is a uniformly rotating field (the true solution is a circular arc, so the curvature is obvious at a glance): switch solvers, drag dt, and watch how each method assembles the step out of 1–4 "peeks", and how the single-step error grows.</p>
+<figure class="fms-panel">
+  <div class="fms-controls">
+    <span class="fms-seg" id="anatomySeg" role="group" aria-label="Select solver"></span>
+    <label>Step size dt <input type="range" id="anatomyDt" min="0.15" max="1.35" step="0.05" value="0.9">
+      <span class="fms-readout" id="anatomyDtVal"></span></label>
+  </div>
+  <canvas id="anatomyCv" height="360" aria-label="Anatomy of a single step: the stage velocity evaluations compared with the true arc"></canvas>
+  <div class="fms-stats">
+    <span><span class="k">NFE this step</span> <b id="anatomyNfe"></b></span>
+    <span><span class="k">Single-step error</span> <b id="anatomyErr"></b></span>
+    <span class="k" id="anatomyDesc"></span>
+  </div>
+  <figcaption><b>Figure 1 · Anatomy of a single step (interactive).</b> One step on a uniformly rotating field: the thick gray line is the true arc, the colored arrow is the direction the solver actually takes, the dashed gray arrows and small dots are the intermediate "peeks" (the stage evaluations k₁…k₄), and the dashed red segment is the single-step error. Switch solvers to compare: at the same dt, the more peeks and the smarter the combination, the closer the landing point is to the true solution.</figcaption>
+</figure>
+
+<h3 id="nfe-bookkeeping">NFE bookkeeping<a class="headerlink" href="#nfe-bookkeeping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Solver</th>
+<th>Order</th>
+<th>Evaluations per step</th>
+<th>What an evaluation buys</th>
+<th>NFE at steps=10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="fms-chip fms-c-euler"></span>Euler</td>
+<td>1</td>
+<td>1</td>
+<td>Take the full step straight along the starting velocity k₁</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-midpoint"></span>Midpoint</td>
+<td>2</td>
+<td>2</td>
+<td>Scout half a step ahead, then take the full step with the <strong>midpoint velocity</strong> k₂</td>
+<td>20</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-heun"></span>Heun</td>
+<td>2</td>
+<td>2</td>
+<td>Scout a full step ahead, then correct with the <strong>average of the endpoints</strong> (k₁+k₂)/2</td>
+<td>20</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-rk4"></span>RK4</td>
+<td>4</td>
+<td>4</td>
+<td>Two midpoints + one endpoint, weighted as (k₁+2k₂+2k₃+k₄)/6</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<div class="ln-eyebrow">Method 02 · order of convergence</div>
+
+<h2 id="5-order-of-convergence-why-higher-order-saves-money">5 · Order of convergence: why higher order "saves money"<a class="headerlink" href="#5-order-of-convergence-why-higher-order-saves-money" title="Permanent link">&para;</a></h2>
+<p>Section 3.3 said it: halve the step size of a <span class="arithmatex">\(p\)</span>-th order method and the error drops by <span class="arithmatex">\(2^p\)</span>, a line of slope <span class="arithmatex">\(-p\)</span> on a log-log plot. This is not just theory — the convergence-order unit test in the companion code <code>test_solvers.py</code> asserts exactly these ratios (Euler 2×, Heun/Midpoint 4×, RK4 16×), and Figure 2 lets you see it with your own eyes.</p>
+<p>Figure 2 solves <span class="arithmatex">\(dx/dt = x^2\)</span>, <span class="arithmatex">\(x(0)=\tfrac12\)</span> (true solution <span class="arithmatex">\(x(1)=1\)</span>) live in your browser, plotting the error NFE by NFE. Note that the horizontal axis has already been converted to NFE: each RK4 step costs 4× more, but a slope of −4 earns that back very quickly.</p>
+<div class="admonition note">
+<p class="admonition-title">An amusing trap</p>
+<p>Why not use the more convenient <span class="arithmatex">\(dx/dt = x\)</span>? Because on a <strong>linear</strong> ODE the single-step updates of Midpoint and Heun are algebraically identical (both are exactly multiplication by <span class="arithmatex">\(1+h+h^2/2\)</span>), so the two curves would coincide digit for digit and look like a plotting bug — to see "same order, different error constant" you need a nonlinear equation. We really did step on this rake.</p>
+</div>
+<figure class="fms-panel">
+  <div class="fms-legend" id="convLegend"></div>
+  <canvas id="convCv" height="380" aria-label="Order-of-convergence plot: log-log curves of error vs NFE for four solvers on an analytic ODE"></canvas>
+  <figcaption><b>Figure 2 · Order of convergence, measured (computed live in the browser; interactive: hover for readouts).</b> Endpoint error vs NFE (log-log) for four solvers on dx/dt=x². The dashed gray lines are slope −1/−2/−4 references: Euler hugs −1, Midpoint and Heun hug −2 (two parallel lines with different error constants), RK4 hugs −4. At the same NFE=40, the four curves can differ by as much as 6 orders of magnitude.</figcaption>
+</figure>
+
+<div class="ln-lesson"><b>Lesson</b>: order is not a paper specification — at the same NFE=40 the
+four curves differ in endpoint error by up to six orders of magnitude. Same-order Midpoint and
+Heun are two parallel lines: the order sets the slope, the error constant sets the intercept.
+Verifying convergence order requires a <b>nonlinear</b> equation: on a linear ODE the one-step
+updates of Midpoint and Heun are algebraically identical, so the two curves coincide digit for
+digit and the plot looks broken.</div>
+
+<div class="ln-eyebrow">Method 03 · adaptive step</div>
+
+<h2 id="6-adaptive-step-size-how-dopri5-paces-itself">6 · Adaptive step size: how Dopri5 paces itself<a class="headerlink" href="#6-adaptive-step-size-how-dopri5-paces-itself" title="Permanent link">&para;</a></h2>
+<p>Fixed step sizes have an awkward property: where the field is gentle, small steps waste effort; where it bends sharply, large steps crash. Dormand–Prince 5(4)<sup><a href="#refs">[6]</a></sup> — the machinery behind SciPy's <code>RK45</code>, MATLAB's <code>ode45</code>, and torchdiffeq's default solver — solves it by <strong>computing two answers at every step</strong>: 7 stage evaluations assemble a 5<sup>th</sup>-order solution <span class="arithmatex">\(y_5\)</span> and a 4<sup>th</sup>-order solution <span class="arithmatex">\(y_4\)</span>, and their difference is a free error estimate:</p>
+<div class="arithmatex">\[
+\mathrm{err} = \mathrm{rms}\!\left(\frac{y_5 - y_4}{\mathrm{atol} + \mathrm{rtol}\cdot\max(|x|, |y_5|)}\right)
+\]</div>
+<ul>
+<li><span class="arithmatex">\(\mathrm{err} \le 1\)</span>: accept the step, and reuse the last stage derivative in the next step (FSAL, so 7 stages cost only 6 new evaluations);</li>
+<li><span class="arithmatex">\(\mathrm{err} &gt; 1\)</span>: <strong>reject</strong>, shrink dt and retry (the evaluations of that attempt are wasted);</li>
+<li>either way, update the step size by <code>dt ×= clip(0.9·err^(−1/5), 0.2, 5)</code> (the classic step-size controller: safety factor 0.9, clipping to prevent oscillation<sup><a href="#refs">[7]</a></sup>).</li>
+</ul>
+<p>Figure 3 runs it once on the real 8-Gaussians flow field (512 particles sharing one step size, matching the implementation in <code>fm_solvers.py</code>). This field is nearly straight early on, and near <span class="arithmatex">\(t=1\)</span> the particles have to squeeze into narrow peaks of σ=0.08 — watch how dt automatically goes "loose early, tight late".</p>
+<figure class="fms-panel">
+  <div class="fms-controls">
+    <label>rtol
+      <span class="fms-seg" id="dpSeg" role="group" aria-label="Select tolerance"></span>
+    </label>
+  </div>
+  <canvas id="dpCv" height="300" aria-label="Dopri5 adaptive step size bar chart: dt of each step, accepted and rejected"></canvas>
+  <div class="fms-stats">
+    <span><span class="k">Accepted</span> <b id="dpAcc"></b></span>
+    <span><span class="k">Rejected</span> <b id="dpRej"></b></span>
+    <span><span class="k">Total NFE</span> <b id="dpNfe"></b></span>
+    <span><span class="k">Min/max dt</span> <b id="dpRange"></b></span>
+  </div>
+  <figcaption><b>Figure 3 · Dopri5 pacing itself (interactive: switch rtol).</b> Each bar is one attempt: the horizontal axis is the t interval it covers, the height is log(dt); solid orange = accepted, red outline = rejected and retried. Early on (where the field is nearly straight) it strides ahead; approaching t=1 (as particles squeeze into the narrow peaks) it automatically takes mincing steps and rejections appear. Tighten rtol and the steps get denser overall while NFE climbs.</figcaption>
+</figure>
+
+<h3 id="butcher-tableau-dormandprince-54">Butcher tableau (Dormand–Prince 5(4))<a class="headerlink" href="#butcher-tableau-dormandprince-54" title="Permanent link">&para;</a></h3>
+<p>These coefficients are the source of <code>_DP_A / _DP_B5 / _DP_B4</code> in <code>fm_solvers.py</code>. Row <span class="arithmatex">\(i\)</span> says that stage <span class="arithmatex">\(i\)</span> evaluates the field at <span class="arithmatex">\(t + c_i\cdot dt\)</span>, at a position formed as the linear combination of the earlier stages with weights <span class="arithmatex">\(a_{ij}\)</span>:</p>
+<table class="fms-butcher">
+<tr><td class="cl">0</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="cl">1/5</td><td>1/5</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="cl">3/10</td><td>3/40</td><td>9/40</td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="cl">4/5</td><td>44/45</td><td>−56/15</td><td>32/9</td><td></td><td></td><td></td></tr>
+<tr><td class="cl">8/9</td><td>19372/6561</td><td>−25360/2187</td><td>64448/6561</td><td>−212/729</td><td></td><td></td></tr>
+<tr><td class="cl">1</td><td>9017/3168</td><td>−355/33</td><td>46732/5247</td><td>49/176</td><td>−5103/18656</td><td></td></tr>
+<tr><td class="cl">1</td><td>35/384</td><td>0</td><td>500/1113</td><td>125/192</td><td>−2187/6784</td><td>11/84</td></tr>
+<tr><td class="cl tp"><i>b</i><sub>5</sub></td><td class="tp">35/384</td><td class="tp">0</td><td class="tp">500/1113</td><td class="tp">125/192</td><td class="tp">−2187/6784</td><td class="tp">11/84</td></tr>
+<tr><td class="cl"><i>b</i><sub>4</sub></td><td>5179/57600</td><td>0</td><td>7571/16695</td><td>393/640</td><td>−92097/339200</td><td>187/2100</td></tr>
+</table>
+
+<p><em>Notice that <span class="arithmatex">\(b_5\)</span> is exactly the <span class="arithmatex">\(a\)</span> row of the final stage — so "this step's 5<sup>th</sup>-order solution" is precisely "the next step's stage 1 evaluation point", and that is where FSAL (First Same As Last) saves an evaluation. The b₄ row also has a trailing 1/40 (the weight of stage 7).</em></p>
+<div class="ln-lesson"><b>Lesson</b>: adaptivity is not "higher order" — it turns choosing the step
+size from a hand-run grid sweep into setting a single <code>rtol</code>. The price is computing a
+5th- and a 4th-order solution every step to get a free error estimate; FSAL makes seven stages cost
+only six fresh network evaluations, while a rejected step is evaluation spent for nothing.</div>
+
+<div class="ln-eyebrow">Hands-on · same field</div>
+
+<h2 id="7-sample-it-yourself-one-field-five-ways-to-walk-it">7 · Sample it yourself: one field, five ways to walk it<a class="headerlink" href="#7-sample-it-yourself-one-field-five-ways-to-walk-it" title="Permanent link">&para;</a></h2>
+<p>Now let us put Sections 4–6 together for real: 1500 particles start from <span class="arithmatex">\(\mathcal{N}(0,I)\)</span> and are integrated to <span class="arithmatex">\(t=1\)</span> on the exact 8-Gaussians flow field. Change the solver, drag the step count, and watch the scatter cloud condense from "one blurry ring" into eight sharp peaks. A recommended comparison tour: <em>Euler·2 steps → Euler·8 steps → Midpoint·4 steps (NFE=8) → RK4·2 steps (NFE=8)</em> — same NFE, very different shapes, and that difference is what "how you spend the money" means.</p>
+<figure class="fms-panel">
+  <div class="fms-controls">
+    <span class="fms-seg" id="pgSeg" role="group" aria-label="Select solver"></span>
+    <label id="pgStepsLab">Steps <input type="range" id="pgSteps" min="0" max="8" step="1" value="3">
+      <span class="fms-readout" id="pgStepsVal"></span></label>
+    <label><input type="checkbox" id="pgShowReal"> Overlay real samples</label>
+  </div>
+  <canvas id="pgCv" height="430" aria-label="Particle endpoint scatter: samples generated with the chosen solver and step count"></canvas>
+  <div class="fms-stats">
+    <span><span class="k">NFE</span> <b id="pgNfe"></b></span>
+    <span><span class="k">On-peak fraction (within 2σ)</span> <b id="pgHqf"></b></span>
+    <span><span class="k">Modes covered</span> <b id="pgModes"></b>/8</span>
+  </div>
+  <figcaption><b>Figure 4 · The sampling playground (interactive: change solver, drag step count, overlay real samples).</b> Scatter of the integration endpoints of 1500 particles on the exact flow field; the red × marks are the eight true mode centers. The "on-peak fraction" is the experimental metric high_quality_frac (the fraction landing within the 2σ radius of any mode) — note that the theoretical ceiling for a perfect reproduction is about 0.865, not 1 (a 2D Gaussian itself puts only 86.5% of its mass within 2σ). The Dopri5 setting uses a fixed rtol=10⁻³.</figcaption>
+</figure>
+
+<div class="ln-eyebrow">Experiments · trained model</div>
+
+<h2 id="8-experiments-comparison-on-a-genuinely-trained-model">8 · Experiments: comparison on a genuinely trained model<a class="headerlink" href="#8-experiments-comparison-on-a-genuinely-trained-model" title="Permanent link">&para;</a></h2>
+<p>Toy fields are easy to understand, but a conclusion only counts if it holds on a <strong>genuinely trained model</strong>. The setup: train one flow matching MLP on each of two 2D datasets, 8-Gaussians and Two-Moons (15000 steps, EMA, fixed seed); then freeze it and let five solvers sample from the <strong>same batch</strong> of 2000 evaluation noise vectors (a paired comparison), with NFE on the horizontal axis. Full code and data are in <code>fm_solvers.py</code> / <code>results.json</code>.</p>
+<div class="ln-chips">
+  <span class="ln-chip">Two-Moons NFE to floor · Euler <b>40</b></span>
+  <span class="ln-chip">Midpoint/Heun <b>16</b></span>
+  <span class="ln-chip good">RK4 <b>12</b></span>
+  <span class="ln-chip">8-Gaussians sampling floor W2 <b>0.165</b></span>
+  <span class="ln-chip bad">At NFE=4, Euler <b>0.194</b> &lt; Heun <b>0.280</b></span>
+</div>
+
+<h3 id="81-distribution-quality-w2-the-floor-arrives-quickly">8.1 · Distribution quality W2: the "floor" arrives quickly<a class="headerlink" href="#81-distribution-quality-w2-the-floor-arrives-quickly" title="Permanent link">&para;</a></h3>
+<p>W2 (the 2-Wasserstein distance) measures how far the generated distribution is from the real data. In Figure 5 it drops fast and then <strong>saturates</strong> — the remaining gap comes from model error and the sampling noise of 2000 points, and no amount of extra NFE will buy it down. The solvers differ only in <em>how quickly</em> they reach the floor.</p>
+<figure class="fms-panel">
+  <div class="fms-legend" id="w2Legend"></div>
+  <canvas id="w2Cv" height="620" aria-label="Line chart of W2 vs NFE on two datasets"></canvas>
+  <figcaption><b>Figure 5 · W2 vs NFE on two datasets (real experimental data; interactive: hover for readouts).</b> The dashed line is the sample floor (the W2 between two independent sets of real samples, i.e. the sampling-noise floor). The 8-Gaussians floor (0.165) sits above the model's converged value, so W2 on that side saturates at NFE≈6–8 and cannot separate the solvers; the Two-Moons side shows the ordering clearly: reaching the floor takes Euler NFE≈40, Midpoint/Heun≈16, RK4≈12.</figcaption>
+</figure>
+
+<h3 id="82-pure-numerical-accuracy-endpoint_err-the-textbook-slopes-appear">8.2 · Pure numerical accuracy, endpoint_err: the textbook slopes appear<a class="headerlink" href="#82-pure-numerical-accuracy-endpoint_err-the-textbook-slopes-appear" title="Permanent link">&para;</a></h3>
+<p>Take RK4 with 500 steps (NFE=2000) as the "true answer", and measure how far each solver's endpoint deviates. This metric strips out model error, leaving only discretization error — and so the textbook slopes of Section 5 reappear unchanged on a <strong>trained network</strong> (Figure 6).</p>
+<figure class="fms-panel">
+  <div class="fms-legend" id="epLegend"></div>
+  <canvas id="epCv" height="620" aria-label="Log-log line chart of endpoint error vs NFE on two datasets"></canvas>
+  <figcaption><b>Figure 6 · Endpoint error vs NFE (log-log, real experimental data; interactive: hover for readouts).</b> The dashed gray lines are slope −1/−2/−4 references: Euler hugs −1, Midpoint/Heun hug −2, RK4 hugs −4 early on, and the higher-order methods eventually hit a floor of ~10⁻³ — that being the accuracy limit of the RK4-500 reference solution itself. <span class="fms-t-dopri5">★ Dopri5</span> needs no step-count tuning and naturally lands on the Pareto frontier.</figcaption>
+</figure>
+
+<h3 id="83-five-conclusions-worth-remembering">8.3 · Five conclusions worth remembering<a class="headerlink" href="#83-five-conclusions-worth-remembering" title="Permanent link">&para;</a></h3>
+<div class="fms-takeaways">
+  <div class="fms-tk"><div class="n">1</div><p class="hd">A 3× spread in the minimum NFE to reach the floor</p>
+    <p>Reaching ≤1.05× the floor on Two-Moons: Euler 40 · Midpoint 16 · Heun 16 · RK4 12. Higher-order methods buy the same distribution quality with about 1/3 of the compute.</p></div>
+  <div class="fms-tk"><div class="n">2</div><p class="hd">At very low NFE, higher order does not always win</p>
+    <p>W2 on 8-Gaussians at NFE=4: Euler 0.194 &lt; Heun 0.280. With too few steps, the "expensive per step" cost of a higher-order method outweighs its "accurate per step" benefit — try it yourself in Figure 4.</p></div>
+  <div class="fms-tk"><div class="n">3</div><p class="hd">W2 has a floor; endpoint error never lies</p>
+    <p>Distribution metrics saturate against sampling noise (the 8G floor is 0.165), and past saturation every solver looks equally good. To compare numerical accuracy you need the paired endpoint error.</p></div>
+  <div class="fms-tk"><div class="n">4</div><p class="hd">Dopri5 = the tuning-free frontier</p>
+    <p>Give it an rtol and it paces itself: a loose tolerance already yields decent samples at NFE≈37, a tight one converges smoothly toward the reference solution, and at no point do you sweep a grid of step counts by hand.</p></div>
+  <div class="fms-tk"><div class="n">5</div><p class="hd">If the field is broken, nothing can save you</p>
+    <p>The undertrained ablation (1000 training steps): the W2 floor jumps from 0.05 to 0.33+, and extra NFE does nothing; on Two-Moons Euler overtakes RK4 — a higher-order method merely integrates a <b>wrong field</b> more precisely.</p></div>
+</div>
+
+<div class="ln-eyebrow">Wrap-up · decision table</div>
+
+<h2 id="9-practical-guide">9 · Practical guide<a class="headerlink" href="#9-practical-guide" title="Permanent link">&para;</a></h2>
+<p>The whole note compressed into a single decision table:</p>
+<table>
+<thead>
+<tr>
+<th>Solver</th>
+<th>Order</th>
+<th>NFE/step</th>
+<th>When to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="fms-chip fms-c-euler"></span>Euler</td>
+<td>1</td>
+<td>1</td>
+<td>The fallback when the budget is tiny (NFE≤6) or the field is coarse (undertrained/distilled models)</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-midpoint"></span>Midpoint</td>
+<td>2</td>
+<td>2</td>
+<td>The low-NFE sweet spot (8–16); the most reliable option at low budget in these experiments</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-heun"></span>Heun</td>
+<td>2</td>
+<td>2</td>
+<td>Also 2<sup>nd</sup> order, with a slightly different error constant; popular in the diffusion community (the default second-order method of EDM<sup><a href="#refs">[9]</a></sup>)</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-rk4"></span>RK4</td>
+<td>4</td>
+<td>4</td>
+<td>Medium-to-high budget (NFE≥12) when you want a high-fidelity endpoint; fastest to reference accuracy</td>
+</tr>
+<tr>
+<td><span class="fms-chip fms-c-dopri5"></span>Dopri5</td>
+<td>5(4)</td>
+<td>adaptive</td>
+<td>When you do not want to tune step counts: set rtol and it lands on the Pareto frontier automatically</td>
+</tr>
+</tbody>
+</table>
+<p>One step further takes us outside the scope of this note: in real image/video generation, the low-NFE regime also hosts a family of <strong>specialized solvers that exploit the structure of the diffusion ODE</strong> — DDIM<sup><a href="#refs">[8]</a></sup>, DPM-Solver++<sup><a href="#refs">[10]</a></sup>, UniPC<sup><a href="#refs">[11]</a></sup>, plus the "Euler + shifted schedule" actually used by flow matching models such as SD3/Flux<sup><a href="#refs">[12]</a></sup>. For how they relate to general-purpose solvers, see the last item in the Q&amp;A.</p>
+<p><em>Cross-reference to the code: the solver implementations live in <code>fm_solvers.py</code> as <code>solve_euler / solve_midpoint / solve_heun / solve_rk4 / solve_dopri5</code>; convergence order and NFE bookkeeping are guarded by <code>test_solvers.py</code>; the data on this page comes from <code>summary.csv</code>.</em></p>
+<div class="ln-eyebrow">Appendix · Q&A</div>
+
+<h2 id="10-qa">10 · Q&amp;A<a class="headerlink" href="#10-qa" title="Permanent link">&para;</a></h2>
+<p><em>Real questions that came up while learning, added to over time. Click each one to see the answer.</em></p>
+<details class="question" open="open">
+<summary>Is the y-axis in the figures 'accuracy'? Is it the same thing as generation quality?</summary>
+<p>The y-axis of Figure 2 (Section 5) and Figure 6 (Section 8.2) is the <strong>endpoint error</strong>: the distance from the solver's computed endpoint to the true solution (analytic in Figure 2, the RK4-500 reference solution in Figure 6), on a log scale. It measures <strong>pure numerical integration accuracy</strong> — the lower it is the more accurate the integration, and the log-log slope is the order of convergence.</p>
+<p>But it is <strong>not</strong> generation quality. For quality, look at W2 in Figure 5 (Section 8.1), which compares the generated distribution against the real data. The division of labor between them is exactly conclusion 3: W2 "saturates" against sampling noise, and past saturation every solver looks equally good; endpoint error strips out model error and sampling noise, so it can always tell them apart. In one line: <em>W2 answers "do the samples look right", endpoint error answers "is the integration accurate".</em></p>
+</details>
+<details class="question">
+<summary>What exactly are rtol and atol? Why is it called a 'relative' tolerance?</summary>
+<p>A tolerance is how large an error you allow the solver <strong>to make in each step</strong>. There are two ways to state one. <strong>atol (absolute)</strong> — "the error must not exceed 0.0001, no matter how large the value is" — a ruler with a fixed scale. <strong>rtol (relative)</strong> — "the error must not exceed one thousandth of the value itself" — accuracy demanded in proportion.</p>
+<p>Why "relative"? Being off by 1 meter when measuring Mount Everest is irrelevant (0.01% of the total), while being off by 1 meter when measuring someone's height is absurd — <strong>whether a given error is serious depends on how big the thing being measured is</strong>. But a purely relative criterion goes out of control as the value approaches 0 ("one thousandth of 0 is still 0", forcing the step size toward zero), so atol provides a backstop. The formula in practice:</p>
+<div class="arithmatex">\[
+\text{tolerance} = \mathrm{atol} + \mathrm{rtol}\cdot|x|
+\]</div>
+<p>When the value is large the rtol term dominates (proportional); as the value approaches 0 the atol term takes over (an absolute floor). These experiments use atol = rtol/100.</p>
+</details>
+<details class="question">
+<summary>Explain RK4 in plain language?</summary>
+<p>Think of one integration step as <strong>driving a stretch of winding road with your eyes closed</strong>, where opening your eyes to look at the road once = one network forward pass (1 NFE).</p>
+<p><span class="fms-t-euler">Euler</span>: glance at the direction before setting off, then drive the whole stretch blind — the moment the road bends, you shoot off it (the "diffuse ring" at low step counts in Figure 4 comes from exactly this).</p>
+<p><span class="fms-t-rk4">RK4</span> cleverly looks four times: one glance at the start (k₁) → drive along k₁ to the <strong>halfway point</strong> and look again (k₂) → go back to the start, drive along k₂ to the halfway point and look once more (k₃) → drive along k₃ to the <strong>endpoint</strong> for one final look (k₄). Then take the weighted average (k₁+2k₂+2k₃+k₄)/6 — the two halfway glances get the largest weight, because the direction at the midpoint is the most representative of the whole stretch — and actually take the step along that "average direction".</p>
+<p>In essence: four samples reconstruct the <strong>average velocity</strong> over the whole stretch (mathematically, Simpson's rule within the step), so it can hug the curve too. The cost is 4 NFE per step; the payoff is that halving the step size drops the error 16-fold — it pays for itself quickly. Switch to RK4 in Figure 1 and drag dt up to see the four glances for yourself.</p>
+</details>
+<details class="question">
+<summary>Explain Dopri5 in plain language?</summary>
+<p>RK4 is a good driver, but <strong>you have to fix the step size in advance</strong>. Dopri5 = a good driver plus adaptive cruise control, with four tricks:</p>
+<p><strong>① Seven glances per step, assembling two versions of the answer</strong> — a fine one (5<sup>th</sup> order) and a coarse one (4<sup>th</sup> order).<br>
+<strong>② The difference between the two versions ≈ how wrong this step is</strong> — self-checking without knowing the true answer, and free.<br>
+<strong>③ Adjust the speed accordingly</strong>: the two versions nearly agree → the road is straight → step on the gas for the next step (dt up to ×5); they differ too much → <strong>scrap this step and redo it</strong>, tightening the stride (down to ×0.2). Like a navigation speed limit: 120 on the highway, automatically 30 entering a village — the "loose early, tight late plus red-outlined retries" of Figure 3 is exactly this at work.<br>
+<strong>④ Tail-to-head splicing (FSAL)</strong>: the last glance of this step happens to land on the starting point of the next, so it is reused directly, and seven glances cost the price of six.</p>
+<p>All you have to say is "I want accuracy of one part in a thousand" (rtol), and where to speed up and where to slow down is entirely its decision — that is what "tuning-free" means.</p>
+</details>
+<details class="question">
+<summary>When actually using a diffusion / flow-matching model, is Dopri5 the first choice?</summary>
+<p><strong>No.</strong> Dopri5 is the "safe default when you do not want to tune anything" (it is the default in SciPy's <code>RK45</code>, MATLAB's <code>ode45</code>, and torchdiffeq), but the low-NFE regime of production-grade generative models is occupied by specialized methods:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Mainstream choice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stable Diffusion 3 / Flux (flow matching)</td>
+<td>Euler + shifted schedule, NFE 20–30<sup><a href="#refs">[12]</a></sup></td>
+</tr>
+<tr>
+<td>Low-NFE sampling for diffusion models</td>
+<td>DPM-Solver++ / UniPC (NFE 10–20)<sup><a href="#refs">[10]</a></sup><sup><a href="#refs">[11]</a></sup></td>
+</tr>
+<tr>
+<td>EDM / Karras family</td>
+<td>Heun + a carefully designed σ grid<sup><a href="#refs">[9]</a></sup></td>
+</tr>
+<tr>
+<td>The origin of deterministic fast sampling</td>
+<td>DDIM<sup><a href="#refs">[8]</a></sup></td>
+</tr>
+<tr>
+<td>Distilled models (LCM / Turbo / Lightning)</td>
+<td>Euler, 1–4 steps</td>
+</tr>
+<tr>
+<td>Exact likelihood / inversion / reference solutions</td>
+<td><strong>Dopri5 ✓</strong><sup><a href="#refs">[6]</a></sup></td>
+</tr>
+</tbody>
+</table>
+<p>Four reasons production does not use it: ① at low NFE it cannot beat the specialized methods — in the data on this page even Dopri5's loosest tolerance starts at NFE≈37, while Midpoint reaches the floor at NFE=16, and rejected steps burn money for nothing on a large model. ② The DPM-Solver family exploits the <strong>semi-linear structure</strong> of the diffusion ODE (integrating the linear part analytically), whereas a general-purpose RK method treats the network as a black box and throws that prior away. ③ Adaptive step sizes mean the NFE per image is unpredictable, while a fixed step count gives constant latency and deploys cleanly. ④ The schedule (σ/timestep schedule) often matters more than the solver's order, and fixed-step methods let you tune it directly.</p>
+<p><strong>Where Dopri5 really shines</strong>: an unfamiliar field, no budget for tuning, a need for high accuracy (computing likelihoods, doing inversion, generating reference solutions), an NFE budget ≥30, and no concern about variability. In one line: <em>the tuning-free Pareto frontier, not the overall optimum — for budget-constrained production sampling, the frontier belongs to the specialized low-NFE methods.</em></p>
+</details>
+<h2 id="refs">References<a class="headerlink" href="#refs" title="Permanent link">&para;</a></h2>
+<ol>
+<li>R. T. Q. Chen, Y. Rubanova, J. Bettencourt, D. Duvenaud. <em>Neural Ordinary Differential Equations.</em> NeurIPS 2018.</li>
+<li>Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, B. Poole. <em>Score-Based Generative Modeling through Stochastic Differential Equations.</em> ICLR 2021. (probability flow ODE)</li>
+<li>J. Ho, A. Jain, P. Abbeel. <em>Denoising Diffusion Probabilistic Models.</em> NeurIPS 2020.</li>
+<li>Y. Lipman, R. T. Q. Chen, H. Ben-Hamu, M. Nickel, M. Le. <em>Flow Matching for Generative Modeling.</em> ICLR 2023.</li>
+<li>X. Liu, C. Gong, Q. Liu. <em>Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow.</em> ICLR 2023.</li>
+<li>J. R. Dormand, P. J. Prince. <em>A family of embedded Runge–Kutta formulae.</em> Journal of Computational and Applied Mathematics, 6(1):19–26, 1980.</li>
+<li>E. Hairer, S. P. Nørsett, G. Wanner. <em>Solving Ordinary Differential Equations I: Nonstiff Problems.</em> Springer, 2<sup>nd</sup> ed., 1993. (the standard textbook on step-size control and stiff problems)</li>
+<li>J. Song, C. Meng, S. Ermon. <em>Denoising Diffusion Implicit Models.</em> ICLR 2021.</li>
+<li>T. Karras, M. Aittala, T. Aila, S. Laine. <em>Elucidating the Design Space of Diffusion-Based Generative Models.</em> NeurIPS 2022. (EDM, the Heun sampler and the σ grid)</li>
+<li>C. Lu, Y. Zhou, F. Bao, J. Chen, C. Li, J. Zhu. <em>DPM-Solver: A Fast ODE Solver for Diffusion Probabilistic Model Sampling in Around 10 Steps.</em> NeurIPS 2022; and <em>DPM-Solver++</em>, arXiv:2211.01095.</li>
+<li>W. Zhao, L. Bai, Y. Rao, J. Zhou, J. Lu. <em>UniPC: A Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models.</em> NeurIPS 2023.</li>
+<li>P. Esser, S. Kulal, A. Blattmann, et al. <em>Scaling Rectified Flow Transformers for High-Resolution Image Synthesis.</em> ICML 2024. (Stable Diffusion 3)</li>
+</ol>
+<p><em>The experimental part of this note (the data in Figures 5–6, the training configuration, the metric definitions) is generated entirely by the companion code <code>fm_solvers.py / plots.py / test_solvers.py</code> and reproduces with a single command; every interactive figure on this page is real numerical integration inside the browser.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../autoregressive-models/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Autoregressive Models: BERT / GPT and Prefix-LM Architectures Explained">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Autoregressive Models: BERT / GPT and Prefix-LM Architectures Explained
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../robotics/" class="md-footer__link md-footer__link--next" aria-label="Next: 机器人">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                机器人
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="/paper-snapshots/" target="_blank" rel="noopener" title="Paper Notes — 论文海报合集" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M64 480c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v213.5c0 17-6.7 33.3-18.7 45.3L322.7 461.3c-12 12-28.3 18.7-45.3 18.7zm325.5-176H296c-13.3 0-24 10.7-24 24v93.5z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/YufengJin" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/vendor/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../../javascripts/fourier-dct.js"></script>
+      
+        <script src="../../../javascripts/fm-solvers.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1746 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — math / machine learning / robotics / reading">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/en/robotics/action-tokenization/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../../math/">
+      
+      
+        
+          <link rel="alternate" href="../../../robotics/action-tokenization/" hreflang="zh">
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Action Tokenization: Discretizing Continuous Actions into Tokens - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#action-tokenization-discretizing-continuous-actions-into-tokens" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Action Tokenization: Discretizing Continuous Actions into Tokens
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../robotics/action-tokenization/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ml/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Machine Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Robotics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mathematics
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                
+                  <span>Back to Robotics</span>
+                
+              </a>
+            
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-the-big-picture-what-problem-is-actually-being-solved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. The big picture: what problem is actually being solved
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites-the-core-concept-triples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites: the core concept triples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-a-robot-action-is-the-object-being-tokenized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What a robot action is (the object being tokenized)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. What a robot action is (the object being tokenized)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#normalization-the-first-preprocessing-step-learned-statistical-quantiles-approximately-lossless" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Normalization: the first preprocessing step LEARNED (statistical quantiles, approximately lossless)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-why-discretize-continuous-actions-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Why discretize continuous actions at all
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Why discretize continuous actions at all">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-the-core-motivation-the-mode-averaging-disaster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 The core motivation: the mode averaging disaster
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-tokenization-concept-borrowed-from-nlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The tokenization concept (borrowed from NLP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dct-the-discrete-cosine-transform-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DCT, the discrete cosine transform DIRECT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. DCT, the discrete cosine transform DIRECT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#intuition-decompose-a-curve-into-a-sum-of-cosine-waves-at-different-frequencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intuition: decompose a curve into a sum of cosine waves at different frequencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-formula-dct-ii-knowing-what-it-looks-like-is-enough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The formula (DCT-II; knowing what it looks like is enough)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-quantization-rounding-direct-lossy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Quantization / rounding DIRECT LOSSY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-bpe-byte-pair-encoding-learned-statistical-fit-not-an-nn-lossless" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. BPE, byte pair encoding LEARNED (statistical fit, not an NN, lossless)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-putting-fast-together-the-panorama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Putting FAST together (the panorama)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Putting FAST together (the panorama)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-a-complete-numerical-example-every-steps-shape-and-data-made-visible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 A complete numerical example: every step's shape and data made visible
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-vq-vae-and-codebooks-the-prerequisite-for-understanding-fsq-learned-a-genuine-neural-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. VQ-VAE and codebooks (the prerequisite for understanding FSQ) LEARNED (a genuine neural network)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. VQ-VAE and codebooks (the prerequisite for understanding FSQ) LEARNED (a genuine neural network)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-straight-through-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The straight-through estimator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-fsq-finite-scalar-quantization-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. FSQ, finite scalar quantization LEARNED
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-binning-uniform-bucketing-the-most-naive-baseline-direct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Binning, uniform bucketing (the most naive baseline) DIRECT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-autoregressive-modelling-cross-entropy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Autoregressive modelling + cross-entropy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-how-multimodality-is-obtained-for-free" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. How multimodality is obtained "for free"
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. How multimodality is obtained &#34;for free&#34;">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-sampling-and-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 Sampling and temperature
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-attention-masking-bidirectional-prefix-vs-causal-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Attention masking: bidirectional prefix vs causal action
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-a-contrast-the-other-route-flow-matching-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. A contrast: the other route, flow matching (π₀)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-reconstruction-quality-of-the-three-tokenizers-compared" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Reconstruction quality of the three tokenizers compared
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-the-full-0-fast-model-base-model-inputs-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. The full π₀-FAST model: base model / inputs / outputs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="16. The full π₀-FAST model: base model / inputs / outputs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#161-the-base-model-paligemma-a-gemma-2b-decoder-siglip-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.1 The base model: PaliGemma (a Gemma-2B decoder + SigLIP vision)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#162-inputs-and-the-multimodal-embedding-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.2 Inputs and the multimodal embedding order
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#163-output-one-token-predicted-per-step-autoregressively-until-the-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.3 Output: one token predicted per step, autoregressively until the end
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#164-is-the-decoded-result-t-d-yes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.4 Is the decoded result (T, D)? — yes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glossary-quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Glossary (quick reference)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Robotics
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="action-tokenization-discretizing-continuous-actions-into-tokens">Action Tokenization: Discretizing Continuous Actions into Tokens<a class="headerlink" href="#action-tokenization-discretizing-continuous-actions-into-tokens" title="Permanent link">&para;</a></h1>
+<div class="ln-byline">2026-08-06 · about 26 min read · Yufeng Jin</div>
+
+<p class="ln-lead">This note takes the chain "continuous action → discrete token → continuous action" and unpacks the background knowledge each link requires. The main thread is the <strong>π₀-FAST style discrete autoregressive route</strong><sup><a href="#refs">[1]</a></sup>, held up against FSQ, Binning, and the continuous alternative, flow matching<sup><a href="#refs">[2]</a></sup>.</p>
+<p>Three labels appear throughout:</p>
+<ul>
+<li><span class="ln-tag ln-direct">DIRECT</span> — pure mathematical transform (deterministic, no training needed)</li>
+<li><span class="ln-tag ln-learned">LEARNED</span> — fitted from data (statistical fit or neural network)</li>
+<li><span class="ln-tag ln-lossy">LOSSY</span> — information is lost</li>
+</ul>
+<div class="ln-howto"><b>How to read this</b>: for the panorama, read Section 0 and Section 7.
+If you only care about one component (DCT / quantization / BPE / VQ-VAE / FSQ / binning), jump
+straight to that section — each is self-contained. Sections 11-14 take the system view of fitting
+the components into a model; Sections 15-16 are the cross-comparison and the full π₀-FAST picture.
+A glossary sits at the end.</div>
+
+<hr />
+<div class="ln-eyebrow">Big picture · problem landscape</div>
+
+<h2 id="0-the-big-picture-what-problem-is-actually-being-solved">0. The big picture: what problem is actually being solved<a class="headerlink" href="#0-the-big-picture-what-problem-is-actually-being-solved" title="Permanent link">&para;</a></h2>
+<p>What a robot policy has to do: <strong>given an observation <span class="arithmatex">\(o\)</span> (images + proprioceptive state), output a stretch of future actions <span class="arithmatex">\(a_{1:T}\)</span></strong>. Actions are <strong>continuous</strong> real-valued vectors (joint angles, end-effector pose, gripper opening).</p>
+<p>There are two completely different routes to modelling <span class="arithmatex">\(p(a_{1:T}\mid o)\)</span>:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Action representation</th>
+<th>Representative</th>
+<th>Analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Continuous generation</strong></td>
+<td>emit real-valued vectors directly</td>
+<td>π₀ (flow matching / diffusion)</td>
+<td>like an image diffusion model</td>
+</tr>
+<tr>
+<td><strong>Discrete autoregression</strong></td>
+<td>turn actions into tokens, predict them one by one like an LLM</td>
+<td>π₀-FAST</td>
+<td>like GPT writing a sentence</td>
+</tr>
+</tbody>
+</table>
+<p>This note focuses on the <strong>second route</strong>. The core magic: "translate" continuous actions into a string of integer tokens, and robot control <strong>becomes a language modelling problem</strong> — the whole LLM machinery (Transformer, cross-entropy, sampling) can be reused as is.</p>
+<div class="admonition note">
+<p class="admonition-title">The one-sentence intuition</p>
+<p>Tokenization = issuing continuous actions a "dictionary" that translates smooth curves into a finite set of "words". All the difficulty lies in: how the dictionary is built (learned or direct?), how much information the translation loses (where is the lossy step?), and how faithfully it translates back (invertibility).</p>
+</div>
+<p><strong>Concept dependency graph:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>robot action (sequence of continuous vectors)
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   │  why not regress it directly? → the mode averaging problem (§2.1)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   ▼
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>motivation for discretization ─┐
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   │                           │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ├─ FAST route:              ├─ signal processing: DCT (§4) compacts energy
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>   │   DCT→quantize→BPE        ├─ quantization/rounding (§5) the one lossy step
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   │                           └─ BPE (§6) lossless compression vocabulary
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ├─ FSQ route: neural autoencoder + VQ/FSQ codebook (§8, §9)
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>   │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   └─ Binning route: uniform bucketing (§10, the most naive baseline)
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                ▼
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        all of them feed an autoregressive Transformer (§11)
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        trained with cross-entropy → naturally multimodal (§12)
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        sampling + temperature (§12.1) pulls out different solutions
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        attention masking (§13) separates prompt from action
+</span></code></pre></div>
+<hr />
+<div class="ln-eyebrow">Prerequisites</div>
+
+<h2 id="prerequisites-the-core-concept-triples">Prerequisites: the core concept triples<a class="headerlink" href="#prerequisites-the-core-concept-triples" title="Permanent link">&para;</a></h2>
+<p>A few concepts recur throughout the note; here they are as <strong>English term = Chinese term = minimal definition</strong>. The Chinese names are kept as a bridge back to the Chinese literature, and the wording in the body matches these entries.</p>
+<ul>
+<li><strong>tokenization = 词元化</strong> = mapping text or a continuous signal onto a sequence of integer IDs drawn from a finite vocabulary, so a Transformer can treat them as categories<sup><a href="#refs">[3]</a></sup>.</li>
+<li><strong>mode averaging = 模式平均</strong> = the phenomenon where L2/MSE regression averages several mutually exclusive correct solutions into one wrong solution; it is the central motivation for this entire discretization route (§2.1).</li>
+<li><strong>DCT (discrete cosine transform) = 离散余弦变换</strong> = an orthogonal transform that invertibly decomposes a discrete signal into the weights (coefficients) of a set of cosine bases at different frequencies; for a smooth signal the energy concentrates in the low-frequency coefficients<sup><a href="#refs">[4]</a></sup>.</li>
+<li><strong>quantization = 量化</strong> = the operation of mapping continuous values onto a finite set of grid points (e.g. multiply by a scale, then round)<sup><a href="#refs">[5]</a></sup>; it is the only lossy step in the "continuous → discrete" chain (§5).</li>
+<li><strong>BPE (byte pair encoding) = 字节对编码</strong> = a lossless compression algorithm that repeatedly merges the most frequent adjacent pair in a sequence to shorten it; the merge rules come from data statistics and involve no neural network<sup><a href="#refs">[3]</a></sup>.</li>
+<li><strong>prefix-LM = 前缀语言模型</strong> = a mixed-mask Transformer in which the prefix (prompt/condition) uses bidirectional attention while the suffix (generation target) uses causal attention<sup><a href="#refs">[6]</a></sup>.</li>
+</ul>
+<hr />
+<div class="ln-eyebrow">Basics 01 · what an action is</div>
+
+<h2 id="1-what-a-robot-action-is-the-object-being-tokenized">1. What a robot action is (the object being tokenized)<a class="headerlink" href="#1-what-a-robot-action-is-the-object-being-tokenized" title="Permanent link">&para;</a></h2>
+<p>One action sample is a two-dimensional matrix:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>actions.shape == (T, D)
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>            ┌─ T = action_horizon: how many future steps one prediction covers (e.g. 50 steps ≈ 1 second @ 50Hz)
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>            └─ D = action_dim: degrees of freedom per step (e.g. 7 = 6 joints + 1 gripper, or 14 = dual arm)
+</span></code></pre></div>
+<p>Two key properties:</p>
+<ul>
+<li><strong>① Smooth in time</strong>: consecutive actions differ little (robots do not teleport) → this is the precondition that lets DCT compress.</li>
+<li><strong>② Different units per dimension</strong>: joint angles may span ±3 rad, the gripper 0~1 → they must first be <strong>normalized</strong> onto a common range.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Why a 'stretch' rather than a single step</p>
+<p>Predicting a whole <strong>action chunk</strong> (instead of a single step) reduces compounding error and makes motion more coherent; it also hands DCT a "time axis" on which to do a frequency-domain transform. A single-step action has no frequency domain to speak of.</p>
+</div>
+<h3 id="normalization-the-first-preprocessing-step-learned-statistical-quantiles-approximately-lossless">Normalization: the first preprocessing step <span class="ln-tag ln-learned">LEARNED</span> (statistical quantiles, approximately lossless)<a class="headerlink" href="#normalization-the-first-preprocessing-step-learned-statistical-quantiles-approximately-lossless" title="Permanent link">&para;</a></h3>
+<p>Scale every action dimension to roughly <span class="arithmatex">\([-1,1]\)</span>. The usual choice is <strong>quantile normalization</strong> rather than plain min-max: take the 1% and 99% quantiles as the bounds, which is more robust to outliers.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Idea: use quantiles computed on the training set to squeeze actions into [-1,1]</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">a_norm</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">q01</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">q99</span> <span class="o">-</span> <span class="n">q01</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>   <span class="c1"># anything outside gets clipped</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Why this counts as LEARNED even though it is not a neural network</p>
+<p>"Learned" here = <strong>parameters fitted from data statistics</strong> (the quantiles), not weights trained by gradient descent. This distinction runs through the whole note: FAST's BPE vocabulary and the normalization quantiles are both this kind of "statistical fit", <strong>not a neural network</strong>.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Basics 02 · why discretize</div>
+
+<h2 id="2-why-discretize-continuous-actions-at-all">2. Why discretize continuous actions at all<a class="headerlink" href="#2-why-discretize-continuous-actions-at-all" title="Permanent link">&para;</a></h2>
+<p>The most natural idea is to have the network output real-valued actions directly, supervised by L2/MSE regression. So why go to the trouble of discretizing into tokens? Three reasons:</p>
+<ol>
+<li><strong>Reuse the entire LLM infrastructure</strong>: once actions are tokens, you can plug straight into a pretrained VLM's (e.g. PaliGemma) Transformer, vocabulary and cross-entropy, and skip designing a new output head.</li>
+<li><strong>Multimodality comes for free</strong> (detailed in §12): a discrete distribution can assign high probability to "go left" and "go right" simultaneously; regression cannot.</li>
+<li><strong>Compression + efficient autoregression</strong>: FAST uses DCT+BPE to squeeze a stretch of actions into a very short token sequence, making autoregressive inference faster.</li>
+</ol>
+<h3 id="21-the-core-motivation-the-mode-averaging-disaster">2.1 The core motivation: the mode averaging disaster<a class="headerlink" href="#21-the-core-motivation-the-mode-averaging-disaster" title="Permanent link">&para;</a></h3>
+<p>This is <strong>the single most important intuition for understanding the whole discretization route</strong>. Picture an obstacle in front of the robot with two equally correct ways around it: <strong>go around the left</strong> or <strong>go around the right</strong>. Both appear in the training data.</p>
+<div class="admonition danger">
+<p class="admonition-title">The fatal flaw of L2 regression</p>
+<p>MSE regression is essentially fitting a <strong>unimodal Gaussian</strong>, and its optimum is the <strong>average</strong> of all correct answers. The average of "left" and "right" = <strong>driving straight into the obstacle</strong>. That is mode averaging.</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 1 · mode averaging vs a multimodal distribution (interactive demo)</div>
+<div class="ln-demo-hint">The data contains two correct actions (blue cluster = go left, green cluster = go right). Drag the slider to change the distance between the clusters and watch where the L2 regression's "optimal prediction" (red line) lands. Takeaway: the red line always falls in the no-man's-land between the clusters — regression averages two correct solutions into one wrong one, which is mode averaging; tick "show discrete distribution" to see a multimodal distribution keep both solutions alive.</div>
+<canvas id="cvMode" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>Gap between the two modes <input type="range" id="modeGap" min="0" max="100" value="70"></label>
+<label><input type="checkbox" id="showCat" checked> Show the discrete distribution (multimodal)</label>
+</div>
+<div class="ln-readout" id="modeOut"></div>
+</div>
+
+<p>The wider the gap, the deeper the L2 "optimal prediction" (the mean of the two clusters) sinks into <strong>no-man's-land</strong> — an action nobody ever demonstrated, one that may drive straight into a wall. A discrete distribution, by contrast, can light up <strong>both</strong> the left and the right bin with high probability, preserving both modes perfectly. That is why continuous actions get sliced into discrete tokens and trained with classification cross-entropy.</p>
+<hr />
+<div class="ln-eyebrow">Basics 03 · tokenization</div>
+
+<h2 id="3-the-tokenization-concept-borrowed-from-nlp">3. The tokenization concept (borrowed from NLP)<a class="headerlink" href="#3-the-tokenization-concept-borrowed-from-nlp" title="Permanent link">&para;</a></h2>
+<p>In NLP, tokenization = cutting a continuous stream of characters into integer IDs from a finite vocabulary:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&quot;the robot is cute&quot;  →  [&quot;the&quot;,&quot;robot&quot;,&quot;is&quot;,&quot;cute&quot;]  →  [8123, 442, 19, 5601]
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>       text                    subwords                    integer token ids
+</span></code></pre></div>
+<p>These integers then index an <strong>embedding table</strong> and become vectors fed into the Transformer. The key points:</p>
+<ul>
+<li>The <strong>vocabulary</strong> is finite (PaliGemma, for instance, has 257,152 tokens<sup><a href="#refs">[6]</a></sup>).</li>
+<li>Each token id corresponds to one row of embedding vector in the vocabulary.</li>
+<li>The model's output is a <strong>probability distribution over the vocabulary</strong> (softmax over 257,152 classes).</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">The core trick for carrying this over to robots</p>
+<p>The last <strong>128</strong> ids of the PaliGemma vocabulary are almost never used in practice. You can <strong>commandeer those 128 slots</strong> as action tokens — so action tokens and text tokens <strong>share one embedding table and one softmax output head</strong>. Robot actions really are stuffed into the language model as "words of a new language".</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Component 01 · DCT</div>
+
+<h2 id="4-dct-the-discrete-cosine-transform-direct">4. DCT, the discrete cosine transform <span class="ln-tag ln-direct">DIRECT</span><a class="headerlink" href="#4-dct-the-discrete-cosine-transform-direct" title="Permanent link">&para;</a></h2>
+<p>This is FAST's first step, and the piece most people are least familiar with.</p>
+<h3 id="intuition-decompose-a-curve-into-a-sum-of-cosine-waves-at-different-frequencies">Intuition: decompose a curve into a sum of cosine waves at different frequencies<a class="headerlink" href="#intuition-decompose-a-curve-into-a-sum-of-cosine-waves-at-different-frequencies" title="Permanent link">&para;</a></h3>
+<p>Any discrete signal (say the 50 samples of one joint angle over time) can be represented <strong>exactly</strong> as a weighted sum of cosine waves at various frequencies. DCT is precisely the computation of "how much weight each frequency carries"<sup><a href="#refs">[4]</a></sup>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Analogy: a mixing desk</p>
+<p>Picture an audio equalizer with one fader each for low (bass), mid and high frequencies. DCT decomposes the signal onto those "frequency faders". Robot actions are <strong>smooth</strong> → almost all low frequency → only the leftmost few faders carry any value, and a wide stretch on the right sits at ≈0. That is "energy concentrated in the low frequencies".</p>
+</div>
+<h3 id="the-formula-dct-ii-knowing-what-it-looks-like-is-enough">The formula (DCT-II; knowing what it looks like is enough)<a class="headerlink" href="#the-formula-dct-ii-knowing-what-it-looks-like-is-enough" title="Permanent link">&para;</a></h3>
+<p>Turning a length-<span class="arithmatex">\(N\)</span> signal <span class="arithmatex">\(x_0,\dots,x_{N-1}\)</span> into coefficients <span class="arithmatex">\(X_0,\dots,X_{N-1}\)</span>:</p>
+<div class="arithmatex">\[
+X_k = \sum_{n=0}^{N-1} x_n \cos\!\left[\frac{\pi}{N}\left(n+\tfrac12\right)k\right]
+\]</div>
+<p><span class="arithmatex">\(k=0\)</span> is the DC component (the overall mean); larger <span class="arithmatex">\(k\)</span> means higher frequency. The inverse transform IDCT adds the coefficients back up using the same cosine bases and is <strong>fully invertible</strong> (up to floating-point error). The DCT is taken along the <strong>time axis T</strong>, independently for each action dimension D.</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 2 · DCT energy compaction (interactive demo)</div>
+<div class="ln-demo-hint">The top plot is a stretch of "action signal" (with adjustable smoothness); the bottom plot shows its DCT coefficients, low frequencies at the left of the horizontal axis and high frequencies at the right. Watch how a smooth signal crams its energy into the leftmost few low-frequency coefficients. Takeaway: the smoother the signal, the more tightly the non-zero coefficients cluster at the low-frequency end — this is energy compaction, and it is what makes the later rounding and BPE compression so efficient.</div>
+<canvas id="cvDct" width="900" height="360"></canvas>
+<div class="ln-controls">
+<label>Signal smoothness <input type="range" id="dctSmooth" min="1" max="20" value="3"></label>
+<button id="dctReroll">🎲 New signal</button>
+</div>
+<div class="ln-readout" id="dctOut"></div>
+</div>
+
+<div class="admonition note">
+<p class="admonition-title">Why DCT is discretization's 'perfect assist'</p>
+<p>DCT itself <strong>does not discretize and loses no information</strong> (it is pure invertible mathematics). What it does is <strong>redistribute</strong> the signal's energy: a smooth action → most coefficients ≈0. At the next step, rounding crushes those small coefficients close to 0 into <strong>exactly</strong> 0, producing a mass of repeated 0s → superb raw material for BPE. <strong>DCT does not compress, but it makes the compression that follows efficient.</strong></p>
+</div>
+<hr />
+<div class="ln-eyebrow">Component 02 · quantization</div>
+
+<h2 id="5-quantization-rounding-direct-lossy">5. Quantization / rounding <span class="ln-tag ln-direct">DIRECT</span> <span class="ln-tag ln-lossy">LOSSY</span><a class="headerlink" href="#5-quantization-rounding-direct-lossy" title="Permanent link">&para;</a></h2>
+<p>This is <strong>the only step in the whole FAST chain that genuinely loses information</strong>, and the place where "continuous → discrete" actually happens.</p>
+<p>A continuous value can take infinitely many values; a token vocabulary can only express finitely many. Quantization = <strong>mapping a continuous value onto the nearest "grid point"</strong><sup><a href="#refs">[5]</a></sup>. In its simplest form: multiply by a scaling factor, then round.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">q</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>        <span class="c1"># continuous x → integer q   (encode, lossy)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">x_hat</span> <span class="o">=</span> <span class="n">q</span> <span class="o">/</span> <span class="n">scale</span>           <span class="c1"># integer q → approximate continuous x̂ (decode, the original value is gone)</span>
+</span></code></pre></div>
+<p>The error <span class="arithmatex">\(|x-\hat x|\)</span> is at most about <span class="arithmatex">\(\frac{1}{2\,\text{scale}}\)</span>. A larger scale → a denser grid → more precision, but a wider integer range and more tokens. This is the <strong>precision vs compression ratio</strong> trade-off.</p>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 3 · The precision / compression trade-off in quantization (interactive demo)</div>
+<div class="ln-demo-hint">The blue line is the original continuous signal; the red staircase is the signal reconstructed after quantization. Drag "quantization levels" and see: fewer levels are cheaper (fewer tokens) but more distorted. Takeaway: the number of quantization levels is exactly the precision vs compression knob — fewer levels means a coarser staircase and larger reconstruction error; this step is also the only lossy link in the entire chain.</div>
+<canvas id="cvQuant" width="900" height="300"></canvas>
+<div class="ln-controls">
+<label>Quantization levels (bins) <input type="range" id="qBins" min="2" max="64" value="8"> <span class="ln-val" id="qBinsV">8</span></label>
+</div>
+<div class="ln-readout" id="quantOut"></div>
+</div>
+
+<div class="admonition warning">
+<p class="admonition-title">The subtlety of FAST</p>
+<p>FAST does not quantize the raw action; it quantizes the <strong>DCT coefficients</strong><sup><a href="#refs">[1]</a></sup>. Because the high-frequency coefficients are ≈0, rounding turns them into a broad field of 0s — affordable to lose (high frequencies contribute almost nothing to a smooth action) while manufacturing a compressible repeated pattern. "Rounding in the frequency domain" is far smarter than "rounding in the time domain".</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Component 03 · BPE</div>
+
+<h2 id="6-bpe-byte-pair-encoding-learned-statistical-fit-not-an-nn-lossless">6. BPE, byte pair encoding <span class="ln-tag ln-learned">LEARNED</span> (statistical fit, not an NN, lossless)<a class="headerlink" href="#6-bpe-byte-pair-encoding-learned-statistical-fit-not-an-nn-lossless" title="Permanent link">&para;</a></h2>
+<p>Rounding yields a long string of integers (with plenty of repetition, especially 0s). BPE is a <strong>lossless compression</strong> algorithm<sup><a href="#refs">[3]</a></sup> that merges "frequently repeated patterns" into a single new token, shortening the sequence.</p>
+<p>Repeat the following: "find the <strong>most frequent adjacent pair</strong> in the current sequence and merge it into a new symbol", until the target vocabulary size is reached.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>initial: a a b a a b a a b       (the pair a a occurs often)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>merge (a,a)→Z:  Z b Z b Z b      (now the pair Z b occurs often)
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>merge (Z,b)→Y:  Y Y Y             ← 9 symbols squeezed into 3, fully recoverable
+</span></code></pre></div>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 4 · BPE merge compression (interactive demo)</div>
+<div class="ln-demo-hint">Below is a stretch of quantized integers (with lots of repetition). Click "merge once" to run one BPE step and watch the sequence shrink and the dictionary grow. Takeaway: each merge shortens the sequence and adds one merge rule to the dictionary; the whole process is invertible and the compression entirely lossless — the loss happened at the previous step, the rounding.</div>
+<canvas id="cvBpe" width="900" height="170"></canvas>
+<div class="ln-controls">
+<button id="bpeStep">▶ Merge the most frequent pair</button>
+<button id="bpeReset">↺ Reset</button>
+</div>
+<div class="ln-readout" id="bpeOut"></div>
+</div>
+
+<p>"Which pairs to merge, and in what order" = the <strong>BPE vocabulary / merge rules</strong>, which are <strong>derived from statistics over the training data</strong> (hence learned), but are <strong>only lookup-style statistical rules, containing no neural network or gradients whatsoever</strong>. Given the vocabulary, both encoding and decoding are <strong>entirely lossless</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Where the name FAST comes from</p>
+<p>FAST = <strong>F</strong>requency-space <strong>A</strong>ction <strong>S</strong>equence <strong>T</strong>okenization<sup><a href="#refs">[1]</a></sup>. DCT+BPE is the algorithm itself — pure signal processing plus statistical compression, no neural network.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">System 01 · FAST panorama</div>
+
+<h2 id="7-putting-fast-together-the-panorama">7. Putting FAST together (the panorama)<a class="headerlink" href="#7-putting-fast-together-the-panorama" title="Permanent link">&para;</a></h2>
+<p>The encoding direction (continuous → token):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>normalized action matrix A (T, D), roughly [-1,1]
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>   │
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>   ① DCT (along the time axis)     DIRECT lossless, energy pushed into low frequencies
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>   ▼
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>frequency coefficient matrix C (T, D), high frequencies ≈0
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>   │
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>   ② Scale + Round                 DIRECT · LOSSY ← discretization happens here
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>   ▼
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>sparse integer matrix (mostly 0)
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>   │
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>   ③ Flatten to 1D                 DIRECT
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>   │
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>   ④ BPE merges repeated patterns  LEARNED vocabulary · lossless
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>   ▼
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>final discrete token sequence (variable length, usually far shorter than T×D)
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>   │
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>   ⑤ map onto the last 128 slots of the PaliGemma vocabulary   DIRECT pure arithmetic
+</span></code></pre></div>
+<p>The decoding direction is simply <strong>the exact reverse</strong>: BPE decode → reshape → divide by the scale → IDCT → denormalize.</p>
+<div class="admonition danger">
+<p class="admonition-title">The conclusion people most often garble</p>
+<p><strong>FAST is not a neural network!</strong> It is "deterministic invertible compression (DCT + rounding + flatten) plus one statistically fitted BPE vocabulary". The only information loss comes from the rounding in step ②. That is exactly its selling point over VQ/FSQ — <strong>no neural autoencoder to train</strong>, usable out of the box<sup><a href="#refs">[1]</a></sup>.</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 5 · The full FAST round trip (continuous ↔ discrete, adjustable scale, interactive demo)</div>
+<div class="ln-demo-hint">A smooth multi-dimensional action trajectory goes through DCT along the time axis → quantization by rounding → IDCT reconstruction. Drag the quantization scale and watch all four panels change at once — this is the most direct demonstration of "how continuous becomes discrete, where the loss comes from, and how many tokens result". Takeaway: the larger the scale, the more closely the reconstruction hugs the original trajectory, but the wider the magnitude range of the integer coefficients grows; the only loss along the whole chain comes from the rounding step.</div>
+<canvas id="cvRT" width="900" height="250"></canvas>
+<canvas id="cvTrade" width="900" height="200" style="margin-top:14px"></canvas>
+<div class="ln-controls">
+<label>Quantization scale (larger = finer) <input type="range" id="rtScale" min="1" max="64" value="10" step="0.5"> <span class="ln-val" id="rtScaleV">10</span></label>
+<button id="rtReroll">🎲 New trajectory</button>
+</div>
+<div class="ln-readout" id="rtOut"></div>
+</div>
+
+<h3 id="71-a-complete-numerical-example-every-steps-shape-and-data-made-visible">7.1 A complete numerical example: every step's shape and data made visible<a class="headerlink" href="#71-a-complete-numerical-example-every-steps-shape-and-data-made-visible" title="Permanent link">&para;</a></h3>
+<p>Many people have no concrete feel for "what shape actually goes into and comes out of the DCT, and how scale+round plays out". Below is a walk-through with <strong>genuinely computed numbers</strong> (for clarity we take <code>D=1</code>, a single dimension, and <code>T=8</code> time steps; with more dimensions each column independently repeats the same process).</p>
+<p><strong>Input: the normalized action matrix A</strong>, of shape <code>(T, D) = (8, 1)</code>, values already normalized to <span class="arithmatex">\([-1,1]\)</span>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>A = [ 1.000, 0.816, 0.494, 0.111, -0.258, -0.555, -0.755, -0.853 ]   # shape (8,1)
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>     t=0    t=1    t=2    t=3    t=4     t=5     t=6     t=7         ← time axis
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>This is a smoothly descending curve (what a robot action typically looks like).
+</span></code></pre></div>
+<p><strong>① DCT — transform along the time axis; input and output shapes are identical</strong> (<code>(T,)→(T,)</code>, and for <code>(T,D)</code> it is one transform per column):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>C = DCT(A) = [ 0.00, 1.889, 0.159, -0.00, -0.00, 0.00, 0.00, -0.00 ]   # still (8,1)
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>              k=0   k=1    k=2    k=3    k=4   k=5   k=6   k=7         ← frequency axis
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>              DC    low ────────────→                     high
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Nearly all the energy sits at k=1 (=1.889)! The high-frequency coefficients from k≥3 are already ≈0.
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">The key realization</p>
+<p>DCT <strong>does not change the number of elements</strong>: 8 numbers in, 8 numbers out. All it does is <strong>change coordinates</strong> — from "time" to "frequency". Not a scrap of information is lost (it is invertible), but it is <strong>redistributed</strong> onto a handful of low-frequency coefficients.</p>
+</div>
+<p><strong>② Scale + Round — discretization happens here</strong> (with <code>scale = 8</code>):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>C × scale = [ 0.00, 15.115, 1.273, -0.00, -0.00, 0.00, 0.00, -0.00 ]
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>round(·)  = [   0,    15,     1,     0,     0,    0,    0,    0    ]   = Cq (integers!)
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>                                                                       only 2 of the 8 are non-zero
+</span></code></pre></div>
+<p>This step: ① turns continuous decimals into <strong>integers</strong> (the real "discretization"); ② crushes those ≈0 high-frequency coefficients into <strong>exactly</strong> 0. The loss originates here (the rounding of <code>15.115→15</code> and <code>1.273→1</code>).</p>
+<p><strong>③ Flatten</strong> flattens <code>(T,D)</code> into the 1D integer sequence <code>[0, 15, 1, 0, 0, 0, 0, 0]</code> (for <code>D&gt;1</code> it is straightened out along <code>T×D</code>).</p>
+<p><strong>④ BPE</strong> merges frequently repeated patterns (such as "5 consecutive 0s") into single tokens, shortening the sequence, and finally <strong>⑤</strong> maps them onto the ids of the top 128 slots of the vocabulary.</p>
+<p><strong>Decoding: retrace the path and see how small the loss is</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>token → BPE decode → [0,15,1,0,0,0,0,0] → reshape(8,1) → ÷scale → IDCT → denormalize
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>reconstructed A_rec = [0.977, 0.803, 0.497, 0.125, -0.241, -0.545, -0.756, -0.862]
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>original A          = [1.000, 0.816, 0.494, 0.111, -0.258, -0.555, -0.755, -0.853]
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>reconstruction MSE ≈ 1.7e-4   ← 8 values recovered almost perfectly from just 2 non-zero coefficients!
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">This example says it all</p>
+<p>8 continuous values → DCT → only <strong>2</strong> effective (non-zero) integer coefficients → a reconstruction error of just 1.7e-4. <strong>That is the entire secret of FAST's efficient compression</strong>: after the DCT a smooth action has extremely concentrated energy, rounding manufactures a mass of 0s, and BPE then compresses the runs of 0s away. For a deeper dive into the mathematics of DCT energy compaction, see <a href="../../math/fourier-dct/#7-dct">Fourier and DCT · energy compaction</a>.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Component 04 · VQ-VAE</div>
+
+<h2 id="8-vq-vae-and-codebooks-the-prerequisite-for-understanding-fsq-learned-a-genuine-neural-network">8. VQ-VAE and codebooks (the prerequisite for understanding FSQ) <span class="ln-tag ln-learned">LEARNED</span> (a genuine neural network)<a class="headerlink" href="#8-vq-vae-and-codebooks-the-prerequisite-for-understanding-fsq-learned-a-genuine-neural-network" title="Permanent link">&para;</a></h2>
+<p>The FSQ route is <strong>a genuine neural network approach</strong>. To understand FSQ, first understand the "codebook" idea of its predecessor, VQ-VAE.</p>
+<p>The idea of VQ-VAE (Vector Quantized VAE)<sup><a href="#refs">[7]</a></sup>: maintain a <strong>learnable "codebook"</strong> — say 256 vectors, each called a codeword, numbered 0~255.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>encoder (NN) → continuous vector z
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>         ↓ find the nearest codeword in the codebook
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>index of the nearest codeword = token (e.g. #42)      ← discretization
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>         ↓
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>decoder (NN) reconstructs the action from the codeword vector of #42
+</span></code></pre></div>
+<p>The encoder, the decoder and <strong>the 256 vectors of the codebook themselves</strong> are all obtained by <strong>gradient training</strong> (with a reconstruction MSE loss). This is a genuine "end-to-end learned discrete representation".</p>
+<div class="admonition warning">
+<p class="admonition-title">The pain points of VQ-VAE</p>
+<p>① <strong>Codebook collapse</strong>: during training many codewords are never used, wasting capacity and making training hard.</p>
+<p>② Taking the nearest neighbour is not differentiable → a <strong>straight-through estimator</strong> trick is needed to backpropagate at all.</p>
+<p>These pain points are exactly what <strong>FSQ</strong> sets out to solve.</p>
+</div>
+<h3 id="the-straight-through-estimator">The straight-through estimator<a class="headerlink" href="#the-straight-through-estimator" title="Permanent link">&para;</a></h3>
+<p>"Nearest neighbour / rounding" is a staircase function whose derivative is 0 everywhere, so gradients never make it back to the encoder. The trick: <strong>use the discrete value in the forward pass, and pretend it is the identity function in the backward pass</strong> (let the gradient pass straight through)<sup><a href="#refs">[8]</a></sup>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">z_q</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">stop_gradient</span><span class="p">(</span><span class="n">quantize</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1">#   forward:  z_q == quantize(z) (discrete)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">#   backward: d z_q / d z == 1   (the gradient flows straight through as if nothing were quantized)</span>
+</span></code></pre></div>
+<hr />
+<div class="ln-eyebrow">Component 05 · FSQ</div>
+
+<h2 id="9-fsq-finite-scalar-quantization-learned">9. FSQ, finite scalar quantization <span class="ln-tag ln-learned">LEARNED</span><a class="headerlink" href="#9-fsq-finite-scalar-quantization-learned" title="Permanent link">&para;</a></h2>
+<p>FSQ (Finite Scalar Quantization)<sup><a href="#refs">[9]</a></sup> is the elegant replacement for VQ-VAE: <strong>drop the learnable codebook and instead round onto a fixed grid, independently in each of a handful of dimensions</strong>. It needs no codebook learning, yet is inherently collapse-free.</p>
+<p>The core trick:</p>
+<ol>
+<li>The encoder projects the action into a <strong>very low-dimensional</strong> space (say only 3 dimensions).</li>
+<li>Each dimension is squashed to <span class="arithmatex">\([-1,1]\)</span> with <span class="arithmatex">\(\tanh\)</span>, then <strong>rounded to the few fixed grid points of that dimension</strong> (e.g. 8 grid points for dimension 1, 6 for dimension 2, 5 for dimension 3).</li>
+<li>The combination of grid points across dimensions is encoded into <strong>a single integer</strong> token using <strong>mixed-radix</strong> arithmetic (<span class="arithmatex">\(8\times6\times5=240\approx256\)</span> codewords).</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># FSQ encode (conceptual)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">x</span> <span class="o">=</span> <span class="n">proj_down</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>                      <span class="c1"># project down to ~3 dims        [LEARNED]</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">zc</span> <span class="o">=</span> <span class="n">tanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                          <span class="c1"># squash to [-1,1]</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">digits</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">zc</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">bases</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>    <span class="c1"># round each dim to a grid point [DIRECT, LOSSY]</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">token</span> <span class="o">=</span> <span class="n">undigitize</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>            <span class="c1"># multi-dim digits → one integer (mixed radix) [DIRECT]</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">FSQ vs VQ in one line</p>
+<p>VQ: the codebook is <strong>a pile of arbitrary vectors that must be learned</strong>, with collapse to guard against.</p>
+<p>FSQ: the codebook is <strong>a fixed regular grid</strong> (the Cartesian product of equally spaced grid points per dimension) — nothing to learn, nothing to collapse. Only the projection encoder/decoder are neural networks.</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 6 · FSQ's fixed 2D grid codebook (interactive demo)</div>
+<div class="ln-demo-hint">Once the action has been squeezed into 2 dimensions, FSQ's "codewords" are exactly these regular grid points. Move the mouse (or drag) and watch a continuous point snap to the nearest grid codeword (= one integer token). Adjust the number of grid points per dimension to see the codebook size change. Takeaway: FSQ's codebook is the fixed regular grid itself — nothing to learn, inherently collapse-free, with codebook size = the product of the grid counts across dimensions.</div>
+<canvas id="cvFsq" width="420" height="420" style="margin:auto"></canvas>
+<div class="ln-controls">
+<label>Grid points, dim 1 <input type="range" id="fsqB1" min="2" max="9" value="6"> <span class="ln-val" id="fsqB1V">6</span></label>
+<label>Grid points, dim 2 <input type="range" id="fsqB2" min="2" max="9" value="5"> <span class="ln-val" id="fsqB2V">5</span></label>
+</div>
+<div class="ln-readout" id="fsqOut"></div>
+</div>
+
+<hr />
+<div class="ln-eyebrow">Component 06 · binning</div>
+
+<h2 id="10-binning-uniform-bucketing-the-most-naive-baseline-direct">10. Binning, uniform bucketing (the most naive baseline) <span class="ln-tag ln-direct">DIRECT</span><a class="headerlink" href="#10-binning-uniform-bucketing-the-most-naive-baseline-direct" title="Permanent link">&para;</a></h2>
+<p>The RT-2<sup><a href="#refs">[10]</a></sup> / OpenVLA<sup><a href="#refs">[11]</a></sup> style, with <strong>zero learning</strong>: for every dimension and every time step <strong>independently</strong>, cut <span class="arithmatex">\([-1,1]\)</span> into 256 uniform buckets and round to the bucket index.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">token</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n_bins</span><span class="p">)</span>     <span class="c1"># encode</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">a_hat</span> <span class="o">=</span> <span class="n">token</span> <span class="o">/</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>      <span class="c1"># decode</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Upside</strong>: simple, needs no training at all, fully invertible (up to rounding).</li>
+<li><strong>Downside</strong>: the token count = T×D (no compression, very long sequences); precision is capped at 256 levels and it <strong>exploits no temporal correlation</strong>. It is the control baseline in the papers.</li>
+</ul>
+<p>Seeing all three side by side:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Binning</th>
+<th>FAST</th>
+<th>FSQ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>continuous→discrete</td>
+<td>uniform bucketing + rounding</td>
+<td>DCT→round→BPE</td>
+<td>Transformer→FSQ quantization</td>
+</tr>
+<tr>
+<td>is it an NN</td>
+<td>❌</td>
+<td>❌ (statistical fit)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>needs pretraining</td>
+<td>❌</td>
+<td>only the BPE vocabulary / quantiles</td>
+<td>✅ needs a checkpoint</td>
+</tr>
+<tr>
+<td>token count</td>
+<td>many (T×D)</td>
+<td>few (compressed)</td>
+<td>medium (fixed)</td>
+</tr>
+<tr>
+<td>exploits temporal correlation</td>
+<td>❌</td>
+<td>✅ (DCT)</td>
+<td>✅ (attention)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div class="ln-eyebrow">System 02 · autoregressive modelling</div>
+
+<h2 id="11-autoregressive-modelling-cross-entropy">11. Autoregressive modelling + cross-entropy<a class="headerlink" href="#11-autoregressive-modelling-cross-entropy" title="Permanent link">&para;</a></h2>
+<p>Whichever tokenizer is used, once the actions are tokens the <strong>training objective is exactly GPT's</strong>: predict the next token.</p>
+<p>What the sequence looks like:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Task: pick up the cup, State: &lt;discretized proprioceptive state&gt;;
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Action: &lt;a₁&gt;&lt;a₂&gt;...&lt;aₙ&gt;|
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>└──────── prefix (the condition, no loss) ────────┘└─ postfix (loss here) ─┘
+</span></code></pre></div>
+<p>Note: even the proprioceptive <strong>state is discretized</strong> (cut into 256 buckets) and stuffed into the prompt.</p>
+<p>The training objective = next-token cross-entropy (negative log-likelihood):</p>
+<div class="arithmatex">\[
+\mathcal{L} = -\frac{1}{|\text{mask}|}\sum_{t}\; \text{mask}_t \cdot \log p_\theta(a_t \mid a_{&lt;t}, o)
+\]</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">targets</span> <span class="o">=</span> <span class="n">one_hot</span><span class="p">(</span><span class="n">tokens</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">vocab</span><span class="o">=</span><span class="mi">257152</span><span class="p">)</span>   <span class="c1"># shift right by one to form the target</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">logp</span>    <span class="o">=</span> <span class="n">log_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">token_logp</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">targets</span> <span class="o">*</span> <span class="n">logp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>        <span class="c1"># log probability of the correct token</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">token_logp</span> <span class="o">*</span> <span class="n">loss_mask</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">loss_mask</span><span class="p">)</span>  <span class="c1"># loss only over the action segment</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Three points to note</p>
+<p>① <strong>There is no MSE/regression term whatsoever</strong> — pure cross-entropy.</p>
+<p>② <code>loss_mask</code> is True only over the postfix <code>Action:...|</code> → loss is computed on action tokens only; prompt/state serve purely as conditions.</p>
+<p>③ At inference, tokens are sampled autoregressively one by one, stopping at <code>|</code> or EOS, after which the tokenizer transforms them back into continuous actions.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">System 03 · multimodality</div>
+
+<h2 id="12-how-multimodality-is-obtained-for-free">12. How multimodality is obtained "for free"<a class="headerlink" href="#12-how-multimodality-is-obtained-for-free" title="Permanent link">&para;</a></h2>
+<p>Back to the mode averaging problem of §2.1. Discrete tokens + cross-entropy solve it <strong>on three levels</strong>:</p>
+<ol>
+<li><strong>A discrete categorical is inherently multimodal</strong>: at each token position the model emits a softmax over the whole vocabulary, and can assign high probability to "the token corresponding to left" and "the token corresponding to right" at the same time. No more forced averaging.</li>
+<li><strong>The autoregressive factorization expresses joint multimodality</strong>: <span class="arithmatex">\(p(a_{1:n}\mid o)=\prod_t p(a_t\mid a_{&lt;t},o)\)</span>. A product of categoricals can express complex multimodal joint distributions — "left" is one coherent token sequence, "right" is another.</li>
+<li><strong>At inference, sampling pulls out the different solutions</strong> (next section).</li>
+</ol>
+<h3 id="121-sampling-and-temperature">12.1 Sampling and temperature<a class="headerlink" href="#121-sampling-and-temperature" title="Permanent link">&para;</a></h3>
+<p>Given a multimodal distribution, how do you extract an action? Sample each token's logits with a temperature:</p>
+<div class="arithmatex">\[
+p_i = \frac{\exp(z_i/\tau)}{\sum_j \exp(z_j/\tau)}
+\]</div>
+<ul>
+<li><span class="arithmatex">\(\tau=0\)</span>: take the argmax → deterministic, the single most likely solution.</li>
+<li><span class="arithmatex">\(\tau&gt;0\)</span>: sample randomly from the distribution → different RNG yields different feasible solutions; the larger <span class="arithmatex">\(\tau\)</span>, the more diverse.</li>
+</ul>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 7 · How temperature modulates multimodal sampling (interactive demo)</div>
+<div class="ln-demo-hint">Bimodal logits at one token position (two high-probability regions, "left" and "right"). Drag the temperature and watch the softmax distribution change; click "sample 20 times" to see the distribution of tokens actually drawn. Takeaway: at small τ the distribution collapses to a single spike (only the tallest peak's solution survives), while at large τ both peaks stand a chance of being drawn — the different solutions of a multimodal distribution are precisely what random sampling extracts.</div>
+<canvas id="cvTemp" width="900" height="280"></canvas>
+<div class="ln-controls">
+<label>temperature τ <input type="range" id="tempT" min="0" max="200" value="100"> <span class="ln-val" id="tempTV">1.00</span></label>
+<button id="tempSample">🎲 Sample 20 times</button>
+</div>
+<div class="ln-readout" id="tempOut"></div>
+</div>
+
+<div class="admonition tip">
+<p class="admonition-title">The intuition</p>
+<p>τ→0: the distribution becomes a needle (only the tallest peak is taken, the other solution is discarded). Large τ: the distribution flattens and both peaks stand a chance of being drawn → left this time, right the next. <strong>The "solutions" of a multimodal problem are pulled out by random sampling from the multimodal distribution that was preserved.</strong></p>
+</div>
+<hr />
+<div class="ln-eyebrow">System 04 · attention masking</div>
+
+<h2 id="13-attention-masking-bidirectional-prefix-vs-causal-action">13. Attention masking: bidirectional prefix vs causal action<a class="headerlink" href="#13-attention-masking-bidirectional-prefix-vs-causal-action" title="Permanent link">&para;</a></h2>
+<p>Within the sequence, the prompt/state (prefix) and the action (postfix) play different roles and get different attention masks (<code>ar_mask</code>):</p>
+<ul>
+<li><strong>Prefix = bidirectional attention (like an encoder)</strong>: the prompt + state are known conditions and can all see each other (BERT style), letting the model fully absorb the task context.</li>
+<li><strong>Postfix = causal attention (like a decoder)</strong>: an action token may only see what lies to its <strong>left</strong> (GPT style), which guarantees no peeking at the future during autoregressive generation.</li>
+</ul>
+<p>This "bidirectional prefix + causal postfix" mixed mask is the <strong>prefix-LM</strong> structure, used by both PaliGemma<sup><a href="#refs">[6]</a></sup> and π₀-FAST<sup><a href="#refs">[1]</a></sup>.</p>
+<hr />
+<div class="ln-eyebrow">Contrast 01 · flow matching</div>
+
+<h2 id="14-a-contrast-the-other-route-flow-matching-0">14. A contrast: the other route, flow matching (π₀)<a class="headerlink" href="#14-a-contrast-the-other-route-flow-matching-0" title="Permanent link">&para;</a></h2>
+<p>To place the discrete route on a map, let us glance at the continuous one. π₀<sup><a href="#refs">[2]</a></sup> <strong>does not tokenize</strong>; it uses <strong>flow matching</strong><sup><a href="#refs">[12]</a></sup> (of the diffusion family) to generate continuous actions directly: starting from Gaussian noise, it integrates along a learned "velocity field", gradually "flowing" the noise into an action.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>π₀-FAST (this note's main thread)</th>
+<th>π₀ (flow matching)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action representation</td>
+<td>discrete tokens</td>
+<td>continuous vectors</td>
+</tr>
+<tr>
+<td>modelling</td>
+<td>autoregression + cross-entropy</td>
+<td>velocity field + integration</td>
+</tr>
+<tr>
+<td>source of multimodality</td>
+<td>multimodal categorical + sampling</td>
+<td>stochastic integration paths from noise</td>
+</tr>
+<tr>
+<td>reuses the LLM</td>
+<td>✅ vocabulary/Transformer reused directly</td>
+<td>needs a dedicated flow head</td>
+</tr>
+<tr>
+<td>inference</td>
+<td>token by token (speed depends on token count)</td>
+<td>a few integration steps</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">One problem, two answers</p>
+<p>Both routes are solving the multimodality puzzle of "one observation admits several reasonable actions". FAST answers with "discretize + classify", π₀ with "continuous stochastic generation". Once you understand why the discrete route needs tokenization (mode averaging + LLM reuse), you understand the central tension of this field.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Contrast 02 · reconstruction</div>
+
+<h2 id="15-reconstruction-quality-of-the-three-tokenizers-compared">15. Reconstruction quality of the three tokenizers compared<a class="headerlink" href="#15-reconstruction-quality-of-the-three-tokenizers-compared" title="Permanent link">&para;</a></h2>
+<p>"Continuous → token → continuous" is necessarily lossy (because of the quantization rounding). The three tokenizers strike different balances between <strong>reconstruction error</strong> and <strong>token count</strong>. First a measured comparison, then a chance to turn the knobs yourself.</p>
+<div class="admonition warning">
+<p class="admonition-title">A point of fact to clear up</p>
+<p>In practice <strong>usually only FAST actually encodes actions into tokens</strong>; Binning / FSQ serve more as <strong>inference baselines</strong> (responsible only for decoding existing tokens back into actions). The "encode-decode round trip comparison" below is a conceptual measurement made <strong>according to each algorithm's mathematical definition</strong>, meant to convey the precision/compression trade-offs among the three.</p>
+</div>
+<div class="ln-demo">
+<div class="ln-demo-title">Figure 8 · FAST vs Binning vs FSQ reconstruction round-trip comparison (interactive demo)</div>
+<div class="ln-demo-hint">The same stretch of action (with adjustable smoothness/noise), encoded and then decoded by each of the three methods. The top plot overlays the three reconstructed curves (colour-coded by method, matching the bar colours below); the bottom plot compares "reconstruction MSE" and "token count" as bars. FSQ is <b>illustrative</b> (there is no trained checkpoint, so its behaviour is approximated by "fixed token count + grid quantization"). Takeaway: the smoother the signal, the lower the reconstruction error FAST achieves with fewer tokens; Binning's error does not improve with smoothness and it uses the most tokens — whether temporal correlation is exploited is the decisive difference among the three.</div>
+<canvas id="cvCmp" width="900" height="250"></canvas>
+<canvas id="cvCmpBar" width="900" height="190" style="margin-top:14px"></canvas>
+<div class="ln-controls">
+<label>Signal smoothness <input type="range" id="cmpSmooth" min="1" max="12" value="2"> <span class="ln-val" id="cmpSmoothV">2</span></label>
+<label><input type="checkbox" id="cmpNoise"> Add noise</label>
+<label>FAST scale <input type="range" id="cmpScale" min="2" max="40" value="12"> <span class="ln-val" id="cmpScaleV">12</span></label>
+<label>FSQ token count <input type="range" id="cmpFsqN" min="4" max="24" value="12"> <span class="ln-val" id="cmpFsqNV">12</span></label>
+</div>
+<div class="ln-readout" id="cmpOut"></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>FAST</th>
+<th>FSQ</th>
+<th>Binning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source of reconstruction error</td>
+<td>rounding of DCT coefficients</td>
+<td>FSQ grid quantization + neural reconstruction error</td>
+<td>independent 256-bucket rounding per scalar</td>
+</tr>
+<tr>
+<td>error improves with smoothness</td>
+<td>✅ smoother is more accurate (DCT exploits temporal correlation)</td>
+<td>✅ the encoder can learn temporal structure</td>
+<td>❌ independent of smoothness, a fixed quantization floor</td>
+</tr>
+<tr>
+<td>token count</td>
+<td>few and <strong>variable</strong> (compressed, ≪ T×D)</td>
+<td>medium and <strong>fixed</strong> (=num_tokens)</td>
+<td>many and fixed (=T×D, one per scalar)</td>
+</tr>
+<tr>
+<td>precision at an equal token budget</td>
+<td>high (for smooth signals)</td>
+<td>high (if well trained)</td>
+<td>low (wasted on high frequencies)</td>
+</tr>
+<tr>
+<td>training required</td>
+<td>only the BPE vocabulary / quantiles (statistical fit)</td>
+<td>✅ needs a trained neural checkpoint</td>
+<td>❌ zero training</td>
+</tr>
+</tbody>
+</table>
+<div class="ln-lesson">
+<p><strong>How to read this table</strong>: the core trade-off is <strong>"token count ↔ precision ↔ whether temporal structure is exploited"</strong>. Binning is the most naive: one token per scalar, constant error but the most tokens, and no notion of temporal correlation. FAST uses DCT to turn temporal correlation into low-frequency sparsity, <strong>buying higher precision with fewer tokens</strong> (provided the action is smooth). FSQ uses a neural network to learn a compact latent space, with a fixed and controllable token count, but it has to be trained first.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">System 05 · full model</div>
+
+<h2 id="16-the-full-0-fast-model-base-model-inputs-outputs">16. The full π₀-FAST model: base model / inputs / outputs<a class="headerlink" href="#16-the-full-0-fast-model-base-model-inputs-outputs" title="Permanent link">&para;</a></h2>
+<p>Once the tokenizer has turned actions into tokens, who consumes those tokens? This section lays out the π₀-FAST model skeleton.</p>
+<h3 id="161-the-base-model-paligemma-a-gemma-2b-decoder-siglip-vision">16.1 The base model: PaliGemma (a Gemma-2B decoder + SigLIP vision)<a class="headerlink" href="#161-the-base-model-paligemma-a-gemma-2b-decoder-siglip-vision" title="Permanent link">&para;</a></h3>
+<p>The backbone of π₀-FAST is <strong>PaliGemma</strong><sup><a href="#refs">[6]</a></sup> — a vision-language model (VLM) made of two parts:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>What it is</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vision encoder</td>
+<td><strong>SigLIP So400m/14</strong> (ViT)<sup><a href="#refs">[13]</a></sup></td>
+<td>patch=14, 224×224 → 16×16 = <strong>256 image tokens per image</strong></td>
+</tr>
+<tr>
+<td>language model (LLM)</td>
+<td><strong>Gemma-2B, decoder-only</strong></td>
+<td>width=2048, depth=18, heads=8, vocab=<strong>257,152</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Is it decoder-only? — yes, but with a prefix-LM mask</p>
+<p>Gemma itself is a <strong>decoder-only</strong> language model. But π₀-FAST uses <strong>attention masking</strong> to turn it into a <strong>prefix-LM</strong>: the prefix of image + prompt + state attends <strong>bidirectionally</strong>, while the action postfix attends <strong>causally</strong>. So both statements — "decoder-only architecture" and "prefix-LM mask" — are correct. For the masking details and an interactive comparison, see <a href="../../ml/autoregressive-models/#2">Autoregressive models · attention masking</a>.</p>
+</div>
+<h3 id="162-inputs-and-the-multimodal-embedding-order">16.2 Inputs and the multimodal embedding order<a class="headerlink" href="#162-inputs-and-the-multimodal-embedding-order" title="Permanent link">&para;</a></h3>
+<p>The model input contains: images from several cameras, their respective masks, the proprioceptive state, and the tokenized text prompt. They are concatenated into <strong>one token sequence</strong>, in this order:</p>
+<div class="ln-fig">
+<svg viewBox="0 0 860 230" role="img" aria-label="π0-FAST input sequence structure">
+  <text x="10" y="20" fill="#6B675F" font-size="13">Input token sequence (concatenated along the sequence axis): left→right</text>
+  <rect x="10" y="36" width="150" height="56" rx="8" fill="rgba(63,185,80,.13)" stroke="#3fb950"/>
+  <text x="85" y="60" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="700">① image tokens</text>
+  <text x="85" y="78" text-anchor="middle" fill="#6B675F" font-size="10">base_0 / base_1 / wrist_0</text>
+  <rect x="166" y="36" width="330" height="56" rx="8" fill="rgba(63,185,80,.13)" stroke="#3fb950"/>
+  <text x="331" y="58" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="700">② text prefix</text>
+  <text x="331" y="76" text-anchor="middle" fill="#6B675F" font-size="10">"Task: …, State: ⟨discretized state⟩;\nAction: "</text>
+  <rect x="502" y="36" width="250" height="56" rx="8" fill="rgba(88,166,255,.13)" stroke="#58a6ff"/>
+  <text x="627" y="58" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="700">③ action tokens + "|"</text>
+  <text x="627" y="76" text-anchor="middle" fill="#6B675F" font-size="10">FAST discrete tokens (to be predicted)</text>
+  <line x1="10" y1="104" x2="496" y2="104" stroke="#3fb950" stroke-width="2"/>
+  <text x="253" y="122" text-anchor="middle" fill="#3fb950" font-size="12">prefix · bidirectional attention · no loss</text>
+  <line x1="502" y1="104" x2="752" y2="104" stroke="#58a6ff" stroke-width="2"/>
+  <text x="627" y="122" text-anchor="middle" fill="#58a6ff" font-size="12">suffix · causal · loss computed</text>
+  <text x="10" y="158" fill="#6B675F" font-size="12">embedding source:</text>
+  <text x="85" y="178" text-anchor="middle" fill="#bc8cff" font-size="11">SigLIP vision encoder</text>
+  <text x="430" y="178" text-anchor="middle" fill="#bc8cff" font-size="11">Gemma vocabulary embedding (text + action share one table)</text>
+  <text x="10" y="208" fill="#6B675F" font-size="11">Note: the state is not a separate vector; it is discretized into 256 buckets and written into the text prompt (as a string).</text>
+</svg>
+<div class="ln-fig-cap">Figure 9 · The π₀-FAST input sequence structure: images first, then the text prefix, then the action. Green blocks = prefix (image tokens + text prompt/state, bidirectional attention, no loss), blue blocks = postfix (action tokens + "|", causal attention, loss computed); purple annotations mark where each segment's embedding comes from. Takeaway: prefix bidirectional, postfix causal, with text and action sharing one Gemma vocabulary embedding table.</div>
+</div>
+
+<ul>
+<li><strong>Images first, text second</strong>: each image is passed through SigLIP to obtain a run of image tokens, and <strong>then</strong> the embeddings of the tokenized text prompt are appended.</li>
+<li><strong>The state lives in the text</strong>: the proprioceptive state is discretized into 256 buckets, turned into a string and spliced into <code>"State: …;"</code>, so it travels through the <strong>text embedding</strong> rather than a separate channel.</li>
+<li><strong>Images share the same Transformer with text/action</strong>, but image tokens attend to each other bidirectionally.</li>
+</ul>
+<h3 id="163-output-one-token-predicted-per-step-autoregressively-until-the-end">16.3 Output: one token predicted per step, autoregressively until the end<a class="headerlink" href="#163-output-one-token-predicted-per-step-autoregressively-until-the-end" title="Permanent link">&para;</a></h3>
+<p>The model's output is a <strong>probability distribution over the vocabulary (257,152 classes)</strong>, i.e. "who the next token is". Generation is <strong>autoregressive, token by token</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>while EOS not reached and steps &lt; limit(256):
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    token = sample from last_logit          # each step produces exactly [1] token (argmax or temperature sampling)
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    embed the token back in, predict the next  # append to the input and continue
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>stop on EOS or when the limit is reached
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">One at a time or several?</p>
+<p><strong>One action token per prediction</strong> (one per step). The <strong>total number</strong> of action tokens is <strong>variable</strong> (after FAST compression it is usually far fewer than T×D), terminated by hitting <code>"|"</code> / EOS. Training is different: it is <strong>a single forward pass with teacher forcing</strong> — the whole sequence predicts the next token at every position in parallel, and cross-entropy is computed only over the action segment.</p>
+</div>
+<h3 id="164-is-the-decoded-result-t-d-yes">16.4 Is the decoded result (T, D)? — yes<a class="headerlink" href="#164-is-the-decoded-result-t-d-yes" title="Permanent link">&para;</a></h3>
+<p>The generated run of variable-length action tokens is restored: take the tokens between <code>"Action: "</code> and <code>"|"</code> → map them back into the FAST token space → decode with <code>time_horizon=T, action_dim=D</code> and reshape into <strong><code>(T, D)</code></strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Closing the loop</p>
+<p>However many tokens sit in the middle, the decoder uses <code>time_horizon</code> / <code>action_dim</code> to force a reshape back to <code>(T, D)</code>, matching exactly the <strong>input</strong> shape of the tokenizer in §1 — and the whole "continuous (T,D) → token → continuous (T,D)" loop closes.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Quick reference · glossary</div>
+
+<h2 id="glossary-quick-reference">Glossary (quick reference)<a class="headerlink" href="#glossary-quick-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>action chunk / horizon (T)</td>
+<td>the number of future action steps predicted at once</td>
+</tr>
+<tr>
+<td>action_dim (D)</td>
+<td>the degrees of freedom of each action step</td>
+</tr>
+<tr>
+<td>tokenization</td>
+<td>continuous/text → integer IDs from a finite vocabulary</td>
+</tr>
+<tr>
+<td>DCT / IDCT</td>
+<td>discrete cosine (inverse) transform, time↔frequency, invertible, direct</td>
+</tr>
+<tr>
+<td>quantization</td>
+<td>mapping continuous values onto finite grid points (rounding), the only lossy step</td>
+</tr>
+<tr>
+<td>BPE</td>
+<td>byte pair encoding, lossless compression by merging frequent pairs</td>
+</tr>
+<tr>
+<td>codebook / codeword</td>
+<td>the "dictionary" of a discrete representation and its entries</td>
+</tr>
+<tr>
+<td>VQ-VAE</td>
+<td>a discrete autoencoder with a learnable codebook</td>
+</tr>
+<tr>
+<td>FSQ</td>
+<td>finite scalar quantization, a fixed grid in place of a learnable codebook</td>
+</tr>
+<tr>
+<td>straight-through estimator</td>
+<td>the gradient trick of discrete forward, identity backward</td>
+</tr>
+<tr>
+<td>mode averaging</td>
+<td>regression averaging several correct solutions into a wrong one</td>
+</tr>
+<tr>
+<td>categorical distribution</td>
+<td>a probability distribution over discrete classes, can be multimodal</td>
+</tr>
+<tr>
+<td>cross-entropy</td>
+<td>the negative log-likelihood loss of classification</td>
+</tr>
+<tr>
+<td>temperature τ</td>
+<td>the sampling temperature, tuning the sharpness/diversity of a distribution</td>
+</tr>
+<tr>
+<td>ar_mask</td>
+<td>the mask separating bidirectional (prefix) from causal (action) attention</td>
+</tr>
+<tr>
+<td>prefix-LM</td>
+<td>a mixed Transformer with a bidirectional prefix and a causal suffix</td>
+</tr>
+<tr>
+<td>flow matching</td>
+<td>the continuous action generation route (π₀), of the diffusion family</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="/paper-snapshots/fast-tokenization/">FAST Tokenization paper snapshot</a> — a close reading of the original FAST paper on paper-snapshots</li>
+<li><a href="../../math/fourier-dct/">The Fourier transform and DCT</a> — §4's DCT in full: energy compaction, why it is near-optimal (KLT), and the shared recipe running from JPEG to FAST</li>
+<li><a href="../../ml/autoregressive-models/">Autoregressive models · BERT / GPT</a> — the expansion of §11/§13: the three paradigms, BERT bidirectional vs GPT causal, and why VLAs choose prefix-LM</li>
+</ul>
+<hr />
+<h2 id="refs">References<a class="headerlink" href="#refs" title="Permanent link">&para;</a></h2>
+<ol>
+<li>K. Pertsch, K. Stachowicz, B. Ichter, D. Driess, S. Nair, Q. Vuong, O. Mees, C. Finn, S. Levine. <em>FAST: Efficient Action Tokenization for Vision-Language-Action Models</em>. arXiv:2501.09747, 2025.</li>
+<li>K. Black et al. <em>π₀: A Vision-Language-Action Flow Model for General Robot Control</em>. RSS 2025. arXiv:2410.24164.</li>
+<li>R. Sennrich, B. Haddow, A. Birch. <em>Neural Machine Translation of Rare Words with Subword Units</em>. ACL 2016. arXiv:1508.07909.</li>
+<li>N. Ahmed, T. Natarajan, K. R. Rao. <em>Discrete Cosine Transform</em>. IEEE Transactions on Computers, 1974.</li>
+<li>A. Gersho, R. M. Gray. <em>Vector Quantization and Signal Compression</em>. Kluwer Academic Publishers, 1992.</li>
+<li>L. Beyer et al. <em>PaliGemma: A versatile 3B VLM for transfer</em>. arXiv:2407.07726, 2024.</li>
+<li>A. van den Oord, O. Vinyals, K. Kavukcuoglu. <em>Neural Discrete Representation Learning</em>. NeurIPS 2017. arXiv:1711.00937.</li>
+<li>Y. Bengio, N. Léonard, A. Courville. <em>Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation</em>. arXiv:1308.3432, 2013.</li>
+<li>F. Mentzer, D. Minnen, E. Agustsson, M. Tschannen. <em>Finite Scalar Quantization: VQ-VAE Made Simple</em>. ICLR 2024. arXiv:2309.15505.</li>
+<li>A. Brohan et al. <em>RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control</em>. arXiv:2307.15818, 2023.</li>
+<li>M. J. Kim et al. <em>OpenVLA: An Open-Source Vision-Language-Action Model</em>. arXiv:2406.09246, 2024.</li>
+<li>Y. Lipman, R. T. Q. Chen, H. Ben-Hamu, M. Nickel, M. Le. <em>Flow Matching for Generative Modeling</em>. ICLR 2023. arXiv:2210.02747.</li>
+<li>X. Zhai, B. Mustafa, A. Kolesnikov, L. Beyer. <em>Sigmoid Loss for Language Image Pre-Training</em>. ICCV 2023. arXiv:2303.15343.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: 机器人">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                机器人
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../math/" class="md-footer__link md-footer__link--next" aria-label="Next: 数学">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                数学
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="/paper-snapshots/" target="_blank" rel="noopener" title="Paper Notes — 论文海报合集" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M64 480c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v213.5c0 17-6.7 33.3-18.7 45.3L322.7 461.3c-12 12-28.3 18.7-45.3 18.7zm325.5-176H296c-13.3 0-24 10.7-24 24v93.5z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/YufengJin" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/vendor/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../../javascripts/fourier-dct.js"></script>
+      
+        <script src="../../../javascripts/fm-solvers.js"></script>
+      
+    
+  </body>
+</html>

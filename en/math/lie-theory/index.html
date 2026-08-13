@@ -1,0 +1,997 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — math / machine learning / robotics / reading">
+      
+      
+        <meta name="author" content="Yufeng Jin">
+      
+      
+        <link rel="canonical" href="https://yufengjin.github.io/learning-notes/en/math/lie-theory/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../fourier-dct/">
+      
+      
+        
+          <link rel="alternate" href="../../../math/lie-theory/" hreflang="zh">
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Lie Theory: An Intuitive Introduction for Optimization and Robotics - Yufeng's Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lie-theory-an-intuitive-introduction-for-optimization-and-robotics" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../" title="Yufeng&#39;s Learning Notes" class="md-header__button md-logo" aria-label="Yufeng's Learning Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yufeng's Learning Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lie Theory: An Intuitive Introduction for Optimization and Robotics
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../math/lie-theory/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/YufengJin/learning-notes" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YufengJin/learning-notes
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../ml/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Machine Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../robotics/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Robotics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mathematics
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+  
+    
+    
+    
+    
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          
+            
+            
+              
+              
+              <a class="ln-back" href="../">
+                <span class="ln-back__arrow">←</span>
+                
+                  <span>Back to Mathematics</span>
+                
+              </a>
+            
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-recap-optimization-in-euclidean-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Recap: optimization in Euclidean space
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-dilemma-optimizing-over-a-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The dilemma: optimizing over a rotation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-manifolds-and-lie-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Manifolds and Lie groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-lie-algebra-and-tangent-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Lie algebra and tangent space
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-hat-and-vee-mathbbrn-as-a-proxy-tangent-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. hat and vee: \(\mathbb{R}^n\) as a proxy tangent space
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-exp-and-log-connecting-the-curved-and-the-flat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. exp and log: connecting the curved and the flat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. exp and log: connecting the curved and the flat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-so2-transparent-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 \(SO(2)\): transparent at a glance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-so3-the-rodrigues-formula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 \(SO(3)\): the Rodrigues formula
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-putting-it-together-one-optimization-step-on-a-manifold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Putting it together: one optimization step on a manifold
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-code-sample-hand-writing-hat-vee-exp-log-for-so3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Code sample: hand-writing hat / vee / exp / log for \(SO(3)\)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-why-all-this-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Why all this matters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+  
+
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../" class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Mathematics
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lie-theory-an-intuitive-introduction-for-optimization-and-robotics">Lie Theory: An Intuitive Introduction for Optimization and Robotics<a class="headerlink" href="#lie-theory-an-intuitive-introduction-for-optimization-and-robotics" title="Permanent link">&para;</a></h1>
+<div class="ln-byline">2026-08-06 · about 8 min read · Yufeng Jin</div>
+
+<p class="ln-lead">Lie theory is the common language for carrying optimization over "curved spaces" — rotations, poses — back into ordinary vector calculus. This note walks from manifolds and tangent spaces to hat/vee and exp/log, assembles them into one optimization step on a manifold, and closes with a hand-written <span class="arithmatex">\(SO(3)\)</span> code sample.</p>
+<div class="admonition abstract">
+<p class="admonition-title">The whole story in one sentence</p>
+<p>A <strong>Lie group</strong> is a "smoothly curved" space whose elements represent transformations (rotations, poses, and so on).
+The trouble is: <strong>you cannot add, subtract, or take gradients directly on a curved space</strong>.
+The fix is to shuttle back and forth between three spaces:</p>
+<div class="arithmatex">\[
+\underbrace{\mathcal{M}}_{\text{curved manifold}}
+\;\xrightleftharpoons[\ \exp\ ]{\ \log\ }\;
+\underbrace{\mathfrak{m}}_{\text{tangent space / Lie algebra}}
+\;\xrightleftharpoons[\ (\cdot)^\wedge\ ]{\ (\cdot)^\vee\ }\;
+\underbrace{\mathbb{R}^n}_{\text{plain vector workspace}}
+\]</div>
+<p><strong>log</strong> an element down to the flat tangent space, optimize as usual in the isomorphic <span class="arithmatex">\(\mathbb{R}^n\)</span>, then <strong>exp</strong> it back onto the manifold. This one diagram is what the whole note is about.</p>
+</div>
+<blockquote>
+<p>A study note based on Aalok Patwardhan's <a href="https://aalok.uk/projects/lietheory/"><em>A Visual Introduction to Lie Theory</em></a><sup><a href="#refs">[1]</a></sup>, with the concrete derivations and code filled in.</p>
+</blockquote>
+<hr />
+<div class="ln-eyebrow">Prerequisites</div>
+
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>The main text keeps returning to the following concepts, each written as an "English term = Chinese name = minimal definition" triple:</p>
+<ul>
+<li><strong>manifold = 流形</strong> = a smoothly curved space that looks locally like flat <span class="arithmatex">\(\mathbb{R}^n\)</span> but is globally curved.<sup><a href="#refs">[2]</a></sup></li>
+<li><strong>Lie group = 李群</strong> = an object that is both a manifold and a group whose operations (matrix multiplication and inversion) are smooth.<sup><a href="#refs">[4]</a></sup></li>
+<li><strong>tangent space = 切空间</strong> = the flat tangent plane attached to the manifold at a given point.<sup><a href="#refs">[2]</a></sup></li>
+<li><strong>Lie algebra = 李代数</strong> = the special tangent space of a Lie group at the identity element (written <span class="arithmatex">\(\mathfrak{so}(n)\)</span> for rotation groups).<sup><a href="#refs">[2]</a></sup></li>
+<li><strong>skew-symmetric matrix = 反对称矩阵</strong> = a matrix satisfying <span class="arithmatex">\(A^\top=-A\)</span>; elements of a rotation group's Lie algebra take exactly this form.<sup><a href="#refs">[2]</a></sup></li>
+<li><strong>exponential map / logarithm map = 指数映射 / 对数映射</strong> = a pair of mutually inverse maps travelling between the tangent space and the manifold; for rotations they are the matrix exponential and matrix logarithm.<sup><a href="#refs">[4]</a></sup></li>
+</ul>
+<hr />
+<div class="ln-eyebrow">Problem 01 · starting point</div>
+
+<h2 id="1-recap-optimization-in-euclidean-space">1. Recap: optimization in Euclidean space<a class="headerlink" href="#1-recap-optimization-in-euclidean-space" title="Permanent link">&para;</a></h2>
+<p>Start with the case where everything goes smoothly. Given a cost function <span class="arithmatex">\(f:\mathbb{R}^n\to\mathbb{R}\)</span>, we want the <span class="arithmatex">\(\mathbf{x}\)</span> that minimizes it. The gradient descent recipe is:</p>
+<ol>
+<li><strong>perturb</strong>: nudge <span class="arithmatex">\(\mathbf{x}\)</span> by a tiny amount;</li>
+<li><strong>gradient</strong>: compute <span class="arithmatex">\(\nabla f(\mathbf{x})\)</span>, which points in the direction of steepest ascent;</li>
+<li><strong>step</strong>: take a small step along <span class="arithmatex">\(-\nabla f\)</span>.</li>
+</ol>
+<div class="arithmatex">\[
+\mathbf{x}_{k+1} = \mathbf{x}_k - \alpha\,\nabla f(\mathbf{x}_k)
+\]</div>
+<p>The crucial premise here is that <strong><span class="arithmatex">\(\mathbf{x}\)</span> is a free vector</strong>. Each of its components can independently absorb a small increment <span class="arithmatex">\(\delta\)</span>, and the result is still a valid input. <span class="arithmatex">\(\mathbb{R}^n\)</span> is "flat" and addition is unconstrained, so perturbing and stepping are entirely natural.</p>
+<div class="admonition question">
+<p class="admonition-title">But what if the object being optimized is not a free vector?</p>
+<p>Say it must be a <strong>rotation</strong> — a <span class="arithmatex">\(3\times3\)</span> matrix satisfying particular constraints. Then "just perturb one number" breaks down immediately.</p>
+</div>
+<hr />
+<div class="ln-eyebrow">Problem 02 · the dilemma</div>
+
+<h2 id="2-the-dilemma-optimizing-over-a-rotation">2. The dilemma: optimizing over a rotation<a class="headerlink" href="#2-the-dilemma-optimizing-over-a-rotation" title="Permanent link">&para;</a></h2>
+<p>Take 2D rotations as an example; the rotation matrix is:</p>
+<div class="arithmatex">\[
+R(\theta)=\begin{bmatrix}\cos\theta &amp; -\sin\theta\\[2pt] \sin\theta &amp; \cos\theta\end{bmatrix}
+\]</div>
+<p>It has 4 entries, but they are not free — two constraints must hold simultaneously:</p>
+<div class="arithmatex">\[
+R^\top R = I \quad(\text{orthogonal: unit orthogonal columns}),\qquad \det R = 1\quad(\text{right-handed, no reflection})
+\]</div>
+<p>Suppose we do what we would in <span class="arithmatex">\(\mathbb{R}^4\)</span> and add a small increment <span class="arithmatex">\(\delta\)</span> to the top-left <span class="arithmatex">\(\cos\theta\)</span>:</p>
+<div class="arithmatex">\[
+\begin{bmatrix}\cos\theta+\delta &amp; -\sin\theta\\ \sin\theta &amp; \cos\theta\end{bmatrix}
+\]</div>
+<div class="admonition failure">
+<p class="admonition-title">The result: it is no longer a rotation</p>
+<p>The norm of the first column becomes <span class="arithmatex">\(\sqrt{(\cos\theta+\delta)^2+\sin^2\theta}\neq 1\)</span>, so <span class="arithmatex">\(R^\top R = I\)</span> is violated and <span class="arithmatex">\(\det\)</span> is no longer 1.
+<strong>You cannot "perturb one of the numbers" and keep it a rotation.</strong> The matrix entries are tightly bound together by the constraints and cannot move independently.</p>
+</div>
+<p>This is exactly where ordinary optimization hits a wall: the valid rotations do not form a flat vector space but a <strong>curved, constrained subset</strong>. Doing calculus on it requires a different toolset.</p>
+<hr />
+<div class="ln-eyebrow">Concept 01 · curved spaces</div>
+
+<h2 id="3-manifolds-and-lie-groups">3. Manifolds and Lie groups<a class="headerlink" href="#3-manifolds-and-lie-groups" title="Permanent link">&para;</a></h2>
+<p>The set of all valid 2D rotations is called the <strong>special orthogonal group</strong> <span class="arithmatex">\(SO(2)\)</span>; the 3D version is <span class="arithmatex">\(SO(3)\)</span>:</p>
+<div class="arithmatex">\[
+SO(n)=\{\,R\in\mathbb{R}^{n\times n}\ \mid\ R^\top R=I,\ \det R = 1\,\}
+\]</div>
+<p>They are <strong>manifolds</strong>: smoothly curved spaces that <strong>locally</strong> look like flat <span class="arithmatex">\(\mathbb{R}^n\)</span> (much as a patch of the Earth's surface is well approximated by a flat map) but are <strong>globally</strong> curved. An object that is both a manifold and a group with smooth operations (matrix multiplication and inversion) is a <strong>Lie group</strong><sup><a href="#refs">[4]</a></sup>.</p>
+<div class="admonition info">
+<p class="admonition-title">Dimension vs. degrees of freedom: why a <span class="arithmatex">\(3\times3\)</span> rotation has only 3 degrees of freedom</p>
+<p>A matrix in <span class="arithmatex">\(SO(3)\)</span> has 9 entries, but <span class="arithmatex">\(R^\top R=I\)</span> is a symmetric matrix equation, yielding <span class="arithmatex">\(\tfrac{3\cdot 4}{2}=6\)</span> independent constraints.
+<span class="arithmatex">\(9-6=3\)</span> ⟹ <strong><span class="arithmatex">\(SO(3)\)</span> is a 3-dimensional manifold</strong>, matching exactly the 3 degrees of freedom of "rotate by some angle about some axis".
+Likewise <span class="arithmatex">\(SO(2)\)</span> is 1-dimensional (just the one angle <span class="arithmatex">\(\theta\)</span>). This "intrinsic dimension" is precisely the number of parameters we actually want to optimize.</p>
+</div>
+<figure>
+  <img alt="The three spaces: manifold, tangent space, R^n" src="../../../math/img/lie-three-spaces.svg" width="100%" />
+<br />
+<figcaption>Figure 1. A point $X$ on a Lie group; its tangent space is a "plane" attached at that point, and that plane is in turn isomorphic to $\mathbb{R}^n$. All the optimization happens on the far right.</figcaption>
+</figure>
+<hr />
+<div class="ln-eyebrow">Concept 02 · tangent space</div>
+
+<h2 id="4-lie-algebra-and-tangent-space">4. Lie algebra and tangent space<a class="headerlink" href="#4-lie-algebra-and-tangent-space" title="Permanent link">&para;</a></h2>
+<p>At a point <span class="arithmatex">\(X\)</span> on the manifold, one can attach a flat tangent plane called the <strong>tangent space</strong>. The special tangent space at the <strong>identity element</strong> <span class="arithmatex">\(I\)</span> is the <strong>Lie algebra</strong> of the Lie group, written <span class="arithmatex">\(\mathfrak{so}(n)\)</span><sup><a href="#refs">[2]</a></sup>.</p>
+<p>For rotations, the elements of the Lie algebra turn out to be exactly the <strong>skew-symmetric matrices</strong> (反对称矩阵, <span class="arithmatex">\(A^\top=-A\)</span>):</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="arithmatex">\(\mathfrak{so}(2)\)</span></label><label for="__tabbed_1_2"><span class="arithmatex">\(\mathfrak{so}(3)\)</span></label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Only one free parameter:</p>
+<div class="arithmatex">\[
+\boldsymbol{\theta}^\wedge=\begin{bmatrix}0 &amp; -\theta\\ \theta &amp; 0\end{bmatrix}=\theta\underbrace{\begin{bmatrix}0&amp;-1\\1&amp;0\end{bmatrix}}_{G}
+\]</div>
+</div>
+<div class="tabbed-block">
+<p>Three free parameters <span class="arithmatex">\(\boldsymbol{\omega}=(\omega_1,\omega_2,\omega_3)\)</span>:</p>
+<div class="arithmatex">\[
+\boldsymbol{\omega}^\wedge=\begin{bmatrix}0 &amp; -\omega_3 &amp; \omega_2\\ \omega_3 &amp; 0 &amp; -\omega_1\\ -\omega_2 &amp; \omega_1 &amp; 0\end{bmatrix}
+\]</div>
+<p>It doubles as the cross-product operator: <span class="arithmatex">\(\boldsymbol{\omega}^\wedge\mathbf{v}=\boldsymbol{\omega}\times\mathbf{v}\)</span>.</p>
+</div>
+</div>
+</div>
+<p>Note that the number of independent components of a skew-symmetric matrix (1 for <span class="arithmatex">\(SO(2)\)</span>, 3 for <span class="arithmatex">\(SO(3)\)</span>) <strong>is exactly the intrinsic dimension of the manifold</strong>. This is no accident — the dimension of the tangent space is the number of degrees of freedom. That hands us a <strong>flat, unconstrained</strong> space in which to do the math.</p>
+<hr />
+<div class="ln-eyebrow">Concept 03 · proxy coordinates</div>
+
+<h2 id="5-hat-and-vee-mathbbrn-as-a-proxy-tangent-space">5. hat and vee: <span class="arithmatex">\(\mathbb{R}^n\)</span> as a proxy tangent space<a class="headerlink" href="#5-hat-and-vee-mathbbrn-as-a-proxy-tangent-space" title="Permanent link">&para;</a></h2>
+<p>The tangent space (those skew-symmetric matrices) is flat, but written as matrices it is still awkward to feed straight into an optimizer. Fortunately it is <strong>isomorphic</strong> to the ordinary vector space <span class="arithmatex">\(\mathbb{R}^n\)</span> — two mutually inverse operators ferry elements between them:</p>
+<ul>
+<li><strong>hat</strong> <span class="arithmatex">\((\cdot)^\wedge:\ \mathbb{R}^n\to\mathfrak{so}(n)\)</span>: lifts a workspace vector into the Lie algebra;</li>
+<li><strong>vee</strong> <span class="arithmatex">\((\cdot)^\vee:\ \mathfrak{so}(n)\to\mathbb{R}^n\)</span>: flattens a Lie algebra element back into a workspace vector.</li>
+</ul>
+<div class="arithmatex">\[
+\boldsymbol{\omega}\in\mathbb{R}^3
+\ \xrightarrow{\ (\cdot)^\wedge\ }\
+\boldsymbol{\omega}^\wedge\in\mathfrak{so}(3)
+\ \xrightarrow{\ (\cdot)^\vee\ }\
+\boldsymbol{\omega}\in\mathbb{R}^3,\qquad
+\big((\boldsymbol{\omega}^\wedge)\big)^\vee=\boldsymbol{\omega}
+\]</div>
+<p>So the object we actually hand to gradient descent is that plain 3-dimensional vector <span class="arithmatex">\(\boldsymbol{\omega}\)</span> — it carries no constraints and can be perturbed however we like.</p>
+<hr />
+<div class="ln-eyebrow">Concept 04 · curved to flat</div>
+
+<h2 id="6-exp-and-log-connecting-the-curved-and-the-flat">6. exp and log: connecting the curved and the flat<a class="headerlink" href="#6-exp-and-log-connecting-the-curved-and-the-flat" title="Permanent link">&para;</a></h2>
+<p>The last piece of the puzzle is the bridge that travels between the manifold and the tangent space:</p>
+<ul>
+<li><strong>exponential map</strong> <span class="arithmatex">\(\exp:\ \mathfrak{m}\to\mathcal{M}\)</span>: "wraps" an element of the tangent space back onto the curved manifold;</li>
+<li><strong>logarithm map</strong> <span class="arithmatex">\(\log:\ \mathcal{M}\to\mathfrak{m}\)</span>: conversely, "unrolls" an element of the manifold onto the tangent space.</li>
+</ul>
+<div class="arithmatex">\[
+X=\exp(\boldsymbol{\tau}^\wedge),\qquad \boldsymbol{\tau}^\wedge=\log(X)
+\]</div>
+<p>For rotations, <span class="arithmatex">\(\exp/\log\)</span> here are just the <strong>matrix exponential and matrix logarithm</strong>.</p>
+<h3 id="61-so2-transparent-at-a-glance">6.1 <span class="arithmatex">\(SO(2)\)</span>: transparent at a glance<a class="headerlink" href="#61-so2-transparent-at-a-glance" title="Permanent link">&para;</a></h3>
+<p>Substituting <span class="arithmatex">\(\theta^\wedge=\theta G\)</span> into the matrix exponential series and using <span class="arithmatex">\(G^2=-I\)</span>, the terms assemble themselves into <span class="arithmatex">\(\sin/\cos\)</span>:</p>
+<div class="arithmatex">\[
+\exp(\theta G)=I+\theta G+\tfrac{\theta^2}{2!}G^2+\cdots
+=\cos\theta\,I+\sin\theta\,G
+=\begin{bmatrix}\cos\theta &amp; -\sin\theta\\ \sin\theta &amp; \cos\theta\end{bmatrix}=R(\theta)
+\]</div>
+<p>Conversely <span class="arithmatex">\(\log R(\theta)=\theta G\)</span>, i.e. <span class="arithmatex">\(\theta=\operatorname{atan2}(R_{21},R_{11})\)</span>. <strong>The number <span class="arithmatex">\(\theta\)</span> living in the tangent space is the rotation angle itself.</strong></p>
+<h3 id="62-so3-the-rodrigues-formula">6.2 <span class="arithmatex">\(SO(3)\)</span>: the Rodrigues formula<a class="headerlink" href="#62-so3-the-rodrigues-formula" title="Permanent link">&para;</a></h3>
+<p>Let <span class="arithmatex">\(\boldsymbol{\omega}=\theta\,\hat{\mathbf{u}}\)</span>, where <span class="arithmatex">\(\theta=\|\boldsymbol{\omega}\|\)</span> is the rotation angle and <span class="arithmatex">\(\hat{\mathbf{u}}\)</span> is the unit rotation axis. Using the <span class="arithmatex">\(\mathfrak{so}(3)\)</span> identity <span class="arithmatex">\((\boldsymbol{\omega}^\wedge)^3=-\theta^2\,\boldsymbol{\omega}^\wedge\)</span> to collapse the series gives <strong>Rodrigues' rotation formula</strong><sup><a href="#refs">[2]</a></sup><sup><a href="#refs">[3]</a></sup>:</p>
+<div class="arithmatex">\[
+R=\exp(\boldsymbol{\omega}^\wedge)=I+\frac{\sin\theta}{\theta}\,\boldsymbol{\omega}^\wedge+\frac{1-\cos\theta}{\theta^2}\,(\boldsymbol{\omega}^\wedge)^2
+\]</div>
+<p>The inverse (log map):</p>
+<div class="arithmatex">\[
+\theta=\arccos\!\Big(\frac{\operatorname{tr}(R)-1}{2}\Big),\qquad
+\boldsymbol{\omega}^\wedge=\log(R)=\frac{\theta}{2\sin\theta}\,\big(R-R^\top\big)
+\]</div>
+<div class="admonition warning">
+<p class="admonition-title">Numerical stability: two singularities to watch</p>
+<ul>
+<li><strong><span class="arithmatex">\(\theta\to 0\)</span></strong>: both <span class="arithmatex">\(\tfrac{\sin\theta}{\theta}\)</span> and <span class="arithmatex">\(\tfrac{\theta}{2\sin\theta}\)</span> are <span class="arithmatex">\(0/0\)</span>. Fall back on Taylor expansions: <span class="arithmatex">\(\tfrac{\sin\theta}{\theta}\approx 1-\tfrac{\theta^2}{6}\)</span>, <span class="arithmatex">\(\tfrac{1-\cos\theta}{\theta^2}\approx \tfrac12-\tfrac{\theta^2}{24}\)</span>.</li>
+<li><strong><span class="arithmatex">\(\theta\to\pi\)</span></strong>: <span class="arithmatex">\(\sin\theta\to 0\)</span>, the <span class="arithmatex">\(R-R^\top\)</span> in the log formula degenerates, and the axis must be recovered specially from the columns of <span class="arithmatex">\(R+I\)</span>.
+Production implementations (Sophus, manif) special-case both spots; don't forget them if you roll your own.</li>
+</ul>
+</div>
+<hr />
+<div class="ln-eyebrow">Application 01 · one step</div>
+
+<h2 id="7-putting-it-together-one-optimization-step-on-a-manifold">7. Putting it together: one optimization step on a manifold<a class="headerlink" href="#7-putting-it-together-one-optimization-step-on-a-manifold" title="Permanent link">&para;</a></h2>
+<p>Now chain the three spaces into a closed loop. Let the cost function <span class="arithmatex">\(f(X)\)</span> be defined on the manifold (<span class="arithmatex">\(X\in SO(3)\)</span>). The key trick is to use a <strong>right perturbation</strong> to parameterize <span class="arithmatex">\(X\)</span> by a <strong>local, unconstrained</strong> small vector <span class="arithmatex">\(\boldsymbol{\tau}\in\mathbb{R}^3\)</span>:</p>
+<div class="arithmatex">\[
+X(\boldsymbol{\tau}) = X\,\exp(\boldsymbol{\tau}^\wedge)\;\equiv\;X\boxplus\boldsymbol{\tau}
+\]</div>
+<p>(The <span class="arithmatex">\(\boxplus\)</span> notation follows the convention of micro Lie theory<sup><a href="#refs">[2]</a></sup>.)</p>
+<p>Take the gradient of <span class="arithmatex">\(f\)</span> with respect to <span class="arithmatex">\(\boldsymbol{\tau}\)</span> at <span class="arithmatex">\(\boldsymbol{\tau}=\mathbf{0}\)</span> (this step happens entirely inside flat <span class="arithmatex">\(\mathbb{R}^3\)</span>, with the ordinary chain rule), obtain the gradient <span class="arithmatex">\(\mathbf{g}\in\mathbb{R}^3\)</span>, and then:</p>
+<div class="admonition example">
+<p class="admonition-title">One full iteration</p>
+<ol>
+<li><strong>Define the perturbation in <span class="arithmatex">\(\mathbb{R}^n\)</span></strong>: <span class="arithmatex">\(X(\boldsymbol{\tau})=X\exp(\boldsymbol{\tau}^\wedge)\)</span>, with <span class="arithmatex">\(\boldsymbol{\tau}\in\mathbb{R}^3\)</span> unconstrained;</li>
+<li><strong>Take the gradient / Jacobian</strong>: <span class="arithmatex">\(\mathbf{g}=\left.\dfrac{\partial f(X(\boldsymbol{\tau}))}{\partial \boldsymbol{\tau}}\right|_{\boldsymbol{\tau}=\mathbf{0}}\)</span> (flat space, differentiate freely);</li>
+<li><strong>Step in <span class="arithmatex">\(\mathbb{R}^n\)</span></strong>: <span class="arithmatex">\(\boldsymbol{\tau}^\star=-\alpha\,\mathbf{g}\)</span>;</li>
+<li><strong>hat + exp back onto the manifold</strong>: <span class="arithmatex">\(X\leftarrow X\exp\big((\boldsymbol{\tau}^\star)^\wedge\big)\)</span>;</li>
+<li>The resulting <span class="arithmatex">\(X\)</span> <strong>still satisfies exactly</strong> <span class="arithmatex">\(R^\top R=I,\ \det R=1\)</span> — because we "walked along the manifold" rather than "adding a number in <span class="arithmatex">\(\mathbb{R}^9\)</span> and then forcing the result back".</li>
+</ol>
+</div>
+<p>This is the diagram of the whole note, made concrete: <strong>log to flatten → optimize in <span class="arithmatex">\(\mathbb{R}^n\)</span> → exp to wrap back</strong>. The constraints are guaranteed automatically by <span class="arithmatex">\(\exp\)</span>, and all the optimizer ever sees is one free little vector.</p>
+<hr />
+<div class="ln-eyebrow">Application 02 · hands-on</div>
+
+<h2 id="8-code-sample-hand-writing-hat-vee-exp-log-for-so3">8. Code sample: hand-writing hat / vee / exp / log for <span class="arithmatex">\(SO(3)\)</span><a class="headerlink" href="#8-code-sample-hand-writing-hat-vee-exp-log-for-so3" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">NumPy implementation</label><label for="__tabbed_2_2">Self-check</label><label for="__tabbed_2_3">Off-the-shelf libraries</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-python highlight"><span class="filename">so3.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">hat</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>                      <span class="c1"># R^3 -&gt; so(3)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="n">w</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">wz</span><span class="p">,</span>  <span class="n">wy</span><span class="p">],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                     <span class="p">[</span><span class="n">wz</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">wx</span><span class="p">],</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                     <span class="p">[</span><span class="o">-</span><span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]])</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">def</span><span class="w"> </span><span class="nf">vee</span><span class="p">(</span><span class="n">W</span><span class="p">):</span>                      <span class="c1"># so(3) -&gt; R^3</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">def</span><span class="w"> </span><span class="nf">exp_so3</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>                  <span class="c1"># Rodrigues: R^3 -&gt; SO(3)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">W</span> <span class="o">=</span> <span class="n">hat</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="k">if</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">:</span>             <span class="c1"># θ→0: fall back to Taylor</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">W</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">/</span> <span class="n">theta</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span> <span class="o">/</span> <span class="n">theta</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">a</span> <span class="o">*</span> <span class="n">W</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">W</span> <span class="o">@</span> <span class="n">W</span><span class="p">)</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_so3</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>                  <span class="c1"># SO(3) -&gt; R^3</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="k">if</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">:</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="k">return</span> <span class="n">vee</span><span class="p">(</span><span class="n">R</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="k">return</span> <span class="n">theta</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span> <span class="o">*</span> <span class="n">vee</span><span class="p">(</span><span class="n">R</span> <span class="o">-</span> <span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">R</span> <span class="o">=</span> <span class="n">exp_so3</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">R</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>        <span class="c1"># still orthogonal</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>     <span class="c1"># det = 1</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">log_so3</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">w</span><span class="p">)</span>             <span class="c1"># log ∘ exp = id</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>In a real project, don't reinvent the wheel — reach for a mature implementation:</p>
+<ul>
+<li><strong><a href="https://github.com/strasdat/Sophus">Sophus</a></strong> (C++, <code>SO3</code>/<code>SE3</code>, Jacobians included)</li>
+<li><strong><a href="https://github.com/artivis/manif">manif</a></strong> (C++/Python, the reference implementation of micro Lie theory<sup><a href="#refs">[2]</a></sup>)</li>
+<li><strong><a href="https://gtsam.org/">GTSAM</a></strong> / <strong><a href="http://ceres-solver.org/">Ceres</a></strong> (wrap manifold optimization as factor graphs / a <code>Manifold</code> type)</li>
+</ul>
+</div>
+</div>
+</div>
+<hr />
+<div class="ln-eyebrow">Wrap-up · why it matters</div>
+
+<h2 id="9-why-all-this-matters">9. Why all this matters<a class="headerlink" href="#9-why-all-this-matters" title="Permanent link">&para;</a></h2>
+<p>Lie theory is the lingua franca of modern robotic <strong>state estimation</strong><sup><a href="#refs">[2]</a></sup><sup><a href="#refs">[3]</a></sup>. Almost anywhere rotations or poses have to be optimized or integrated, it is at work:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Where Lie theory enters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SLAM / bundle adjustment</strong></td>
+<td>Camera poses live in <span class="arithmatex">\(SE(3)\)</span>; Gauss–Newton runs in the tangent space</td>
+</tr>
+<tr>
+<td><strong>pose graph optimization</strong></td>
+<td>Nodes are poses, edges are relative constraints; residuals and Jacobians are computed in the Lie algebra</td>
+</tr>
+<tr>
+<td><strong>IMU preintegration</strong></td>
+<td>A gyroscope measures angular velocity; integration happens on <span class="arithmatex">\(SO(3)\)</span> rather than by Euclidean accumulation</td>
+</tr>
+<tr>
+<td><strong>state estimation / EKF</strong></td>
+<td>Uncertainty is modelled as a Gaussian in the tangent space (error-state Kalman filter)</td>
+</tr>
+</tbody>
+</table>
+<div class="ln-lesson">
+<p><strong>Remember this one thread</strong>: when facing a <strong>constrained object</strong> (a rotation, a pose, a unit quaternion, …), <strong>do not force additions and subtractions on the raw parameters</strong>.
+First <span class="arithmatex">\(\log\)</span> down to the flat tangent space, do the optimization / differentiation / modelling in the isomorphic <span class="arithmatex">\(\mathbb{R}^n\)</span>, then <span class="arithmatex">\(\exp\)</span> back onto the manifold. The constraints are kept intact by <span class="arithmatex">\(\exp\)</span>, and everything returns to familiar vector calculus.</p>
+</div>
+<hr />
+<h2 id="refs">References<a class="headerlink" href="#refs" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Aalok Patwardhan, <a href="https://aalok.uk/projects/lietheory/"><em>A Visual Introduction to Lie Theory</em></a>, aalok.uk interactive tutorial — the original source of this note.</li>
+<li>J. Solà, J. Deray, D. Atchuthan, <a href="https://arxiv.org/abs/1812.01537"><em>A micro Lie theory for state estimation in robotics</em></a>, arXiv:1812.01537 (2018) — the authoritative short treatment from an engineering perspective, with <strong>manif</strong> as its companion library.</li>
+<li>T. D. Barfoot, <em>State Estimation for Robotics</em>, Cambridge University Press (2017) — a systematic textbook; Chapter 7 covers <span class="arithmatex">\(SO(3)/SE(3)\)</span>.</li>
+<li>B. C. Hall, <em>Lie Groups, Lie Algebras, and Representations: An Elementary Introduction</em>, 2<sup>nd</sup> ed., Springer, Graduate Texts in Mathematics 222 (2015).</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: 数学">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                数学
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../fourier-dct/" class="md-footer__link md-footer__link--next" aria-label="Next: Fourier Transform &amp; DCT: From Frequency to Energy Compaction">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Fourier Transform & DCT: From Frequency to Energy Compaction
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="/paper-snapshots/" target="_blank" rel="noopener" title="Paper Notes — 论文海报合集" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M64 480c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v213.5c0 17-6.7 33.3-18.7 45.3L322.7 461.3c-12 12-28.3 18.7-45.3 18.7zm325.5-176H296c-13.3 0-24 10.7-24 24v93.5z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/YufengJin" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.tracking", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tooltips"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/vendor/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../../javascripts/action-tokenization.js"></script>
+      
+        <script src="../../../javascripts/autoregressive-models.js"></script>
+      
+        <script src="../../../javascripts/fourier-dct.js"></script>
+      
+        <script src="../../../javascripts/fm-solvers.js"></script>
+      
+    
+  </body>
+</html>
